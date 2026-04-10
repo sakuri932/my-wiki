@@ -1,0 +1,9 @@
+site_name: 我的个人博客 # 这里改成你的网站名称
+site_url: https://sakuri932.github.io/ # 稍后会提到，填入你的 GitHub Pages 地址
+
+theme:
+  name: material
+
+# 这里可以按需添加导航栏等配置
+nav:
+  - 首页: index.md
