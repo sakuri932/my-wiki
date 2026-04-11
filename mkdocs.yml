@@ -1,9 +1,97 @@
-site_name: 我的个人博客 # 这里改成你的网站名称
-site_url: https://sakuri932.github.io/ # 稍后会提到，填入你的 GitHub Pages 地址
+site_name: 老中传习录
+site_url: https://sakuri932.github.io/my-wiki/
 
+# 1. 主题与颜色、界面功能设置（必须与 nav、plugins 平级）
 theme:
   name: material
+  language: zh
+  palette:
+    # 浅色模式设置
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: red       # 喜庆的红色生效
+      accent: red
+      toggle:
+        icon: material/weather-night
+        name: 切换到深色模式
+    # 深色模式设置
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: red       # 喜庆的红色生效
+      accent: red
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到浅色模式
+  features:
+    - navigation.tabs        # 顶部横向 Tab
+    - navigation.tabs.sticky # 让顶部 Tab 滚动时始终吸顶
+    - navigation.indexes     # 允许分区拥有自己的 index 页面
+    - navigation.top         # 回到顶部按钮
+    - navigation.tracking    # 左侧目录树跟随
+    - toc.follow             # 右侧目录树跟随
+    - content.code.copy  # 在代码块右上角开启”复制”按钮
 
-# 这里可以按需添加导航栏等配置
+    - search.suggest    # 搜索建议
+    - search.highlight  # 搜索词高亮
+    - search.share      # 搜索结果分享链接
+
+
+# 2. 插件设置
+plugins:
+  - search
+  - blog:
+      archive: false
+      categories: false
+
+# 3. Markdown 扩展语法设置（把所有扩展合并到了这里）
+markdown_extensions:
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true # 允许链接到具体代码行
+  - attr_list      # 添加这一行，允许给 Markdown 元素加 CSS 样式和 HTML 属性
+
+# 4. 导航栏设置
 nav:
-  - 首页: index.md
+  - 🏠 首页：新手村:
+    - 概览: index.md
+    - ❤️ 开局神装:
+      - 开局神装/index.md
+      - LaTeX与模板使用方法: 开局神装/latex.md
+      - AI工具: 开局神装/AI工具.md
+
+    - 📚 修仙课程:
+        - 修仙课程/index.md
+        - 数学基础: 
+          - 修仙课程/数学基础/微积分.md
+          - 修仙课程/数学基础/线性代数.md
+          - 修仙课程/数学基础/凸优化.md
+        - 编程语言: 
+          - 修仙课程/编程语言/python.md
+          - 修仙课程/编程语言/数据结构.md
+        - 深度学习: 
+          - 修仙课程/深度学习/李宏毅机器学习.md
+        - 计算机架构: 
+          - 修仙课程/计算机架构/nand2tetris.md
+
+    - 🔧 满级法宝:
+      - 实用工具/index.md
+      - LaTeX公式图片生成器: 实用工具/latex2img/latex2img.md
+
+    - 🤔 不务正业:
+      - 不务正业/index.md
+      - 斗地主: 不务正业/斗地主.html
+      - 打僵尸: 不务正业/打僵尸.html
+      
+    - 📂 资源归档:
+      - 资源归档/index.md
+      - 博客建造: 资源归档/博客建造/如何撰写blog.md
+      - 原版index: 资源归档/博客建造/index.md
+      - 书单推荐: 资源归档/books.md
+
+    - ✍️ 常用经验贴:
+      - blog/index.md
+  - 🎬 视频区: video/index.md
+
+  - 📊 数据区: data/index.md
