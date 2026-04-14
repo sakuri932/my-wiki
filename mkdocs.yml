@@ -79,19 +79,23 @@ nav:
       - 实用工具/index.md
       - LaTeX公式图片生成器: 实用工具/latex2img/latex2img.md
 
+    - 📂 资源归档:
+      - 资源归档/index.md
+      - 26～27实习资讯: 资源归档/26～27实习资讯/26～27实习资讯整理.md
+      - 经典论文:
+        - 资源归档/经典论文/index.md
+        - Diffusion: 资源归档/经典论文/diffusion/index.md
+
     - 🤔 不务正业:
       - 不务正业/index.md
       - 斗地主: 不务正业/斗地主.html
       - 打僵尸: 不务正业/打僵尸.html
-      
-    - 📂 资源归档:
-      - 资源归档/index.md
-      - 博客建造: 资源归档/博客建造/如何撰写blog.md
-      - 原版index: 资源归档/博客建造/index.md
-      - 书单推荐: 资源归档/books.md
 
-    - ✍️ 常用经验贴:
-      - blog/index.md
+    - 🗂️ 杂七杂八:
+      - 杂七杂八/index.md
+      - 经验贴: blog/index.md
+      - 博客建造: 杂七杂八/如何撰写blog.md
+      - 原版index: 杂七杂八/博客建造index.md
   - 🎬 视频区: video/index.md
 
   - 📊 数据区: data/index.md

@@ -4,5 +4,5 @@
 
 ---
 
-- [LaTeX与模板使用方法](latex/index.md) — 排版利器，从入门到实用
-- [AI工具](AI工具/index.md) — 精选 AI 工具与使用技巧
+- [LaTeX与模板使用方法](latex.md) — 排版利器，从入门到实用
+- [AI工具](AI工具.md) — 精选 AI 工具与使用技巧
