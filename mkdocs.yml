@@ -50,7 +50,14 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true # 允许链接到具体代码行
-  - attr_list      # 添加这一行，允许给 Markdown 元素加 CSS 样式和 HTML 属性
+  - attr_list
+  - toc:
+      toc_depth: 2  # 右侧目录只显示到二级标题
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 # 4. 导航栏设置
 nav:
@@ -70,8 +77,9 @@ nav:
         - 编程语言: 
           - 修仙课程/编程语言/python.md
           - 修仙课程/编程语言/数据结构.md
-        - 深度学习: 
+        - 深度学习:
           - 修仙课程/深度学习/李宏毅机器学习.md
+          - "MIT 6.S184: Generative AI with SDE": 修仙课程/深度学习/MIT 6.S184.md
         - 计算机架构: 
           - 修仙课程/计算机架构/nand2tetris.md
 
@@ -79,12 +87,19 @@ nav:
       - 实用工具/index.md
       - LaTeX公式图片生成器: 实用工具/latex2img/latex2img.md
 
+    - 📜 经典论文选读:
+      - 经典论文/index.md
+      - Diffusion:
+        - 经典论文/diffusion/index.md
+        - Latent Diffusion Models: 经典论文/diffusion/Latent Diffusion Models.md
+      - Transformer:
+        - 经典论文/Transformer/index.md
+      - GAN:
+        - 经典论文/GAN/index.md
+
     - 📂 资源归档:
       - 资源归档/index.md
       - 26～27实习资讯: 资源归档/26～27实习资讯/26～27实习资讯整理.md
-      - 经典论文:
-        - 资源归档/经典论文/index.md
-        - Diffusion: 资源归档/经典论文/diffusion/index.md
 
     - 🤔 不务正业:
       - 不务正业/index.md
