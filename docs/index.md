@@ -2,6 +2,12 @@
 
 <img src="./index.assets/47B71478-0BF9-491E-8EBB-643801A5B128_1_102_o.jpeg" alt="47B71478-0BF9-491E-8EBB-643801A5B128_1_102_o" style="zoom:50%;" />
 
+If your native language is not Chinese, please read [this](https://sakuri932.github.io/my-wiki/%E5%BC%80%E5%B1%80%E7%A5%9E%E8%A3%85/AI%E5%B7%A5%E5%85%B7/) first.
+
+母語が中国語でない場合は、まず[こちら](https://sakuri932.github.io/my-wiki/%E5%BC%80%E5%B1%80%E7%A5%9E%E8%A3%85/AI%E5%B7%A5%E5%85%B7/)をご覧ください。
+
+
+
 ## 为什么要建立这个网站？
 
 其实以前一直都很想建一个个人网站，但因为众所周知的原因在国内一般很难做到，再加上自己不太会写html，所以一直没搞成🤔。但是现在网络环境的变化和AI的发展，导致客观条件成熟了。加上研究室的同学一直在拿AI做很多有趣的事情，所以干脆我也来做一个吧！这个网站主要收录我个人或别人的各种经验贴，以及一些有趣的小玩意儿。

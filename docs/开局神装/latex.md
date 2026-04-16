@@ -12,7 +12,7 @@ $\LaTeX$是一款常用于科研与教育的文本语言，因为它支持强大
 
 TeX 是由著名计算机科学家、图灵奖得主高德纳（Donald Knuth）在20世纪70年代末发明的排版系统。
 
-![Donald_Ervin_Knuth_(cropped)](./latex.assets/Donald_Ervin_Knuth_(cropped).jpg){ style="zoom:24%;" }
+![Donald_Ervin_Knuth_(cropped)](./latex.assets/Donald_Ervin_Knuth_(cropped).jpg){ style="zoom:25%;" }
 
 当时，高德纳在校对他的巨著《计算机程序设计艺术》（*The Art of Computer Programming*)时，对出版社糟糕的排版质量感到极为失望，尤其是数学公式的排版。于是，他决定自己动手，开发一套能够生成高质量印刷品的排版语言，这就是 TeX。
 
