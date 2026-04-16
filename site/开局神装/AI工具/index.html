@@ -2117,16 +2117,18 @@
 <p>AI真的太好用了你知道吗！</p>
 </blockquote>
 <hr />
+<p>You can first install the AI tools mentioned below, then use them to translate the content of this website; that way the translations will most closely match the original meaning.</p>
+<p>まず以下に挙げるAIツールをインストールし、それらを使って本サイトの内容を翻訳してください。そうすることで、原文の意味に最も近い翻訳が得られます。</p>
 <p>在写下这篇文章的时候，AI早已无处不在，包括本专栏的建立也很大依赖于AI的帮助。因此在此处整理几个我认为很好用的AI工具，以供参考</p>
 <h2 id="_1">常用工具</h2>
 <h3 id="sider">Sider</h3>
-<p>sider是一款AI聚合软件，且它可以以浏览器插件的形式存在，提供几乎所有市面上主流AI的查询功能。并且由于与浏览器高度融合，因此可以实现划线翻译、网页OCR等功能，十分方便。可惜目前暂时不开放API。</p>
+<p>sider是一款AI聚合软件，且它可以以浏览器插件的形式存在，提供几乎所有市面上主流AI的查询功能。并且由于与浏览器高度融合，因此可以实现网页划线翻译、网页OCR等功能，十分方便。可惜目前暂时不开放API。</p>
 <p>免费版每天20次基础查询，Basic版大概有3000次基础查询，200次高级查询，升级到了Plus版则可以有无限查询额度。</p>
-<p><img alt="image-20260411160946336" src="../AI%E5%B7%A5%E5%85%B7.assets/image-20260411160946336.png" style="zoom:25%;" /></p>
+<p><img alt="image-20260411160946336" src="../AI%E5%B7%A5%E5%85%B7.assets/image-20260411160946336.png" style="zoom:50%;" /></p>
 <h3 id="geminichatgptdeepseek">Gemini、chatGPT、DeepSeek等</h3>
 <p>这些直接到对应官方平台购买的会员放在这里一并讲。他们的特点是只能用对应自家的模型，收费贵（一般20$/月），但是几乎可以无限使用高级查询功能（相比之下Sider大概只能一个月100次）。并且提供API选项，可以方便接入第三方软件。另外值得提醒的是，这些软件对学生邮箱有优惠，比如Gemini Pro使用学生邮箱打开就是免费的。</p>
 <h3 id="claude-code">Claude Code</h3>
-<p>今年编程界的一大神器，我认为比目前的龙虾🦞都要好用，配置简单功能强大，而且写出来的程序可用性都非常高。本专栏的摸鱼游戏都是用它写出来的。价格目前有点高，Pro版22美元一个月，Max版110美元一个月，就当买个玩具了。</p>
+<p>今年编程界的一大神器，我认为比目前的龙虾🦞都要好用，配置简单功能强大，而且写出来的程序可用性都非常高。本专栏的摸鱼游戏都是用它写出来的。价格目前有点高，Pro版22美元一个月，Max版110美元一个月，就当买个玩具了。一般来说，Pro额度大概能让你一天耍上两三次AI coding。</p>
 <p><img alt="image-20260411161908095" src="../AI%E5%B7%A5%E5%85%B7.assets/image-20260411161908095.png" style="zoom:25%;" /></p>
 <p>安装也极度简单，在 Mac 上安装 Anthropic 的 <strong>Claude Code</strong>（官方 CLI 工具）非常简单。官方强烈建议使用<strong>原生安装脚本</strong>，因为它自带自动更新功能，不需要依赖 Node.js 或 npm。</p>
 <p>以下是具体的安装方法与步骤：</p>
@@ -2146,55 +2148,13 @@
 <ol>
 <li>脚本会自动下载二进制文件、配置 PATH 环境变量并设置后台自动更新（整个过程通常不到 1 分钟）。</li>
 </ol>
-<hr />
-<h5 id="2">2. 其他安装选项</h5>
-<p>如果你有特定的包管理习惯，也可以选择以下方式，但这两种方式<strong>不支持后台自动更新</strong>，需要你日后手动更新。</p>
-<ul>
-<li>
-<h6 id="homebrew"><strong>使用 Homebrew：</strong></h6>
-</li>
-</ul>
-<p>如果你是 Homebrew 用户，可以直接通过 cask 安装：</p>
-<p>Bash</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brew install --cask claude-code
-</code></pre></div>
-<p><em>(日后更新需运行 <code>brew upgrade claude-code</code>)</em></p>
-<ul>
-<li>
-<h6 id="npm"><strong>使用 npm（适合需固定版本的开发者）：</strong></h6>
-</li>
-</ul>
-<p>要求系统已安装 Node.js 18 或以上版本。</p>
-<p>Bash</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>npm install -g @anthropic-ai/claude-code
-</code></pre></div>
-<p><em>(注意：尽量避免使用 <code>sudo npm install</code>，以免引发权限错误)</em></p>
-<hr />
-<h5 id="_2">安装后的初始化步骤</h5>
-<p>安装完成后，你需要进行账号授权才能开始使用：</p>
-<ol>
-<li><strong>验证安装：</strong> 运行以下命令，如果有输出版本号则说明安装成功。</li>
-</ol>
-<p>Bash</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>claude --version
-</code></pre></div>
-<ol>
-<li><strong>登录与授权：</strong> 在终端中输入启动命令。</li>
-</ol>
-<p>Bash</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>claude
-</code></pre></div>
-<p>如果是首次运行，Claude Code 会自动唤起默认浏览器，提示你登录并授权 Anthropic 账号。</p>
-<ol>
-<li><strong>环境诊断（可选）：</strong> 你可以随时运行 <code>claude doctor</code> 来诊断本地环境配置、网络或权限是否存在隐患。</li>
-</ol>
-<blockquote>
-<p><strong>💡 重要注意事项：</strong></p>
-<ul>
-<li><strong>系统要求：</strong> 需要运行 macOS 13.0 或更高版本。</li>
-<li><strong>付费门槛：</strong> 使用 Claude Code 需要拥有 <strong>Claude Pro 订阅</strong>、<strong>Team 订阅</strong> 或拥有 Anthropic Console 开发者账号并绑定计费。免费版账号目前无法使用该工具。</li>
-</ul>
-</blockquote>
+<p>接下来会需要加入PATH路径之类的操作，简单解决一下就行。</p>
+<p>另外，VScode或其他同类型软件也提供对应的插件，能让你在编辑器内使用Claude Code，在插件区搜索</p>
+<p><img alt="image-20260416135824239" src="../AI%E5%B7%A5%E5%85%B7.assets/image-20260416135824239.png" style="zoom:50%;" /></p>
+<p>下载即可。</p>
+<h3 id="poe-ai">Poe 网页AI聚合平台</h3>
+<p>Poe是一款相对老牌的AI聚合平台，你几乎可以在这里用到市面上所有牌子的AI，保证最大广度的尝新体验。包括但不限于文本、图片、视频、助理等类型。缺点是单价相对贵一点。</p>
+<p><img alt="截屏2026-04-16 14.12.03" src="../AI%E5%B7%A5%E5%85%B7.assets/%E6%88%AA%E5%B1%8F2026-04-16%2014.12.03.png" /></p>
 
 
 

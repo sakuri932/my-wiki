@@ -1,6 +1,9 @@
 site_name: 老中传习录
 site_url: https://sakuri932.github.io/my-wiki/
 
+hooks:
+  - hooks/pdf_list.py
+
 # 1. 主题与颜色、界面功能设置（必须与 nav、plugins 平级）
 theme:
   name: material
@@ -74,6 +77,7 @@ nav:
           - 修仙课程/数学基础/微积分.md
           - 修仙课程/数学基础/线性代数.md
           - 修仙课程/数学基础/凸优化.md
+          - 积分求法大总结: 修仙课程/数学基础/积分求法大总结.md
         - 编程语言: 
           - 修仙课程/编程语言/python.md
           - 修仙课程/编程语言/数据结构.md

@@ -24,3 +24,7 @@
 ## 笔者注
 
 一门能提高你理解diffusion model的课程，建议已经对扩散模型有一定了解后再学，反正也就5节课不多，不急。不过它笔记写得是真的好，0基础开始看也完全没问题。
+
+## 课件下载
+
+<!-- PDF_AUTO_LIST: MIT 6.S184 Flow Matching and Diffusion Models -->
