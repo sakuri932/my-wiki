@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>证件照 & 表情包工作室</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --orange: #FF6B35;
+  --yellow: #FFD23F;
+  --green: #06D6A0;
+  --blue: #118AB2;
+  --dark: #1A1A2E;
+  --mid: #4A5568;
+  --light: #FFF8F3;
+  --white: #FFFFFF;
+  --border: #E8E0D8;
+  --gray: #F7F3EF;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background: var(--light);
+  color: var(--dark);
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  background: linear-gradient(135deg, #FF6B35 0%, #FFB347 50%, #FFD23F 100%);
+  padding: 8px 24px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 3px 16px rgba(255,107,53,0.25);
+  position: relative; z-index: 100;
+  flex-shrink: 0;
+}
+.logo-icon { font-size: 1.6rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.logo-text h1 { color: #fff; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.3px; }
+.logo-text p { color: rgba(255,255,255,0.8); font-size: 0.72rem; margin-top: 1px; }
+.header-badge {
+  margin-left: auto;
+  background: rgba(255,255,255,0.22);
+  color: white;
+  padding: 3px 11px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 6px 12px;
+  height: calc(100vh - 50px);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#uploadSection {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 20px;
+}
+.upload-card {
+  background: white;
+  border-radius: 24px;
+  padding: 50px 60px;
+  text-align: center;
+  border: 3px dashed #FFD23F;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(255,107,53,0.08);
+}
+.upload-card:hover, .upload-card.dragover {
+  border-color: #FF6B35;
+  background: #FFF5EE;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(255,107,53,0.15);
+}
+.upload-emoji { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+.upload-title { font-size: 1.25rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+.upload-sub { font-size: 0.88rem; color: #888; margin-bottom: 24px; }
+.btn-upload-main {
+  display: inline-block;
+  padding: 13px 36px;
+  background: linear-gradient(135deg, #FF6B35, #FFD23F);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(255,107,53,0.35);
+}
+.btn-upload-main:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.45); }
+
+.feature-pills {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  margin-top: 32px;
+}
+.pill {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  color: var(--mid);
+  display: flex; align-items: center; gap: 6px;
+}
+
+#workspace { display: none; height: 100%; }
+#workspace.active { display: grid; grid-template-columns: 1fr 268px 230px; gap: 10px; height: 100%; min-height: 0; }
+
+.preview-card {
+  background: white;
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.hint-bar {
+  background: linear-gradient(135deg, rgba(255,107,53,0.08), rgba(255,210,63,0.08));
+  border: 1.5px solid rgba(255,107,53,0.2);
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-size: 0.75rem;
+  color: #B55A30;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 7px;
+  flex-shrink: 0;
+}
+.canvases {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.canvas-wrap { text-align: center; min-height: 0; }
+.canvas-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--mid);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+canvas {
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+  display: block;
+  cursor: crosshair;
+  max-width: 100%;
+  max-height: calc(100vh - 185px);
+  object-fit: contain;
+}
+#outCanvas { cursor: default; }
+
+.controls-panel {
+  display: flex; flex-direction: column; gap: 6px;
+  overflow-y: auto; overflow-x: hidden;
+  min-height: 0;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #FFD23F transparent;
+}
+.controls-panel::-webkit-scrollbar { width: 3px; }
+.controls-panel::-webkit-scrollbar-track { background: transparent; }
+.controls-panel::-webkit-scrollbar-thumb { background: #FFD23F; border-radius: 2px; }
+
+.ctrl-card {
+  background: white;
+  border-radius: 12px;
+  padding: 9px 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  flex-shrink: 0;
+}
+.ctrl-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Size buttons: 2-column grid */
+#sizeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+.size-btn {
+  padding: 8px 6px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+}
+.size-btn .sn { font-size: 0.82rem; font-weight: 700; color: var(--dark); display: block; }
+.size-btn .sd { font-size: 0.67rem; color: var(--mid); display: block; margin-top: 1px; }
+.size-btn:hover { border-color: var(--orange); background: #FFF8F3; }
+.size-btn:hover .sn { color: var(--orange); }
+.size-btn.active {
+  border-color: var(--orange);
+  background: linear-gradient(135deg, #FFF0E8, #FFF8E0);
+}
+.size-btn.active .sn { color: var(--orange); }
+.size-btn.active .sd { color: #c0602a; }
+
+.bg-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.clr-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  flex-shrink: 0;
+}
+.clr-btn:hover { transform: scale(1.2); }
+.clr-btn.active { box-shadow: 0 0 0 2px white, 0 0 0 3.5px var(--orange); }
+.clr-transparent {
+  background-color: white;
+  background-image:
+    linear-gradient(45deg, #bbb 25%, transparent 25%),
+    linear-gradient(-45deg, #bbb 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #bbb 75%),
+    linear-gradient(-45deg, transparent 75%, #bbb 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+}
+.clr-custom {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2.5px dashed var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+  position: relative;
+}
+.clr-custom:hover { transform: scale(1.2); border-color: var(--orange); }
+.clr-custom input[type="color"] {
+  opacity: 0; position: absolute; inset: 0;
+  width: 100%; height: 100%; cursor: pointer;
+}
+
+.slider-group { margin-bottom: 5px; }
+.slider-group:last-of-type { margin-bottom: 0; }
+.slider-row { display: flex; justify-content: space-between; font-size: 0.71rem; color: var(--mid); margin-bottom: 1px; }
+.slider-val { font-weight: 700; color: var(--orange); }
+input[type="range"] {
+  width: 100%; height: 4px;
+  -webkit-appearance: none;
+  background: linear-gradient(to right, var(--orange) 0%, var(--yellow) 100%);
+  border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: white;
+  border: 2.5px solid var(--orange);
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(255,107,53,0.3);
+}
+
+.btn {
+  width: 100%;
+  padding: 8px 8px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  margin-bottom: 4px;
+}
+.btn:last-child { margin-bottom: 0; }
+.btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+.btn-row { display: flex; gap: 5px; margin-bottom: 4px; }
+.btn-row .btn { margin-bottom: 0; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--orange), var(--yellow));
+  color: white;
+  box-shadow: 0 4px 14px rgba(255,107,53,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,0.4); }
+.btn-teal {
+  background: linear-gradient(135deg, #06D6A0, #118AB2);
+  color: white;
+  box-shadow: 0 4px 14px rgba(6,214,160,0.3);
+}
+.btn-teal:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,214,160,0.4); }
+.btn-ghost {
+  background: var(--gray);
+  color: var(--mid);
+  border: 1.5px solid var(--border);
+}
+.btn-ghost:hover { background: var(--border); color: var(--dark); }
+.active-btn { background: linear-gradient(135deg,#FFF0E8,#FFF8E0) !important; border-color: var(--orange) !important; color: var(--orange) !important; }
+
+/* ===== CROP MODAL (redesigned) ===== */
+#cropOverlay {
+  display: none;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.82);
+  z-index: 200;
+  justify-content: center; align-items: center;
+}
+#cropOverlay.active { display: flex; }
+.crop-modal {
+  background: #1a1a2e;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 95vw;
+  user-select: none;
+}
+.crop-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.crop-header h2 { color: white; font-size: 1.05rem; margin-bottom: 4px; }
+.crop-header p { color: rgba(255,255,255,0.5); font-size: 0.78rem; }
+.crop-close {
+  background: rgba(255,255,255,0.1);
+  border: none; border-radius: 50%;
+  width: 32px; height: 32px;
+  color: white; font-size: 0.9rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.crop-close:hover { background: rgba(255,255,255,0.2); }
+#cropCanvas {
+  display: block;
+  border-radius: 12px;
+  cursor: grab;
+  box-shadow: none;
+}
+#cropCanvas:active { cursor: grabbing; }
+.crop-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.crop-toolbar button {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 5px;
+}
+.ctb-ghost {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.75);
+}
+.ctb-ghost:hover { background: rgba(255,255,255,0.18); }
+.ctb-confirm {
+  background: linear-gradient(135deg, #FF6B35, #FFD23F);
+  color: white;
+  box-shadow: 0 3px 12px rgba(255,107,53,0.4);
+  margin-left: auto;
+}
+.ctb-confirm:hover { transform: translateY(-1px); }
+
+/* Print modal */
+#printModal {
+  display: none; position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+  z-index: 300; justify-content: center; align-items: center;
+}
+#printModal.active { display: flex; }
+.print-inner {
+  background: white; border-radius: 20px; padding: 28px;
+  max-width: 92vw; max-height: 92vh; overflow: auto; position: relative;
+}
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  background: var(--gray); border: none; border-radius: 50%;
+  width: 34px; height: 34px; cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--border); }
+
+.compare-strip {
+  background: var(--gray);
+  border-radius: 7px;
+  padding: 3px 8px;
+  font-size: 0.68rem;
+  color: var(--mid);
+  margin-top: 4px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1000px) {
+  #workspace.active { grid-template-columns: 1fr 268px; }
+  #workspace.active .controls-panel:last-child { grid-column: 2; grid-row: 1; display: contents; }
+}
+@media (max-width: 700px) {
+  body { overflow: auto; height: auto; }
+  .container { height: auto; overflow: visible; padding: 8px; }
+  #workspace, #workspace.active { grid-template-columns: 1fr; height: auto; }
+  .preview-card { min-height: auto; }
+  canvas { max-height: 60vw; }
+  header { padding: 8px 14px; }
+}
+
+/* ===== SIZE MODE TOGGLE ===== */
+.size-mode-row { display:flex; gap:4px; margin-bottom:6px; background:var(--gray); border-radius:8px; padding:3px; }
+.size-mode-btn { flex:1; padding:4px; border:none; border-radius:6px; font-size:0.7rem; font-weight:700; cursor:pointer; background:transparent; color:var(--mid); transition:all 0.15s; }
+.size-mode-btn.active { background:white; color:var(--orange); box-shadow:0 1px 4px rgba(0,0,0,0.1); }
+
+/* ===== PRESET FILTERS ===== */
+.filter-presets { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.flt-btn { padding:6px 4px; border:1.5px solid var(--border); border-radius:8px; background:white; font-size:0.72rem; font-weight:700; cursor:pointer; color:var(--mid); transition:all 0.18s; text-align:center; }
+.flt-btn:hover { border-color:var(--orange); color:var(--orange); }
+.flt-btn.active { border-color:var(--orange); background:linear-gradient(135deg,#FFF0E8,#FFF8E0); color:var(--orange); }
+
+/* ===== MEME EDITOR MODAL ===== */
+#memeModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.86); z-index:200; align-items:center; justify-content:center; }
+#memeModal.active { display:flex; }
+.meme-inner { background:#1a1a2e; border-radius:20px; padding:16px; display:flex; gap:12px; width:min(1000px,96vw); max-height:95vh; overflow:hidden; user-select:none; }
+.meme-left { flex:1; display:flex; flex-direction:column; gap:8px; min-width:0; }
+.meme-header { display:flex; justify-content:space-between; align-items:center; }
+.meme-header h2 { color:#fff; font-size:0.95rem; font-weight:700; }
+.meme-close { background:rgba(255,255,255,0.1); border:none; border-radius:50%; width:30px; height:30px; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
+.meme-close:hover { background:rgba(255,255,255,0.2); }
+#memeCanvas { border-radius:10px; display:block; box-shadow:0 4px 20px rgba(0,0,0,0.5); max-width:100%; max-height:calc(95vh - 140px); object-fit:contain; }
+.meme-canvas-hint { color:rgba(255,255,255,0.35); font-size:0.67rem; text-align:center; }
+.meme-footer { display:flex; gap:8px; }
+.meme-confirm { flex:1; padding:9px; border:none; border-radius:9px; font-size:0.82rem; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#FF6B35,#FFD23F); color:white; }
+.meme-confirm:hover { transform:translateY(-1px); }
+.meme-cancel { padding:9px 14px; border:none; border-radius:9px; font-size:0.82rem; cursor:pointer; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); }
+.meme-right { width:232px; flex-shrink:0; display:flex; flex-direction:column; gap:7px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#FF6B35 transparent; }
+.meme-right::-webkit-scrollbar { width:3px; }
+.meme-right::-webkit-scrollbar-thumb { background:#FF6B35; border-radius:2px; }
+.meme-tabs { display:flex; gap:3px; background:rgba(255,255,255,0.07); border-radius:9px; padding:3px; flex-shrink:0; }
+.mtab { flex:1; padding:5px 2px; border:none; border-radius:6px; background:transparent; color:rgba(255,255,255,0.45); font-size:0.67rem; font-weight:700; cursor:pointer; transition:all 0.15s; }
+.mtab.active { background:linear-gradient(135deg,#FF6B35,#FFD23F); color:white; }
+.meme-section { background:rgba(255,255,255,0.06); border-radius:10px; padding:9px; flex-shrink:0; }
+.meme-section-title { color:rgba(255,255,255,0.45); font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.meme-input { width:100%; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.12); border-radius:7px; padding:6px 8px; color:white; font-size:0.78rem; margin-bottom:5px; box-sizing:border-box; resize:vertical; }
+.meme-input:focus { outline:none; border-color:#FF6B35; }
+.meme-select { width:100%; background:rgba(30,30,50,0.95); border:1.5px solid rgba(255,255,255,0.12); border-radius:7px; padding:5px 7px; color:white; font-size:0.76rem; cursor:pointer; margin-bottom:5px; box-sizing:border-box; }
+.meme-row { display:flex; gap:6px; align-items:center; margin-bottom:5px; }
+.meme-label { color:rgba(255,255,255,0.5); font-size:0.68rem; flex:0 0 auto; min-width:28px; }
+.meme-range { flex:1; height:4px; accent-color:#FF6B35; cursor:pointer; }
+.meme-val { color:#FF6B35; font-size:0.7rem; font-weight:700; min-width:30px; text-align:right; }
+.meme-btn { width:100%; padding:7px; border:none; border-radius:7px; font-size:0.75rem; font-weight:700; cursor:pointer; margin-bottom:4px; transition:all 0.15s; }
+.meme-btn:last-child { margin-bottom:0; }
+.meme-btn-orange { background:linear-gradient(135deg,#FF6B35,#FFD23F); color:white; }
+.meme-btn-orange:hover { transform:translateY(-1px); }
+.meme-btn-ghost { background:rgba(255,255,255,0.09); color:rgba(255,255,255,0.75); }
+.meme-btn-ghost:hover { background:rgba(255,255,255,0.15); }
+.meme-btn-red { background:rgba(200,50,50,0.75); color:white; }
+.meme-btn-row { display:flex; gap:5px; margin-bottom:4px; }
+.meme-btn-row .meme-btn { margin-bottom:0; }
+.meme-color-row { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:5px; align-items:center; }
+.meme-swatch { width:22px; height:22px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:transform 0.12s; flex-shrink:0; }
+.meme-swatch:hover { transform:scale(1.2); }
+.meme-swatch.active { box-shadow:0 0 0 2px white, 0 0 0 3.5px #FF6B35; }
+.meme-color-pick { width:22px; height:22px; border-radius:50%; border:2px dashed rgba(255,255,255,0.3); overflow:hidden; cursor:pointer; position:relative; flex-shrink:0; }
+.meme-color-pick input { opacity:0; position:absolute; inset:0; width:100%; height:100%; cursor:pointer; }
+.emoji-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:5px; }
+.emoji-pick { font-size:1.25rem; border:none; background:rgba(255,255,255,0.07); border-radius:5px; cursor:pointer; padding:3px 2px; transition:background 0.12s; }
+.emoji-pick:hover { background:rgba(255,107,53,0.3); }
+.draw-tools { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px; }
+.dtool { padding:5px 7px; border:1.5px solid rgba(255,255,255,0.15); border-radius:6px; background:transparent; color:rgba(255,255,255,0.6); font-size:0.7rem; cursor:pointer; transition:all 0.15s; }
+.dtool.active { border-color:#FF6B35; color:#FF6B35; background:rgba(255,107,53,0.15); }
+.layer-list { display:flex; flex-direction:column; gap:3px; }
+.layer-item { display:flex; align-items:center; gap:5px; padding:5px 7px; border-radius:7px; background:rgba(255,255,255,0.05); cursor:pointer; transition:background 0.12s; border:1px solid transparent; }
+.layer-item:hover { background:rgba(255,255,255,0.09); }
+.layer-item.sel { background:rgba(255,107,53,0.18); border-color:rgba(255,107,53,0.4); }
+.layer-ico { font-size:0.85rem; flex-shrink:0; }
+.layer-nm { color:rgba(255,255,255,0.7); font-size:0.7rem; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.layer-up,.layer-dn,.layer-del { background:none; border:none; color:rgba(255,255,255,0.35); cursor:pointer; font-size:0.75rem; padding:2px 3px; border-radius:4px; }
+.layer-up:hover,.layer-dn:hover { color:#FFD23F; }
+.layer-del:hover { color:#ff5555; }
+.meme-no-layers { color:rgba(255,255,255,0.3); font-size:0.72rem; text-align:center; padding:10px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">📷</div>
+  <div class="logo-text">
+    <h1>证件照 & 表情包工作室</h1>
+    <p>智能换背景 · 多尺寸裁切 · 一键打印</p>
+  </div>
+  <div class="header-badge">✨ 完全免费离线</div>
+</header>
+
+<div class="container">
+
+  <div id="uploadSection">
+    <div class="upload-card" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+      <span class="upload-emoji">🖼️</span>
+      <div class="upload-title">拖拽照片到此处上传</div>
+      <div class="upload-sub">支持 JPG、PNG、WEBP 等格式</div>
+      <button class="btn-upload-main" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+        选择照片
+      </button>
+    </div>
+    <div class="feature-pills">
+      <div class="pill">🔄 一键换背景</div>
+      <div class="pill">📐 10+ 标准尺寸</div>
+      <div class="pill">✂️ 拖拽构图裁切</div>
+      <div class="pill">🎨 亮度/对比度调节</div>
+      <div class="pill">🖨️ 生成打印版</div>
+      <div class="pill">🔒 本地处理不上传</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+  </div>
+
+  <div id="workspace">
+
+    <div class="preview-card">
+      <div class="card-title">📸 照片预览</div>
+      <div class="hint-bar">
+        💡 <span id="hintText">点击左侧照片的背景区域，即可自动替换背景颜色</span>
+      </div>
+      <div class="canvases">
+        <div class="canvas-wrap">
+          <div class="canvas-label">原图（点击背景换色）</div>
+          <canvas id="srcCanvas"></canvas>
+        </div>
+        <div class="canvas-wrap">
+          <div class="canvas-label" id="outLabel">输出预览</div>
+          <canvas id="outCanvas"></canvas>
+        </div>
+      </div>
+      <div class="compare-strip" id="compareInfo">← 选择尺寸和背景色，右侧实时预览效果 →</div>
+    </div>
+
+    <!-- 中间栏：操作 + 尺寸 + 背景色 -->
+    <div class="controls-panel">
+
+      <div class="ctrl-card">
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="resetBtn" onclick="resetToInitial()" style="flex:1">↺ 重置初始</button>
+          <button class="btn btn-ghost" id="undoBtn"  onclick="undo()"           style="flex:1" disabled>↩ 撤销</button>
+        </div>
+        <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">🔄 重新上传照片</button>
+        <button class="btn btn-ghost" onclick="openCrop()">✂️ 拖拽构图 / 调整裁切</button>
+        <button class="btn btn-ghost" onclick="openMemeModal()" style="color:#FF6B35;border-color:#FF6B35">🎭 表情包编辑器</button>
+      </div>
+
+      <div class="ctrl-card">
+        <div class="ctrl-title" id="sizePanelTitle">📐 证件照尺寸</div>
+        <div class="size-mode-row">
+          <button class="size-mode-btn active" id="btnSizeId"     onclick="toggleSizeMode('id')">📷 证件照</button>
+          <button class="size-mode-btn"        id="btnSizeSocial" onclick="toggleSizeMode('social')">📱 社交媒体</button>
+        </div>
+        <div class="size-grid" id="sizeGrid"></div>
+      </div>
+
+      <div class="ctrl-card">
+        <div class="ctrl-title">🎨 背景颜色</div>
+        <div class="bg-row">
+          <div class="clr-btn active" style="background:#FFFFFF;border:2px solid #ddd" data-color="#FFFFFF" title="白色（护照/签证）" onclick="selectBg(this)"></div>
+          <div class="clr-btn" style="background:#438EDB" data-color="#438EDB" title="标准蓝（最常用）" onclick="selectBg(this)"></div>
+          <div class="clr-btn" style="background:#6CAAD4" data-color="#6CAAD4" title="浅蓝（毕业照）" onclick="selectBg(this)"></div>
+          <div class="clr-btn" style="background:#C9362E" data-color="#C9362E" title="红色（社保/IC卡）" onclick="selectBg(this)"></div>
+          <div class="clr-btn clr-transparent" data-color="transparent" title="透明（输出PNG）" onclick="selectBg(this)"></div>
+          <div class="clr-custom" title="自定义颜色">
+            🎨
+            <input type="color" id="customColorPicker" value="#438EDB" oninput="customBgPreview(this.value)" onchange="customBg(this.value)">
+          </div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-row">
+            <span>识别容差（越大范围越广）</span>
+            <span class="slider-val" id="tolVal">40</span>
+          </div>
+          <input type="range" id="tolSlider" min="5" max="130" value="40"
+            oninput="document.getElementById('tolVal').textContent=this.value">
+        </div>
+        <button class="btn btn-ghost" onclick="reapplyBg()">🔁 重新识别（调整容差后用）</button>
+      </div>
+
+    </div>
+
+    <!-- 右栏：图像优化 + 下载打印 -->
+    <div class="controls-panel">
+
+      <div class="ctrl-card">
+        <div class="ctrl-title">✨ 图像优化</div>
+        <div class="slider-group">
+          <div class="slider-row"><span>亮度</span><span class="slider-val" id="brVal">0</span></div>
+          <input type="range" id="brightness" min="-100" max="100" value="0"
+            oninput="brVal.textContent=this.value;renderOutput()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-row"><span>对比度</span><span class="slider-val" id="ctVal">0</span></div>
+          <input type="range" id="contrast" min="-100" max="100" value="0"
+            oninput="ctVal.textContent=this.value;renderOutput()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-row"><span>饱和度</span><span class="slider-val" id="satVal">0</span></div>
+          <input type="range" id="saturation" min="-100" max="100" value="0"
+            oninput="satVal.textContent=this.value;renderOutput()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-row"><span>锐化</span><span class="slider-val" id="shVal">0</span></div>
+          <input type="range" id="sharpen" min="0" max="10" value="0"
+            oninput="shVal.textContent=this.value;renderOutput()">
+        </div>
+      </div>
+
+      <div class="ctrl-card">
+        <div class="ctrl-title">🎨 一键滤镜</div>
+        <div class="filter-presets">
+          <button class="flt-btn active" id="flt-" onclick="setPresetFilter('')">✖ 原色</button>
+          <button class="flt-btn" id="flt-grayscale" onclick="setPresetFilter('grayscale')">⚫ 黑白</button>
+          <button class="flt-btn" id="flt-sepia"     onclick="setPresetFilter('sepia')">🟤 复古</button>
+          <button class="flt-btn" id="flt-deepfry"   onclick="setPresetFilter('deepfry')">🔥 深炸</button>
+        </div>
+      </div>
+
+      <div class="ctrl-card">
+        <div class="ctrl-title">🔧 画面校正</div>
+        <div class="slider-group">
+          <div class="slider-row"><span>旋转校正</span><span class="slider-val" id="rotVal">0°</span></div>
+          <input type="range" id="rotSlider" min="-20" max="20" value="0" step="0.5"
+            oninput="rotVal.textContent=this.value+'°';rotAngle=parseFloat(this.value);renderOutput()">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="flipHBtn" onclick="doFlipH()" style="flex:1">↔ 水平翻转</button>
+          <button class="btn btn-ghost" id="flipVBtn" onclick="doFlipV()" style="flex:1">↕ 垂直翻转</button>
+        </div>
+        <button class="btn btn-ghost" onclick="resetTransform()">↺ 重置校正</button>
+      </div>
+
+      <div class="ctrl-card">
+        <div class="ctrl-title">💾 下载与打印</div>
+        <button class="btn btn-primary" onclick="downloadPhoto()">⬇️ 下载证件照</button>
+        <button class="btn btn-teal" onclick="showPrint()">🖨️ 生成6寸打印版</button>
+      </div>
+
+    </div>
+
+  </div><!-- workspace -->
+
+</div>
+
+<!-- Meme Editor Modal -->
+<div id="memeModal">
+  <div class="meme-inner">
+    <!-- Left: canvas -->
+    <div class="meme-left">
+      <div class="meme-header">
+        <h2>🎭 表情包编辑器</h2>
+        <button class="meme-close" onclick="closeMemeModal()">✕</button>
+      </div>
+      <canvas id="memeCanvas"></canvas>
+      <div class="meme-canvas-hint">拖动图层移动位置 · 点击空白处取消选中</div>
+      <div class="meme-footer">
+        <button class="meme-cancel" onclick="closeMemeModal()">取消</button>
+        <button class="meme-confirm" onclick="confirmMeme()">✅ 应用更改</button>
+      </div>
+    </div>
+    <!-- Right: tools -->
+    <div class="meme-right">
+      <div class="meme-tabs">
+        <button class="mtab active" id="mtab-text"  onclick="switchMemeTab('text')">✏️ 文字</button>
+        <button class="mtab"        id="mtab-emoji" onclick="switchMemeTab('emoji')">😊 贴纸</button>
+        <button class="mtab"        id="mtab-image" onclick="switchMemeTab('image')">🖼️ 图片</button>
+        <button class="mtab"        id="mtab-draw"  onclick="switchMemeTab('draw')">🖌️ 涂鸦</button>
+      </div>
+
+      <!-- TEXT TAB -->
+      <div id="mpanel-text" class="meme-section">
+        <div class="meme-section-title">添加文字</div>
+        <textarea class="meme-input" id="mTextInput" rows="2" placeholder="输入文字（换行支持多行）">MEME</textarea>
+        <select class="meme-select" id="mFontFamily">
+          <option value="Impact">Impact（冲击体）</option>
+          <option value="'Arial Black',sans-serif">Arial Black</option>
+          <option value="'Comic Sans MS',cursive">'Comic Sans（搞笑体）</option>
+          <option value="'Microsoft YaHei',sans-serif">微软雅黑</option>
+          <option value="Georgia,serif">Georgia</option>
+          <option value="monospace">等宽字体</option>
+        </select>
+        <div class="meme-row">
+          <span class="meme-label">大小</span>
+          <input type="range" class="meme-range" id="mFontSize" min="2" max="25" value="10" oninput="document.getElementById('mFontSizeVal').textContent=this.value+'%';updateSelectedLayer()">
+          <span class="meme-val" id="mFontSizeVal">10%</span>
+        </div>
+        <div class="meme-row">
+          <span class="meme-label">描边</span>
+          <input type="range" class="meme-range" id="mStrokeW" min="0" max="12" value="4" oninput="document.getElementById('mStrokeWVal').textContent=this.value;updateSelectedLayer()">
+          <span class="meme-val" id="mStrokeWVal">4</span>
+        </div>
+        <div class="meme-section-title" style="margin-top:4px">文字颜色</div>
+        <div class="meme-color-row" id="mTextColorRow"></div>
+        <div class="meme-section-title">描边颜色</div>
+        <div class="meme-color-row" id="mStrokeColorRow"></div>
+        <div class="meme-row" style="gap:8px;margin-bottom:6px">
+          <label style="color:rgba(255,255,255,0.6);font-size:0.7rem;display:flex;align-items:center;gap:4px;cursor:pointer">
+            <input type="checkbox" id="mBold" onchange="updateSelectedLayer()" style="accent-color:#FF6B35"> 粗体
+          </label>
+          <label style="color:rgba(255,255,255,0.6);font-size:0.7rem;display:flex;align-items:center;gap:4px;cursor:pointer">
+            <input type="checkbox" id="mItalic" onchange="updateSelectedLayer()" style="accent-color:#FF6B35"> 斜体
+          </label>
+          <select class="meme-select" id="mAlign" style="margin-bottom:0;flex:1;font-size:0.7rem" onchange="updateSelectedLayer()">
+            <option value="center">居中</option>
+            <option value="left">左对齐</option>
+            <option value="right">右对齐</option>
+          </select>
+        </div>
+        <div class="meme-btn-row">
+          <button class="meme-btn meme-btn-ghost" style="flex:1" onclick="placeText('top')">顶部</button>
+          <button class="meme-btn meme-btn-ghost" style="flex:1" onclick="placeText('center')">居中</button>
+          <button class="meme-btn meme-btn-ghost" style="flex:1" onclick="placeText('bottom')">底部</button>
+        </div>
+        <button class="meme-btn meme-btn-orange" onclick="addTextLayer()">＋ 添加文字</button>
+      </div>
+
+      <!-- EMOJI TAB -->
+      <div id="mpanel-emoji" class="meme-section" style="display:none">
+        <div class="meme-section-title">选择贴纸</div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+        <div class="meme-row">
+          <span class="meme-label">大小</span>
+          <input type="range" class="meme-range" id="mEmojiSize" min="3" max="30" value="12" oninput="document.getElementById('mEmojiSizeVal').textContent=this.value+'%';updateSelectedLayer()">
+          <span class="meme-val" id="mEmojiSizeVal">12%</span>
+        </div>
+        <div class="meme-section-title" style="margin-top:4px">自定义输入</div>
+        <div class="meme-row">
+          <input type="text" class="meme-input" id="mCustomEmoji" placeholder="输入emoji" style="margin-bottom:0;flex:1">
+          <button class="meme-btn meme-btn-orange" style="width:auto;padding:6px 10px;margin-left:4px" onclick="addEmojiFromInput()">＋</button>
+        </div>
+      </div>
+
+      <!-- IMAGE TAB -->
+      <div id="mpanel-image" class="meme-section" style="display:none">
+        <div class="meme-section-title">叠加图片（可多张）</div>
+        <button class="meme-btn meme-btn-orange" onclick="document.getElementById('memeImgInput').click()">＋ 上传图片</button>
+        <input type="file" id="memeImgInput" accept="image/*" style="display:none" onchange="addImageLayer(this)">
+        <div id="mImgProps" style="display:none">
+          <div class="meme-section-title" style="margin-top:6px">选中图片属性</div>
+          <div class="meme-row">
+            <span class="meme-label">宽度</span>
+            <input type="range" class="meme-range" id="mImgW" min="5" max="100" value="40" oninput="document.getElementById('mImgWVal').textContent=this.value+'%';updateSelectedLayer()">
+            <span class="meme-val" id="mImgWVal">40%</span>
+          </div>
+          <div class="meme-row">
+            <span class="meme-label">不透明</span>
+            <input type="range" class="meme-range" id="mImgOp" min="10" max="100" value="100" oninput="document.getElementById('mImgOpVal').textContent=this.value+'%';updateSelectedLayer()">
+            <span class="meme-val" id="mImgOpVal">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DRAW TAB -->
+      <div id="mpanel-draw" class="meme-section" style="display:none">
+        <div class="meme-section-title">涂鸦工具</div>
+        <div class="draw-tools">
+          <button class="dtool active" id="dtool-arrow"  onclick="setDrawTool('arrow')">→ 箭头</button>
+          <button class="dtool"        id="dtool-rect"   onclick="setDrawTool('rect')">□ 矩形</button>
+          <button class="dtool"        id="dtool-circle" onclick="setDrawTool('circle')">○ 圆形</button>
+          <button class="dtool"        id="dtool-pen"    onclick="setDrawTool('pen')">✏️ 画笔</button>
+        </div>
+        <div class="meme-section-title">颜色</div>
+        <div class="meme-color-row" id="mDrawColorRow"></div>
+        <div class="meme-row">
+          <span class="meme-label">粗细</span>
+          <input type="range" class="meme-range" id="mDrawW" min="1" max="20" value="4">
+          <span class="meme-val" id="mDrawWVal">4</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.4);font-size:0.68rem;margin-top:4px">在左侧画布上拖拽绘制</p>
+      </div>
+
+      <!-- LAYER LIST -->
+      <div class="meme-section">
+        <div class="meme-section-title">图层列表</div>
+        <div class="layer-list" id="layerList">
+          <div class="meme-no-layers">暂无图层</div>
+        </div>
+        <button class="meme-btn meme-btn-red" id="mDeleteLayerBtn" style="display:none;margin-top:5px" onclick="deleteSelectedLayer()">🗑️ 删除选中图层</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Crop Modal (redesigned: drag to position) -->
+<div id="cropOverlay">
+  <div class="crop-modal">
+    <div class="crop-header">
+      <div>
+        <h2>✂️ 拖拽图片调整构图</h2>
+        <p id="cropSizeLabel">滚轮缩放 · 拖动图片对准发光框 · 框外区域将被裁掉</p>
+      </div>
+      <button class="crop-close" onclick="closeCrop()">✕</button>
+    </div>
+    <canvas id="cropCanvas"></canvas>
+    <div class="crop-toolbar">
+      <button class="ctb-ghost" onclick="cropZoomStep(1.12)">🔍 放大</button>
+      <button class="ctb-ghost" onclick="cropZoomStep(0.89)">🔎 缩小</button>
+      <button class="ctb-ghost" onclick="cropResetPos()">⬜ 重置位置</button>
+      <button class="ctb-confirm" onclick="applyCrop()">✅ 确认裁切</button>
+    </div>
+  </div>
+</div>
+
+<!-- Print Modal -->
+<div id="printModal">
+  <div class="print-inner">
+    <button class="modal-close" onclick="printModal.classList.remove('active')">✕</button>
+    <h2 style="margin-bottom:6px">🖨️ 6寸打印版（4R / 10×15cm）</h2>
+    <p style="font-size:0.82rem;color:#888;margin-bottom:16px" id="printInfo">正在排版...</p>
+    <canvas id="printCanvas" style="border:1px solid #ddd;border-radius:8px;max-width:100%"></canvas>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="downloadPrint()" style="flex:1">⬇️ 下载打印图</button>
+      <button class="btn btn-ghost" onclick="window.print()" style="flex:1">🖨️ 直接打印</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SAMPLE_IMG_URL = 'data:image/jpeg;base64,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';
+
+// ============ STATE ============
+let origImg = null;
+let cropImg = null;          // canvas after manual crop
+let bgReplacedCanvas = null; // canvas after bg replace
+
+// BFS mask cache — avoid re-running BFS on color change
+let bgMask = null;           // Uint8Array: 1=background pixel
+let bgMaskSrcW = 0, bgMaskSrcH = 0;
+let bgMaskSrcSnap = null;    // ImageData snapshot of the source used for BFS
+
+let currentBgHex = '#FFFFFF';
+let clickedColor = null;
+let hasBg = false;
+let selSize = null;
+
+// ============ TRANSFORM CORRECTION ============
+let rotAngle = 0;   // degrees
+let flipH    = false;
+let flipV    = false;
+
+// ============ PRESET FILTER ============
+let presetFilter = ''; // '' | 'grayscale' | 'sepia' | 'deepfry'
+
+// ============ SIZE MODE ============
+let sizeMode = 'id'; // 'id' | 'social'
+const SOCIAL_SIZES = [
+  { name:'正方形',   mm:'1:1',   w:1080, h:1080 },
+  { name:'横屏16:9', mm:'16:9',  w:1920, h:1080 },
+  { name:'竖屏9:16', mm:'9:16',  w:1080, h:1920 },
+  { name:'横图4:3',  mm:'4:3',   w:1200, h:900  },
+  { name:'Twitter',  mm:'2:1',   w:1200, h:600  },
+  { name:'表情包宽', mm:'4:3',   w:800,  h:600  },
+];
+
+// ============ MEME LAYERS ============
+let layers = [];
+let nextLayerId = 1;
+
+// ============ HISTORY ============
+const MAX_HIST = 10;
+let history = [];
+let initialState = null;
+
+function cloneCanvas(c) {
+  if (!c) return null;
+  const d = document.createElement('canvas');
+  d.width = c.width; d.height = c.height;
+  d.getContext('2d').drawImage(c, 0, 0);
+  return d;
+}
+
+function captureState() {
+  return {
+    cropImg:          cloneCanvas(cropImg),
+    bgReplacedCanvas: cloneCanvas(bgReplacedCanvas),
+    bgMask:           bgMask ? new Uint8Array(bgMask) : null,
+    bgMaskSrcSnap:    bgMaskSrcSnap ? new ImageData(new Uint8ClampedArray(bgMaskSrcSnap.data), bgMaskSrcSnap.width, bgMaskSrcSnap.height) : null,
+    bgMaskSrcW, bgMaskSrcH,
+    clickedColor:     clickedColor ? {...clickedColor} : null,
+    currentBgHex, hasBg,
+    rotAngle, flipH, flipV,
+    brightness: document.getElementById('brightness').value,
+    contrast:   document.getElementById('contrast').value,
+    saturation: document.getElementById('saturation').value,
+    sharpen:    document.getElementById('sharpen').value,
+  };
+}
+
+function pushHistory() {
+  history.push(captureState());
+  if (history.length > MAX_HIST) history.shift();
+  syncHistoryBtns();
+}
+
+function restoreState(state) {
+  cropImg          = state.cropImg;
+  bgReplacedCanvas = state.bgReplacedCanvas;
+  bgMask           = state.bgMask;
+  bgMaskSrcSnap    = state.bgMaskSrcSnap;
+  bgMaskSrcW       = state.bgMaskSrcW;
+  bgMaskSrcH       = state.bgMaskSrcH;
+  clickedColor     = state.clickedColor;
+  currentBgHex     = state.currentBgHex;
+  hasBg            = state.hasBg;
+  document.getElementById('brightness').value = state.brightness;
+  document.getElementById('contrast').value   = state.contrast;
+  document.getElementById('saturation').value = state.saturation;
+  document.getElementById('sharpen').value    = state.sharpen;
+  brVal.textContent  = state.brightness;
+  ctVal.textContent  = state.contrast;
+  satVal.textContent = state.saturation;
+  shVal.textContent  = state.sharpen;
+  rotAngle = state.rotAngle ?? 0;
+  flipH    = state.flipH    ?? false;
+  flipV    = state.flipV    ?? false;
+  syncTransformUI();
+  // Sync color button active state
+  document.querySelectorAll('.clr-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.color === currentBgHex));
+  drawSrc();
+  renderOutput();
+}
+
+function undo() {
+  if (!history.length) return;
+  restoreState(history.pop());
+  syncHistoryBtns();
+}
+
+function resetToInitial() {
+  if (!initialState) return;
+  pushHistory(); // allow undoing the reset itself
+  history = [history.pop()]; // keep only this one entry so undo brings back pre-reset state
+  restoreState(initialState);
+  syncHistoryBtns();
+  setHint('已重置到初始状态');
+}
+
+function syncHistoryBtns() {
+  document.getElementById('undoBtn').disabled  = history.length === 0;
+  document.getElementById('resetBtn').disabled = !initialState;
+}
+
+// ============ SIZES ============
+const SIZES = [
+  { name:'一寸',    mm:'25×35', w:295, h:413 },
+  { name:'二寸',    mm:'35×49', w:413, h:579 },
+  { name:'小一寸',  mm:'22×32', w:260, h:378 },
+  { name:'大一寸',  mm:'33×48', w:390, h:567 },
+  { name:'护照',    mm:'33×48', w:390, h:567 },
+  { name:'身份证',  mm:'26×32', w:307, h:378 },
+  { name:'驾照',    mm:'21×26', w:248, h:307 },
+  { name:'美国签证',mm:'51×51', w:600, h:600 },
+  { name:'英国签证',mm:'35×45', w:413, h:531 },
+  { name:'申根签证',mm:'35×45', w:413, h:531 },
+];
+
+// ============ INIT ============
+window.onload = () => {
+  buildSizeGrid();
+  setupDrop();
+  selSize = SIZES[0];
+  fileInput.onchange = e => { if (e.target.files[0]) loadFile(e.target.files[0]); };
+  // Save history on slider drag start (one entry per drag, not per pixel)
+  ['brightness','contrast','saturation','sharpen'].forEach(id => {
+    document.getElementById(id).addEventListener('mousedown',  pushHistory);
+    document.getElementById(id).addEventListener('touchstart', pushHistory, {passive:true});
+  });
+  loadSample();
+};
+
+function loadSample() {
+  const img = new Image();
+  img.onload = () => {
+    origImg = img;
+    cropImg = null;
+    history = []; initialState = null;
+    clearBgState();
+    resetFilters(false);
+    rotAngle = 0; flipH = false; flipV = false; syncTransformUI();
+    drawSrc();
+    autoDetectBg();
+    uploadSection.style.display = 'none';
+    workspace.classList.add('active');
+    setHint('这是样例照片，可直接切换颜色体验效果，或上传自己的照片');
+  };
+  img.src = SAMPLE_IMG_URL;
+}
+
+function buildSizeGrid() {
+  const g = document.getElementById('sizeGrid');
+  SIZES.forEach((s, i) => {
+    const b = document.createElement('div');
+    b.className = 'size-btn' + (i === 0 ? ' active' : '');
+    b.innerHTML = `<span class="sn">${s.name}</span><span class="sd">${s.mm}mm</span>`;
+    b.onclick = () => {
+      document.querySelectorAll('.size-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      selSize = s;
+      document.getElementById('outLabel').textContent = `${s.name} (${s.mm}mm)`;
+      renderOutput();
+    };
+    g.appendChild(b);
+  });
+}
+
+function setupDrop() {
+  const area = document.getElementById('uploadArea');
+  area.ondragover = e => { e.preventDefault(); area.classList.add('dragover'); };
+  area.ondragleave = () => area.classList.remove('dragover');
+  area.ondrop = e => {
+    e.preventDefault(); area.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  };
+}
+
+// ============ LOAD FILE ============
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      origImg = img;
+      cropImg = null;
+      history = []; initialState = null;
+      clearBgState();
+      resetFilters(false);
+      drawSrc();
+      autoDetectBg();
+      uploadSection.style.display = 'none';
+      workspace.classList.add('active');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// 自动取四角平均色作为背景色，立刻建立 mask，使颜色选择器即时生效
+function autoDetectBg() {
+  const src = cropImg || origImg;
+  const c = document.createElement('canvas');
+  c.width = src.width; c.height = src.height;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(src, 0, 0);
+  const W = src.width, H = src.height;
+  const pts = [
+    ctx.getImageData(0,     0,     1, 1).data,
+    ctx.getImageData(W-1,  0,     1, 1).data,
+    ctx.getImageData(0,     H-1,  1, 1).data,
+    ctx.getImageData(W-1,  H-1,  1, 1).data,
+  ];
+  clickedColor = {
+    r: Math.round(pts.reduce((a, p) => a + p[0], 0) / 4),
+    g: Math.round(pts.reduce((a, p) => a + p[1], 0) / 4),
+    b: Math.round(pts.reduce((a, p) => a + p[2], 0) / 4),
+  };
+  runBFSAndApply(false); // 初始化时不记录历史
+  initialState = captureState(); // 固定初始状态供"重置"使用
+  syncHistoryBtns();
+  setHint('背景已自动识别，直接切换颜色即可预览；如效果不对，点击照片背景重新选取');
+}
+
+function clearBgState() {
+  bgReplacedCanvas = null;
+  bgMask = null;
+  bgMaskSrcSnap = null;
+  clickedColor = null;
+  hasBg = false;
+}
+
+// ============ DRAW SOURCE CANVAS ============
+function drawSrc() {
+  const src = cropImg || origImg;
+  const canvas = document.getElementById('srcCanvas');
+  const maxH = 420, maxW = 520;
+  const scale = Math.min(1, maxH / src.height, maxW / src.width);
+  canvas.width  = Math.round(src.width  * scale);
+  canvas.height = Math.round(src.height * scale);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
+
+  canvas.onclick = ev => {
+    const rect = canvas.getBoundingClientRect();
+    const sx = Math.round((ev.clientX - rect.left) * canvas.width  / rect.width);
+    const sy = Math.round((ev.clientY - rect.top)  * canvas.height / rect.height);
+    const px = ctx.getImageData(sx, sy, 1, 1).data;
+    clickedColor = { r: px[0], g: px[1], b: px[2] };
+    runBFSAndApply();
+  };
+}
+
+// ============ BACKGROUND REPLACEMENT ============
+
+// Full BFS run — stores mask, then applies color
+function runBFSAndApply(saveHist = true) {
+  if (!clickedColor) return;
+  if (saveHist) pushHistory();
+  const src = cropImg || origImg;
+  const c = document.createElement('canvas');
+  c.width = src.width; c.height = src.height;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(src, 0, 0);
+
+  const idata = ctx.getImageData(0, 0, c.width, c.height);
+  const data  = idata.data;
+  const tol   = parseInt(document.getElementById('tolSlider').value);
+  const { r: cr, g: cg, b: cb } = clickedColor;
+  const W = c.width, H = c.height;
+
+  const mask = new Uint8Array(W * H);
+
+  function tryAdd(queue, x, y) {
+    if (x < 0 || y < 0 || x >= W || y >= H) return;
+    const idx = y * W + x;
+    if (mask[idx]) return;
+    const di = idx * 4;
+    const dr = data[di] - cr, dg = data[di+1] - cg, db = data[di+2] - cb;
+    if (Math.sqrt(dr*dr + dg*dg + db*db) <= tol) {
+      mask[idx] = 1;
+      queue.push(idx);
+    }
+  }
+
+  const queue = [];
+  for (let x = 0; x < W; x++) { tryAdd(queue, x, 0); tryAdd(queue, x, H-1); }
+  for (let y = 1; y < H-1; y++) { tryAdd(queue, 0, y); tryAdd(queue, W-1, y); }
+
+  let head = 0;
+  while (head < queue.length) {
+    const idx = queue[head++];
+    const x = idx % W, y = (idx / W) | 0;
+    tryAdd(queue, x+1, y); tryAdd(queue, x-1, y);
+    tryAdd(queue, x, y+1); tryAdd(queue, x, y-1);
+  }
+
+  // Cache mask and source snapshot for fast recolor
+  bgMask = mask;
+  bgMaskSrcW = W;
+  bgMaskSrcH = H;
+  bgMaskSrcSnap = ctx.getImageData(0, 0, W, H); // original pixels before coloring
+
+  applyMaskColor(idata, data);
+  ctx.putImageData(idata, 0, 0);
+  bgReplacedCanvas = c;
+  hasBg = true;
+  renderOutput();
+  setHint('背景已替换！更换颜色实时生效。调整容差后点"重新识别"优化边缘。');
+  document.getElementById('compareInfo').textContent =
+    `已替换背景 · ${src.width}×${src.height}px → 输出 ${selSize.w}×${selSize.h}px`;
+}
+
+// Fast recolor using cached mask — no BFS re-run
+function applyMaskColorFast() {
+  if (!bgMask || !bgMaskSrcSnap) return;
+  const W = bgMaskSrcW, H = bgMaskSrcH;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  // Start from original snapshot
+  const idata = new ImageData(new Uint8ClampedArray(bgMaskSrcSnap.data), W, H);
+  applyMaskColor(idata, idata.data);
+  ctx.putImageData(idata, 0, 0);
+  bgReplacedCanvas = c;
+  hasBg = true;
+  renderOutput();
+}
+
+function applyMaskColor(idata, data) {
+  const transparent = currentBgHex === 'transparent';
+  const newRgb = transparent ? null : hexToRgb(currentBgHex);
+  const W = bgMaskSrcW;
+  for (let i = 0; i < bgMask.length; i++) {
+    if (!bgMask[i]) continue;
+    const x = i % W, y = (i / W) | 0;
+    const onEdge = (x > 0 && !bgMask[i-1]) || (x < W-1 && !bgMask[i+1]) ||
+                   (y > 0 && !bgMask[i-W]) || (y < bgMask.length/W-1 && !bgMask[i+W]);
+    const di = i * 4;
+    if (transparent) {
+      data[di+3] = onEdge ? 128 : 0; // 边缘半透明，内部全透明
+    } else if (onEdge) {
+      data[di]   = Math.round((newRgb.r + bgMaskSrcSnap.data[di])   * 0.5);
+      data[di+1] = Math.round((newRgb.g + bgMaskSrcSnap.data[di+1]) * 0.5);
+      data[di+2] = Math.round((newRgb.b + bgMaskSrcSnap.data[di+2]) * 0.5);
+    } else {
+      data[di]   = newRgb.r;
+      data[di+1] = newRgb.g;
+      data[di+2] = newRgb.b;
+    }
+  }
+}
+
+function reapplyBg() {
+  if (!clickedColor) { setHint('请先点击照片背景区域选取背景色！'); return; }
+  runBFSAndApply(); // pushes history internally
+}
+
+// ============ TRANSFORM HELPERS ============
+function getTransformedSrc() {
+  const src = (hasBg && bgReplacedCanvas) ? bgReplacedCanvas : (cropImg || origImg);
+  if (rotAngle === 0 && !flipH && !flipV) return src;
+  const rad = rotAngle * Math.PI / 180;
+  const cos = Math.abs(Math.cos(rad)), sin = Math.abs(Math.sin(rad));
+  const W = Math.round(src.width * cos + src.height * sin);
+  const H = Math.round(src.width * sin + src.height * cos);
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.translate(W / 2, H / 2);
+  if (flipH) ctx.scale(-1, 1);
+  if (flipV) ctx.scale(1, -1);
+  ctx.rotate(rad);
+  ctx.drawImage(src, -src.width / 2, -src.height / 2);
+  return c;
+}
+
+function syncTransformUI() {
+  const sl = document.getElementById('rotSlider');
+  const vl = document.getElementById('rotVal');
+  if (sl) sl.value = rotAngle;
+  if (vl) vl.textContent = rotAngle + '°';
+  const fh = document.getElementById('flipHBtn');
+  const fv = document.getElementById('flipVBtn');
+  if (fh) fh.classList.toggle('active-btn', flipH);
+  if (fv) fv.classList.toggle('active-btn', flipV);
+}
+
+function doFlipH() { pushHistory(); flipH = !flipH; syncTransformUI(); renderOutput(); }
+function doFlipV() { pushHistory(); flipV = !flipV; syncTransformUI(); renderOutput(); }
+function resetTransform() {
+  pushHistory();
+  rotAngle = 0; flipH = false; flipV = false;
+  syncTransformUI(); renderOutput();
+}
+
+// ============ LAYER RENDERING ============
+function renderLayers(ctx, W, H) {
+  layers.forEach(layer => {
+    ctx.save();
+    const lx = layer.x * W, ly = layer.y * H;
+    if (layer.rotation) {
+      ctx.translate(lx, ly);
+      ctx.rotate(layer.rotation * Math.PI / 180);
+      ctx.translate(-lx, -ly);
+    }
+    if (layer.type === 'text') {
+      const fs = Math.max(8, Math.round(layer.fontSize * H));
+      const fw = layer.bold ? 'bold ' : '';
+      const fi = layer.italic ? 'italic ' : '';
+      ctx.font = `${fw}${fi}${fs}px ${layer.fontFamily || 'Impact'}`;
+      ctx.textAlign = layer.align || 'center';
+      ctx.textBaseline = 'middle';
+      const lines = layer.text.split('\n');
+      const lh = fs * 1.25;
+      lines.forEach((line, i) => {
+        const ty = ly + (i - (lines.length-1)/2) * lh;
+        if (layer.strokeWidth > 0) {
+          ctx.strokeStyle = layer.strokeColor || '#000000';
+          ctx.lineWidth = layer.strokeWidth * H / 600;
+          ctx.lineJoin = 'round';
+          ctx.strokeText(line, lx, ty);
+        }
+        ctx.fillStyle = layer.color || '#ffffff';
+        ctx.fillText(line, lx, ty);
+      });
+    } else if (layer.type === 'emoji') {
+      const fs = Math.round(layer.size * H);
+      ctx.font = `${fs}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(layer.emoji, lx, ly);
+    } else if (layer.type === 'image') {
+      ctx.globalAlpha = layer.opacity ?? 1;
+      const lw = layer.w * W, lh2 = layer.h * H;
+      ctx.drawImage(layer.img, lx - lw/2, ly - lh2/2, lw, lh2);
+      ctx.globalAlpha = 1;
+    } else if (layer.type === 'draw') {
+      ctx.strokeStyle = layer.color || '#ff0000';
+      ctx.lineWidth = Math.max(1, (layer.lineWidth || 3) * H / 600);
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      if (layer.tool === 'pen' && layer.points.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(layer.points[0].x*W, layer.points[0].y*H);
+        layer.points.slice(1).forEach(p => ctx.lineTo(p.x*W, p.y*H));
+        ctx.stroke();
+      } else if (layer.tool === 'arrow' && layer.points.length === 2) {
+        _drawArrow(ctx, layer.points[0].x*W, layer.points[0].y*H, layer.points[1].x*W, layer.points[1].y*H, ctx.lineWidth);
+      } else if (layer.tool === 'rect' && layer.points.length === 2) {
+        const x1=layer.points[0].x*W, y1=layer.points[0].y*H;
+        const x2=layer.points[1].x*W, y2=layer.points[1].y*H;
+        ctx.strokeRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+      } else if (layer.tool === 'circle' && layer.points.length === 2) {
+        const cx=(layer.points[0].x+layer.points[1].x)/2*W;
+        const cy=(layer.points[0].y+layer.points[1].y)/2*H;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, Math.abs(layer.points[1].x-layer.points[0].x)*W/2, Math.abs(layer.points[1].y-layer.points[0].y)*H/2, 0, 0, Math.PI*2);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  });
+}
+
+function _drawArrow(ctx, x1, y1, x2, y2, lw) {
+  const angle = Math.atan2(y2-y1, x2-x1);
+  const hl = lw * 5;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.fillStyle = ctx.strokeStyle;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2-hl*Math.cos(angle-Math.PI/6), y2-hl*Math.sin(angle-Math.PI/6));
+  ctx.lineTo(x2-hl*Math.cos(angle+Math.PI/6), y2-hl*Math.sin(angle+Math.PI/6));
+  ctx.closePath(); ctx.fill();
+}
+
+function drawCheckerboard(ctx, W, H, cs=6) {
+  for (let y = 0; y < H; y += cs)
+    for (let x = 0; x < W; x += cs) {
+      ctx.fillStyle = ((Math.floor(x/cs)+Math.floor(y/cs))%2===0) ? '#cccccc' : '#ffffff';
+      ctx.fillRect(x,y,cs,cs);
+    }
+}
+
+// ============ RENDER OUTPUT ============
+function renderOutput() {
+  if (!origImg && !cropImg) return;
+  const size = selSize;
+  const out  = document.getElementById('outCanvas');
+  const disp = Math.min(1, 230 / Math.max(size.w, size.h));
+  out.width  = Math.round(size.w * disp);
+  out.height = Math.round(size.h * disp);
+  const ctx  = out.getContext('2d');
+
+  if (currentBgHex === 'transparent') drawCheckerboard(ctx, out.width, out.height);
+  else { ctx.fillStyle = currentBgHex; ctx.fillRect(0,0,out.width,out.height); }
+
+  const src = getTransformedSrc();
+  const { sx, sy, sw, sh } = coverCrop(src.width, src.height, size.w, size.h);
+  ctx.drawImage(src, sx, sy, sw, sh, 0, 0, out.width, out.height);
+  applyFiltersTo(out);
+  renderLayers(ctx, out.width, out.height);
+}
+
+function coverCrop(sw, sh, dw, dh) {
+  const srcAR = sw/sh, dstAR = dw/dh;
+  let sx, sy, cw, ch;
+  if (srcAR > dstAR) {
+    ch = sh; cw = ch * dstAR; sx = (sw - cw)/2; sy = 0;
+  } else {
+    cw = sw; ch = cw / dstAR; sx = 0; sy = (sh - ch)/2;
+  }
+  return { sx, sy, sw: cw, sh: ch };
+}
+
+// ============ FILTERS ============
+function applyFiltersTo(canvas) {
+  const br  = parseInt(document.getElementById('brightness').value);
+  const ct  = parseInt(document.getElementById('contrast').value);
+  const sat = parseInt(document.getElementById('saturation').value);
+  const sh  = parseInt(document.getElementById('sharpen').value);
+  if (br === 0 && ct === 0 && sat === 0 && sh === 0 && !presetFilter) return;
+
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const idata = ctx.getImageData(0, 0, W, H);
+  const d = idata.data;
+  const factor = ct !== 0 ? (259*(ct+255))/(255*(259-ct)) : 1;
+  const satF = (sat+100)/100;
+
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i], g = d[i+1], b = d[i+2];
+    r += br; g += br; b += br;
+    if (ct !== 0) { r = factor*(r-128)+128; g = factor*(g-128)+128; b = factor*(b-128)+128; }
+    if (sat !== 0) {
+      const gray = 0.299*r + 0.587*g + 0.114*b;
+      r = gray + satF*(r-gray); g = gray + satF*(g-gray); b = gray + satF*(b-gray);
+    }
+    d[i] = clamp(r); d[i+1] = clamp(g); d[i+2] = clamp(b);
+  }
+
+  // Preset filters
+  if (presetFilter === 'grayscale') {
+    for (let i = 0; i < d.length; i += 4) {
+      const g = Math.round(0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]);
+      d[i] = d[i+1] = d[i+2] = g;
+    }
+  } else if (presetFilter === 'sepia') {
+    for (let i = 0; i < d.length; i += 4) {
+      const r=d[i], g=d[i+1], b=d[i+2];
+      d[i]   = clamp(r*0.393 + g*0.769 + b*0.189);
+      d[i+1] = clamp(r*0.349 + g*0.686 + b*0.168);
+      d[i+2] = clamp(r*0.272 + g*0.534 + b*0.131);
+    }
+  } else if (presetFilter === 'deepfry') {
+    for (let i = 0; i < d.length; i += 4) {
+      let r=d[i], g=d[i+1], b=d[i+2];
+      const gray = 0.299*r + 0.587*g + 0.114*b;
+      r = gray + 3.2*(r-gray); g = gray + 3.2*(g-gray); b = gray + 3.2*(b-gray);
+      const cf = (259*385)/(255*129);
+      r = cf*(r-128)+128; g = cf*(g-128)+128; b = cf*(b-128)+128;
+      const noise = (Math.random()-0.5)*45;
+      d[i] = clamp(r+noise); d[i+1] = clamp(g+noise*0.6); d[i+2] = clamp(b-noise*0.4);
+    }
+  }
+  ctx.putImageData(idata, 0, 0);
+
+  if (sh > 0) {
+    const amt = sh * 0.4;
+    const src2 = ctx.getImageData(0, 0, W, H);
+    const out2 = new ImageData(W, H);
+    const s = src2.data, o = out2.data;
+    for (let y = 1; y < H-1; y++) {
+      for (let x = 1; x < W-1; x++) {
+        const i = (y*W+x)*4;
+        for (let c = 0; c < 3; c++) {
+          const center = s[i+c];
+          const neighbors = s[((y-1)*W+x)*4+c] + s[((y+1)*W+x)*4+c] +
+                            s[(y*W+x-1)*4+c]   + s[(y*W+x+1)*4+c];
+          o[i+c] = clamp(center + amt*(4*center - neighbors));
+        }
+        o[i+3] = s[i+3];
+      }
+    }
+    for (let x = 0; x < W; x++) {
+      const t=x*4, b2=((H-1)*W+x)*4;
+      for (let c = 0; c < 4; c++) { o[t+c]=s[t+c]; o[b2+c]=s[b2+c]; }
+    }
+    for (let y = 0; y < H; y++) {
+      const l=y*W*4, r2=(y*W+W-1)*4;
+      for (let c = 0; c < 4; c++) { o[l+c]=s[l+c]; o[r2+c]=s[r2+c]; }
+    }
+    ctx.putImageData(out2, 0, 0);
+  }
+}
+
+function resetFilters(saveHist = true) {
+  if (saveHist) pushHistory();
+  ['brightness','contrast','saturation','sharpen'].forEach(id => {
+    document.getElementById(id).value = 0;
+  });
+  ['brVal','ctVal','satVal','shVal'].forEach(id => {
+    document.getElementById(id).textContent = '0';
+  });
+  renderOutput();
+}
+
+// ============ BACKGROUND COLOR ============
+function selectBg(el) {
+  pushHistory();
+  document.querySelectorAll('.clr-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentBgHex = el.dataset.color;
+  if (bgMask) applyMaskColorFast();
+  else renderOutput();
+}
+
+// 拾色器拖动中实时预览（不存历史）
+function customBgPreview(val) {
+  currentBgHex = val;
+  document.querySelectorAll('.clr-btn').forEach(b => b.classList.remove('active'));
+  if (bgMask) applyMaskColorFast();
+  else renderOutput();
+}
+
+// 拾色器确认颜色（存历史）
+function customBg(val) {
+  pushHistory();
+  customBgPreview(val);
+}
+
+// ============ CROP (drag-to-position) ============
+let cropOffX = 0, cropOffY = 0, cropZoom = 1;
+let cropFX = 0, cropFY = 0, cropFW = 0, cropFH = 0; // frame rect in canvas coords
+let cropDrag = false, cropDragSX = 0, cropDragSY = 0, cropDragOX = 0, cropDragOY = 0;
+
+function openCrop() {
+  if (!origImg) return;
+
+  const src = origImg; // always crop from original
+  const maxW = Math.min(window.innerWidth - 48, 780);
+  const maxH = Math.min(window.innerHeight - 200, 560);
+  const cc = document.getElementById('cropCanvas');
+  cc.width  = maxW;
+  cc.height = maxH;
+
+  // Frame: maintain selected size AR, fills ~70% of canvas
+  const AR = selSize.w / selSize.h;
+  const maxFW = maxW * 0.72, maxFH = maxH * 0.72;
+  if (maxFW / maxFH > AR) {
+    cropFH = maxFH; cropFW = cropFH * AR;
+  } else {
+    cropFW = maxFW; cropFH = cropFW / AR;
+  }
+  cropFX = (maxW - cropFW) / 2;
+  cropFY = (maxH - cropFH) / 2;
+
+  // Initial zoom: image covers frame (cover mode)
+  const zW = cropFW / src.width, zH = cropFH / src.height;
+  cropZoom = Math.max(zW, zH);
+  // Center image within frame
+  cropOffX = cropFX + (cropFW - src.width * cropZoom) / 2;
+  cropOffY = cropFY + (cropFH - src.height * cropZoom) / 2;
+
+  document.getElementById('cropSizeLabel').textContent =
+    `${selSize.name}（${selSize.mm}mm）· 滚轮缩放 · 拖动图片对准发光框`;
+
+  attachCropEvents(cc, src);
+  document.getElementById('cropOverlay').classList.add('active');
+  drawCropPreview();
+}
+
+function drawCropPreview() {
+  const cc = document.getElementById('cropCanvas');
+  const ctx = cc.getContext('2d');
+  const W = cc.width, H = cc.height;
+  const src = origImg;
+  const iw = src.width * cropZoom, ih = src.height * cropZoom;
+
+  // Dark background
+  ctx.fillStyle = '#111827';
+  ctx.fillRect(0, 0, W, H);
+
+  // Dimmed image across whole canvas
+  ctx.globalAlpha = 0.28;
+  ctx.drawImage(src, cropOffX, cropOffY, iw, ih);
+  ctx.globalAlpha = 1;
+
+  // Bright image clipped to frame
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(cropFX, cropFY, cropFW, cropFH);
+  ctx.clip();
+  ctx.drawImage(src, cropOffX, cropOffY, iw, ih);
+  ctx.restore();
+
+  // Subtle rule-of-thirds grid inside frame
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 0.8;
+  for (let i = 1; i <= 2; i++) {
+    ctx.beginPath();
+    ctx.moveTo(cropFX + cropFW*i/3, cropFY);
+    ctx.lineTo(cropFX + cropFW*i/3, cropFY + cropFH);
+    ctx.moveTo(cropFX, cropFY + cropFH*i/3);
+    ctx.lineTo(cropFX + cropFW, cropFY + cropFH*i/3);
+    ctx.stroke();
+  }
+
+  // Glow frame border
+  ctx.save();
+  ctx.shadowColor = 'rgba(255,107,53,0.85)';
+  ctx.shadowBlur = 22;
+  ctx.strokeStyle = '#FF6B35';
+  ctx.lineWidth = 2.5;
+  ctx.strokeRect(cropFX, cropFY, cropFW, cropFH);
+  ctx.strokeRect(cropFX, cropFY, cropFW, cropFH); // double for stronger glow
+  ctx.restore();
+
+  // White corner markers
+  const cs = 18;
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  [
+    [cropFX,        cropFY,        1,  1],
+    [cropFX+cropFW, cropFY,       -1,  1],
+    [cropFX,        cropFY+cropFH, 1, -1],
+    [cropFX+cropFW, cropFY+cropFH,-1, -1],
+  ].forEach(([x, y, dx, dy]) => {
+    ctx.beginPath();
+    ctx.moveTo(x + dx*cs, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy*cs);
+    ctx.stroke();
+  });
+}
+
+function attachCropEvents(cc, src) {
+  cc.onmousedown = e => {
+    cropDrag = true;
+    cropDragSX = e.clientX; cropDragSY = e.clientY;
+    cropDragOX = cropOffX; cropDragOY = cropOffY;
+    cc.style.cursor = 'grabbing';
+  };
+  window.onmousemove = e => {
+    if (!cropDrag) return;
+    cropOffX = cropDragOX + (e.clientX - cropDragSX);
+    cropOffY = cropDragOY + (e.clientY - cropDragSY);
+    drawCropPreview();
+  };
+  window.onmouseup = () => {
+    cropDrag = false;
+    cc.style.cursor = 'grab';
+  };
+  cc.onwheel = e => {
+    e.preventDefault();
+    const rect = cc.getBoundingClientRect();
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.1 : 0.91;
+    zoomAtPoint(factor, cx, cy);
+    drawCropPreview();
+  };
+  // Touch support
+  let lastTouchX = 0, lastTouchY = 0;
+  cc.ontouchstart = e => {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      cropDrag = true;
+      lastTouchX = e.touches[0].clientX; lastTouchY = e.touches[0].clientY;
+      cropDragOX = cropOffX; cropDragOY = cropOffY;
+      cropDragSX = lastTouchX; cropDragSY = lastTouchY;
+    }
+  };
+  cc.ontouchmove = e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && cropDrag) {
+      cropOffX = cropDragOX + (e.touches[0].clientX - cropDragSX);
+      cropOffY = cropDragOY + (e.touches[0].clientY - cropDragSY);
+      drawCropPreview();
+    }
+  };
+  cc.ontouchend = () => { cropDrag = false; };
+}
+
+function zoomAtPoint(factor, cx, cy) {
+  const imgX = (cx - cropOffX) / cropZoom;
+  const imgY = (cy - cropOffY) / cropZoom;
+  cropZoom = Math.max(0.05, Math.min(8, cropZoom * factor));
+  cropOffX = cx - imgX * cropZoom;
+  cropOffY = cy - imgY * cropZoom;
+}
+
+function cropZoomStep(factor) {
+  const cx = cropFX + cropFW/2, cy = cropFY + cropFH/2;
+  zoomAtPoint(factor, cx, cy);
+  drawCropPreview();
+}
+
+function cropResetPos() {
+  const src = origImg;
+  const zW = cropFW / src.width, zH = cropFH / src.height;
+  cropZoom = Math.max(zW, zH);
+  cropOffX = cropFX + (cropFW - src.width * cropZoom) / 2;
+  cropOffY = cropFY + (cropFH - src.height * cropZoom) / 2;
+  drawCropPreview();
+}
+
+function applyCrop() {
+  // Extract what's inside the frame in original image coords
+  const src = origImg;
+  const sx = (cropFX - cropOffX) / cropZoom;
+  const sy = (cropFY - cropOffY) / cropZoom;
+  const sw = cropFW / cropZoom;
+  const sh = cropFH / cropZoom;
+
+  // Clamp to image bounds
+  const csx = Math.max(0, sx), csy = Math.max(0, sy);
+  const csw = Math.min(src.width  - csx, sw - Math.max(0, -sx));
+  const csh = Math.min(src.height - csy, sh - Math.max(0, -sy));
+
+  const c = document.createElement('canvas');
+  c.width  = Math.round(sw);
+  c.height = Math.round(sh);
+  const ctx = c.getContext('2d');
+  ctx.drawImage(src, csx, csy, csw, csh,
+    Math.round(Math.max(0, -sx)), Math.round(Math.max(0, -sy)),
+    Math.round(csw), Math.round(csh));
+
+  pushHistory();
+  cropImg = c;
+  const prevClickedColor = clickedColor; // preserve bg color seed across crop
+  clearBgState();
+  closeCrop();
+  drawSrc();
+  if (prevClickedColor) {
+    // Reuse the known background color so BFS works correctly on the cropped image
+    clickedColor = prevClickedColor;
+    runBFSAndApply(false);
+    initialState = captureState();
+    syncHistoryBtns();
+    setHint('裁切完成！背景已重新识别，可继续切换背景颜色');
+  } else {
+    autoDetectBg();
+    setHint('裁切完成！直接切换背景颜色预览，或点击照片背景重新选取');
+  }
+}
+
+function closeCrop() {
+  document.getElementById('cropOverlay').classList.remove('active');
+  cropDrag = false;
+  window.onmousemove = null;
+  window.onmouseup  = null;
+  const cc = document.getElementById('cropCanvas');
+  cc.onmousedown = cc.onwheel = cc.ontouchstart = cc.ontouchmove = cc.ontouchend = null;
+}
+
+// ============ DOWNLOAD ============
+function buildFullRes() {
+  const size = selSize;
+  const c = document.createElement('canvas');
+  c.width = size.w; c.height = size.h;
+  const ctx = c.getContext('2d');
+  if (currentBgHex !== 'transparent') {
+    ctx.fillStyle = currentBgHex;
+    ctx.fillRect(0, 0, size.w, size.h);
+  }
+  const src = getTransformedSrc();
+  const { sx, sy, sw, sh } = coverCrop(src.width, src.height, size.w, size.h);
+  ctx.drawImage(src, sx, sy, sw, sh, 0, 0, size.w, size.h);
+  applyFiltersTo(c);
+  renderLayers(ctx, size.w, size.h);
+  return c;
+}
+
+function downloadPhoto() {
+  if (!origImg) return;
+  const c = buildFullRes();
+  const a = document.createElement('a');
+  const isPng = currentBgHex === 'transparent';
+  a.download = `证件照_${selSize.name}_${selSize.w}x${selSize.h}.${isPng ? 'png' : 'jpg'}`;
+  a.href = c.toDataURL(isPng ? 'image/png' : 'image/jpeg', 0.97);
+  a.click();
+}
+
+// ============ PRINT ============
+function showPrint() {
+  if (!origImg) return;
+  const PW = 1181, PH = 1772; // 6-inch at 300dpi
+  const size = selSize;
+  const cols = Math.floor(PW / size.w);
+  const rows = Math.floor(PH / size.h);
+
+  const pc = document.getElementById('printCanvas');
+  const sc = Math.min(1, 560 / PW);
+  pc.width  = Math.round(PW * sc);
+  pc.height = Math.round(PH * sc);
+  const ctx = pc.getContext('2d');
+  ctx.fillStyle = '#f0f0f0';
+  ctx.fillRect(0, 0, pc.width, pc.height);
+
+  const src = getTransformedSrc();
+  const { sx, sy, sw, sh } = coverCrop(src.width, src.height, size.w, size.h);
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const dx = Math.round(col * size.w * sc), dy = Math.round(row * size.h * sc);
+      const dw = Math.round(size.w * sc),       dh = Math.round(size.h * sc);
+      ctx.drawImage(src, sx, sy, sw, sh, dx, dy, dw, dh);
+      ctx.strokeStyle = '#cccccc'; ctx.lineWidth = 0.5;
+      ctx.strokeRect(dx, dy, dw, dh);
+    }
+  }
+
+  document.getElementById('printInfo').textContent =
+    `共排 ${cols}列 × ${rows}行 = ${cols*rows} 张${size.name}（${size.mm}mm）· 6寸4R纸打印`;
+  document.getElementById('printModal').classList.add('active');
+}
+
+function downloadPrint() {
+  const PW = 1181, PH = 1772;
+  const size = selSize;
+  const cols = Math.floor(PW / size.w), rows = Math.floor(PH / size.h);
+  const c = document.createElement('canvas');
+  c.width = PW; c.height = PH;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, PW, PH);
+  const src = getTransformedSrc();
+  const { sx, sy, sw, sh } = coverCrop(src.width, src.height, size.w, size.h);
+  for (let r = 0; r < rows; r++) {
+    for (let co = 0; co < cols; co++) {
+      ctx.drawImage(src, sx, sy, sw, sh, co*size.w, r*size.h, size.w, size.h);
+      ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 1;
+      ctx.strokeRect(co*size.w, r*size.h, size.w, size.h);
+    }
+  }
+  const a = document.createElement('a');
+  a.download = `证件照打印版_${size.name}_6寸.jpg`;
+  a.href = c.toDataURL('image/jpeg', 0.95);
+  a.click();
+}
+
+// ============ UTILS ============
+function hexToRgb(hex) {
+  return {
+    r: parseInt(hex.slice(1,3), 16),
+    g: parseInt(hex.slice(3,5), 16),
+    b: parseInt(hex.slice(5,7), 16)
+  };
+}
+function clamp(v) { return v < 0 ? 0 : v > 255 ? 255 : Math.round(v); }
+function setHint(t) { document.getElementById('hintText').textContent = t; }
+
+// ============ SIZE MODE ============
+function toggleSizeMode(mode) {
+  sizeMode = mode;
+  document.getElementById('btnSizeId').classList.toggle('active', mode === 'id');
+  document.getElementById('btnSizeSocial').classList.toggle('active', mode === 'social');
+  document.getElementById('sizePanelTitle').textContent = mode === 'id' ? '📐 证件照尺寸' : '📱 社交媒体';
+  buildSizeGrid();
+  const sizes = mode === 'id' ? SIZES : SOCIAL_SIZES;
+  selSize = sizes[0];
+  document.getElementById('outLabel').textContent = `${selSize.name} (${selSize.mm})`;
+  renderOutput();
+}
+
+// Override buildSizeGrid to respect sizeMode
+const _origBuildSizeGrid = buildSizeGrid;
+buildSizeGrid = function() {
+  const g = document.getElementById('sizeGrid');
+  if (!g) return;
+  g.innerHTML = '';
+  const sizes = sizeMode === 'id' ? SIZES : SOCIAL_SIZES;
+  sizes.forEach((s, i) => {
+    const b = document.createElement('div');
+    b.className = 'size-btn' + (selSize && selSize.name === s.name && selSize.w === s.w ? ' active' : (i === 0 && !selSize ? ' active' : ''));
+    b.innerHTML = `<span class="sn">${s.name}</span><span class="sd">${s.mm}</span>`;
+    b.onclick = () => {
+      document.querySelectorAll('.size-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      selSize = s;
+      document.getElementById('outLabel').textContent = `${s.name} (${s.mm})`;
+      renderOutput();
+    };
+    g.appendChild(b);
+  });
+};
+
+// ============ PRESET FILTERS ============
+function setPresetFilter(f) {
+  presetFilter = f;
+  ['', 'grayscale', 'sepia', 'deepfry'].forEach(k => {
+    const el = document.getElementById('flt-' + k);
+    if (el) el.classList.toggle('active', k === f);
+  });
+  renderOutput();
+}
+
+// ============ MEME EDITOR ============
+const MEME_COLORS = ['#ffffff','#000000','#ff0000','#ff6b35','#ffd23f','#06d6a0','#118ab2','#a020f0','#ff69b4','#00ff00'];
+const MEME_EMOJIS = ['😂','😭','🤣','😍','🥺','🔥','💀','👀','🤡','💯','✨','❤️','😎','🤔','😱','🙏','👊','💪','🎉','🍕','👍','😤','🤦','🤷','😏','🥴','💅','👏','🫡','😈'];
+
+let memeTab = 'text';
+let memeSelectedId = null;
+let memeDrawTool = 'arrow';
+let memeDrawing = false;
+let memeDrawStart = null;
+let memeDrawPoints = [];
+let memeDragging = false;
+let memeDragStart = null;
+let memeDragLayerStart = null;
+let memeTextColor = '#ffffff';
+let memeStrokeColor = '#000000';
+let memeDrawColor = '#ff0000';
+
+function openMemeModal() {
+  if (!origImg && !cropImg) return;
+  buildColorSwatches('mTextColorRow', MEME_COLORS, memeTextColor, c => { memeTextColor = c; updateSelectedLayer(); });
+  buildColorSwatches('mStrokeColorRow', MEME_COLORS, memeStrokeColor, c => { memeStrokeColor = c; updateSelectedLayer(); });
+  buildColorSwatches('mDrawColorRow', MEME_COLORS, memeDrawColor, c => { memeDrawColor = c; });
+  buildEmojiGrid();
+  document.getElementById('mDrawW').oninput = function() {
+    document.getElementById('mDrawWVal').textContent = this.value;
+  };
+  memeSelectedId = null;
+  updateLayerList();
+  resizeMemeCanvas();
+  redrawMemeCanvas();
+  attachMemeCanvasEvents();
+  document.getElementById('memeModal').classList.add('active');
+}
+
+function closeMemeModal() {
+  document.getElementById('memeModal').classList.remove('active');
+  detachMemeCanvasEvents();
+}
+
+function confirmMeme() {
+  closeMemeModal();
+  renderOutput();
+}
+
+function resizeMemeCanvas() {
+  const mc = document.getElementById('memeCanvas');
+  const ar = selSize.w / selSize.h;
+  const maxW = Math.min(window.innerWidth * 0.56, 660);
+  const maxH = Math.min(window.innerHeight - 180, 520);
+  let mW, mH;
+  if (maxW / maxH > ar) { mH = maxH; mW = Math.round(mH * ar); }
+  else { mW = maxW; mH = Math.round(mW / ar); }
+  mc.width = mW; mc.height = mH;
+}
+
+function redrawMemeCanvas() {
+  const mc = document.getElementById('memeCanvas');
+  const ctx = mc.getContext('2d');
+  const W = mc.width, H = mc.height;
+  if (currentBgHex === 'transparent') drawCheckerboard(ctx, W, H, 10);
+  else { ctx.fillStyle = currentBgHex; ctx.fillRect(0, 0, W, H); }
+  const src = getTransformedSrc();
+  const { sx, sy, sw, sh } = coverCrop(src.width, src.height, selSize.w, selSize.h);
+  ctx.drawImage(src, sx, sy, sw, sh, 0, 0, W, H);
+  // Apply filters preview
+  applyFiltersTo(mc);
+  renderLayers(ctx, W, H);
+  // Draw selection handle
+  if (memeSelectedId !== null) {
+    const layer = layers.find(l => l.id === memeSelectedId);
+    if (layer) drawMemeSelection(ctx, layer, W, H);
+  }
+}
+
+function drawMemeSelection(ctx, layer, W, H) {
+  let bx, by, bw, bh;
+  const lx = layer.x * W, ly = layer.y * H;
+  if (layer.type === 'text') {
+    const fs = Math.round(layer.fontSize * H);
+    const lines = layer.text.split('\n');
+    bh = lines.length * fs * 1.3 + 10;
+    bw = Math.min(W * 0.9, Math.max(...lines.map(l => l.length)) * fs * 0.55 + 20);
+    bx = layer.align === 'center' ? lx - bw/2 : layer.align === 'right' ? lx - bw : lx;
+    by = ly - bh/2;
+  } else if (layer.type === 'emoji') {
+    const s = layer.size * H;
+    bx = lx - s/2; by = ly - s/2; bw = s; bh = s;
+  } else if (layer.type === 'image') {
+    bw = layer.w * W; bh = layer.h * H;
+    bx = lx - bw/2; by = ly - bh/2;
+  } else return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,107,53,0.9)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 3]);
+  ctx.strokeRect(bx - 6, by - 6, bw + 12, bh + 12);
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+function hitTest(nx, ny, W, H) {
+  for (let i = layers.length - 1; i >= 0; i--) {
+    const layer = layers[i];
+    const lx = layer.x, ly = layer.y;
+    if (layer.type === 'text') {
+      const fs = layer.fontSize;
+      const lines = layer.text.split('\n');
+      const bh = lines.length * fs * 1.4 + 0.02;
+      const bw = Math.min(0.9, Math.max(...lines.map(l => l.length)) * fs * 0.6);
+      const bx = layer.align === 'center' ? lx - bw/2 : layer.align === 'right' ? lx - bw : lx;
+      if (nx >= bx - 0.02 && nx <= bx + bw + 0.02 && ny >= ly - bh/2 - 0.02 && ny <= ly + bh/2 + 0.02)
+        return layer.id;
+    } else if (layer.type === 'emoji') {
+      if (Math.abs(nx-lx) < layer.size/2 + 0.01 && Math.abs(ny-ly) < layer.size*(W/H)/2 + 0.01)
+        return layer.id;
+    } else if (layer.type === 'image') {
+      if (Math.abs(nx-lx) < layer.w/2 + 0.01 && Math.abs(ny-ly) < layer.h/2 + 0.01)
+        return layer.id;
+    }
+  }
+  return null;
+}
+
+function getMemeNorm(e, mc) {
+  const rect = mc.getBoundingClientRect();
+  return {
+    nx: (e.clientX - rect.left) / rect.width,
+    ny: (e.clientY - rect.top)  / rect.height
+  };
+}
+
+function attachMemeCanvasEvents() {
+  const mc = document.getElementById('memeCanvas');
+  mc.onmousedown = memeMouseDown;
+  mc.onmousemove = memeMouseMove;
+  mc.onmouseup   = memeMouseUp;
+  mc.ontouchstart = e => { e.preventDefault(); memeMouseDown(e.touches[0]); };
+  mc.ontouchmove  = e => { e.preventDefault(); memeMouseMove(e.touches[0]); };
+  mc.ontouchend   = e => { memeMouseUp(e.changedTouches[0]); };
+}
+
+function detachMemeCanvasEvents() {
+  const mc = document.getElementById('memeCanvas');
+  mc.onmousedown = mc.onmousemove = mc.onmouseup = null;
+  mc.ontouchstart = mc.ontouchmove = mc.ontouchend = null;
+}
+
+function memeMouseDown(e) {
+  const mc = document.getElementById('memeCanvas');
+  const { nx, ny } = getMemeNorm(e, mc);
+  if (memeTab === 'draw') {
+    memeDrawing = true;
+    memeDrawStart = { x: nx, y: ny };
+    memeDrawPoints = [{ x: nx, y: ny }];
+    mc.style.cursor = 'crosshair';
+    return;
+  }
+  const hit = hitTest(nx, ny, mc.width, mc.height);
+  if (hit !== null) {
+    memeSelectedId = hit;
+    const layer = layers.find(l => l.id === hit);
+    memeDragging = true;
+    memeDragStart = { x: nx, y: ny };
+    memeDragLayerStart = { x: layer.x, y: layer.y };
+    mc.style.cursor = 'grabbing';
+  } else {
+    memeSelectedId = null;
+  }
+  updateLayerList();
+  syncMemePropsPanel();
+  redrawMemeCanvas();
+}
+
+function memeMouseMove(e) {
+  const mc = document.getElementById('memeCanvas');
+  const { nx, ny } = getMemeNorm(e, mc);
+  if (memeDrawing) {
+    if (memeDrawTool === 'pen') memeDrawPoints.push({ x: nx, y: ny });
+    else memeDrawPoints = [memeDrawStart, { x: nx, y: ny }];
+    redrawMemeCanvas();
+    drawPreviewStroke(mc.getContext('2d'), mc.width, mc.height);
+    return;
+  }
+  if (memeDragging && memeSelectedId !== null) {
+    const layer = layers.find(l => l.id === memeSelectedId);
+    if (layer) {
+      layer.x = Math.max(0, Math.min(1, memeDragLayerStart.x + (nx - memeDragStart.x)));
+      layer.y = Math.max(0, Math.min(1, memeDragLayerStart.y + (ny - memeDragStart.y)));
+      redrawMemeCanvas();
+    }
+  }
+}
+
+function memeMouseUp(e) {
+  const mc = document.getElementById('memeCanvas');
+  if (memeDrawing) {
+    const { nx, ny } = getMemeNorm(e, mc);
+    if (memeDrawTool === 'pen') memeDrawPoints.push({ x: nx, y: ny });
+    else memeDrawPoints = [memeDrawStart, { x: nx, y: ny }];
+    if (memeDrawPoints.length >= 2) {
+      layers.push({
+        id: nextLayerId++, type: 'draw', tool: memeDrawTool,
+        points: [...memeDrawPoints], color: memeDrawColor,
+        lineWidth: parseInt(document.getElementById('mDrawW').value)
+      });
+      updateLayerList();
+      redrawMemeCanvas();
+    }
+    memeDrawing = false; memeDrawPoints = [];
+  }
+  memeDragging = false;
+  mc.style.cursor = memeTab === 'draw' ? 'crosshair' : 'default';
+}
+
+function drawPreviewStroke(ctx, W, H) {
+  if (memeDrawPoints.length < 2) return;
+  ctx.save();
+  ctx.strokeStyle = memeDrawColor;
+  ctx.lineWidth = Math.max(1, parseInt(document.getElementById('mDrawW').value) * H / 600);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (memeDrawTool === 'pen') {
+    ctx.beginPath();
+    ctx.moveTo(memeDrawPoints[0].x*W, memeDrawPoints[0].y*H);
+    memeDrawPoints.slice(1).forEach(p => ctx.lineTo(p.x*W, p.y*H));
+    ctx.stroke();
+  } else if (memeDrawTool === 'arrow') {
+    _drawArrow(ctx, memeDrawPoints[0].x*W, memeDrawPoints[0].y*H, memeDrawPoints[1].x*W, memeDrawPoints[1].y*H, ctx.lineWidth);
+  } else if (memeDrawTool === 'rect') {
+    const x1=memeDrawPoints[0].x*W, y1=memeDrawPoints[0].y*H;
+    const x2=memeDrawPoints[1].x*W, y2=memeDrawPoints[1].y*H;
+    ctx.strokeRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+  } else if (memeDrawTool === 'circle') {
+    const cx=(memeDrawPoints[0].x+memeDrawPoints[1].x)/2*W;
+    const cy=(memeDrawPoints[0].y+memeDrawPoints[1].y)/2*H;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, Math.abs(memeDrawPoints[1].x-memeDrawPoints[0].x)*W/2, Math.abs(memeDrawPoints[1].y-memeDrawPoints[0].y)*H/2, 0, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ---- Layer add functions ----
+function addTextLayer() {
+  const text = document.getElementById('mTextInput').value.trim() || 'TEXT';
+  const yPos = 0.1;
+  layers.push({
+    id: nextLayerId++, type: 'text', text,
+    x: 0.5, y: yPos,
+    fontSize: parseInt(document.getElementById('mFontSize').value) / 100,
+    fontFamily: document.getElementById('mFontFamily').value,
+    color: memeTextColor,
+    strokeColor: memeStrokeColor,
+    strokeWidth: parseInt(document.getElementById('mStrokeW').value),
+    bold: document.getElementById('mBold').checked,
+    italic: document.getElementById('mItalic').checked,
+    align: document.getElementById('mAlign').value,
+    rotation: 0
+  });
+  memeSelectedId = layers[layers.length-1].id;
+  updateLayerList();
+  syncMemePropsPanel();
+  redrawMemeCanvas();
+}
+
+function placeText(pos) {
+  document.getElementById('mTextInput').value = document.getElementById('mTextInput').value || 'TEXT';
+  // Set y position then add
+  const yMap = { top: 0.08, center: 0.5, bottom: 0.92 };
+  addTextLayer();
+  const layer = layers.find(l => l.id === memeSelectedId);
+  if (layer) { layer.y = yMap[pos] || 0.5; redrawMemeCanvas(); }
+}
+
+function addEmojiLayer(emoji) {
+  layers.push({
+    id: nextLayerId++, type: 'emoji', emoji,
+    x: 0.5, y: 0.5,
+    size: parseInt(document.getElementById('mEmojiSize').value) / 100,
+    rotation: 0
+  });
+  memeSelectedId = layers[layers.length-1].id;
+  updateLayerList();
+  redrawMemeCanvas();
+}
+
+function addEmojiFromInput() {
+  const v = document.getElementById('mCustomEmoji').value.trim();
+  if (v) addEmojiLayer(v);
+}
+
+function addImageLayer(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const ar = img.width / img.height;
+      const w = 0.4;
+      layers.push({
+        id: nextLayerId++, type: 'image', img,
+        x: 0.5, y: 0.5,
+        w, h: w / ar, opacity: 1, rotation: 0
+      });
+      memeSelectedId = layers[layers.length-1].id;
+      updateLayerList();
+      syncMemePropsPanel();
+      redrawMemeCanvas();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function deleteSelectedLayer() {
+  if (memeSelectedId === null) return;
+  layers = layers.filter(l => l.id !== memeSelectedId);
+  memeSelectedId = null;
+  updateLayerList();
+  syncMemePropsPanel();
+  redrawMemeCanvas();
+}
+
+function updateSelectedLayer() {
+  if (memeSelectedId === null) return;
+  const layer = layers.find(l => l.id === memeSelectedId);
+  if (!layer) return;
+  if (layer.type === 'text') {
+    layer.text = document.getElementById('mTextInput').value || 'TEXT';
+    layer.fontSize = parseInt(document.getElementById('mFontSize').value) / 100;
+    layer.fontFamily = document.getElementById('mFontFamily').value;
+    layer.strokeWidth = parseInt(document.getElementById('mStrokeW').value);
+    layer.bold = document.getElementById('mBold').checked;
+    layer.italic = document.getElementById('mItalic').checked;
+    layer.align = document.getElementById('mAlign').value;
+    layer.color = memeTextColor;
+    layer.strokeColor = memeStrokeColor;
+  } else if (layer.type === 'emoji') {
+    layer.size = parseInt(document.getElementById('mEmojiSize').value) / 100;
+  } else if (layer.type === 'image') {
+    const wPct = parseInt(document.getElementById('mImgW').value) / 100;
+    const ar = layer.img.width / layer.img.height;
+    layer.w = wPct; layer.h = wPct / ar;
+    layer.opacity = parseInt(document.getElementById('mImgOp').value) / 100;
+  }
+  redrawMemeCanvas();
+}
+
+function syncMemePropsPanel() {
+  const del = document.getElementById('mDeleteLayerBtn');
+  del.style.display = memeSelectedId !== null ? 'block' : 'none';
+  const imgProps = document.getElementById('mImgProps');
+  if (imgProps) imgProps.style.display = 'none';
+  if (memeSelectedId === null) return;
+  const layer = layers.find(l => l.id === memeSelectedId);
+  if (!layer) return;
+  if (layer.type === 'text') {
+    switchMemeTab('text');
+    document.getElementById('mTextInput').value = layer.text;
+    document.getElementById('mFontSize').value = Math.round(layer.fontSize * 100);
+    document.getElementById('mFontSizeVal').textContent = Math.round(layer.fontSize * 100) + '%';
+    document.getElementById('mFontFamily').value = layer.fontFamily;
+    document.getElementById('mStrokeW').value = layer.strokeWidth;
+    document.getElementById('mStrokeWVal').textContent = layer.strokeWidth;
+    document.getElementById('mBold').checked = layer.bold;
+    document.getElementById('mItalic').checked = layer.italic;
+    document.getElementById('mAlign').value = layer.align;
+    memeTextColor = layer.color;
+    memeStrokeColor = layer.strokeColor;
+    buildColorSwatches('mTextColorRow', MEME_COLORS, memeTextColor, c => { memeTextColor = c; updateSelectedLayer(); });
+    buildColorSwatches('mStrokeColorRow', MEME_COLORS, memeStrokeColor, c => { memeStrokeColor = c; updateSelectedLayer(); });
+  } else if (layer.type === 'emoji') {
+    switchMemeTab('emoji');
+    document.getElementById('mEmojiSize').value = Math.round(layer.size * 100);
+    document.getElementById('mEmojiSizeVal').textContent = Math.round(layer.size * 100) + '%';
+  } else if (layer.type === 'image') {
+    switchMemeTab('image');
+    if (imgProps) {
+      imgProps.style.display = 'block';
+      document.getElementById('mImgW').value = Math.round(layer.w * 100);
+      document.getElementById('mImgWVal').textContent = Math.round(layer.w * 100) + '%';
+      document.getElementById('mImgOp').value = Math.round((layer.opacity ?? 1) * 100);
+      document.getElementById('mImgOpVal').textContent = Math.round((layer.opacity ?? 1) * 100) + '%';
+    }
+  }
+}
+
+function updateLayerList() {
+  const list = document.getElementById('layerList');
+  if (!layers.length) { list.innerHTML = '<div class="meme-no-layers">暂无图层</div>'; return; }
+  const icons = { text: '✏️', emoji: '😊', image: '🖼️', draw: '🖌️' };
+  list.innerHTML = '';
+  [...layers].reverse().forEach((layer, ri) => {
+    const i = layers.length - 1 - ri;
+    const div = document.createElement('div');
+    div.className = 'layer-item' + (layer.id === memeSelectedId ? ' sel' : '');
+    const name = layer.type === 'text' ? layer.text.slice(0, 14) :
+                 layer.type === 'emoji' ? layer.emoji :
+                 layer.type === 'image' ? '图片' : layer.tool;
+    div.innerHTML = `<span class="layer-ico">${icons[layer.type]}</span>
+      <span class="layer-nm">${name}</span>
+      <button class="layer-up" title="上移" onclick="layerMove(${layer.id},1)">▲</button>
+      <button class="layer-dn" title="下移" onclick="layerMove(${layer.id},-1)">▼</button>
+      <button class="layer-del" title="删除" onclick="layerDel(${layer.id})">✕</button>`;
+    div.onclick = (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      memeSelectedId = layer.id;
+      updateLayerList();
+      syncMemePropsPanel();
+      redrawMemeCanvas();
+    };
+    list.appendChild(div);
+  });
+  const del = document.getElementById('mDeleteLayerBtn');
+  if (del) del.style.display = memeSelectedId !== null ? 'block' : 'none';
+}
+
+function layerMove(id, dir) {
+  const i = layers.findIndex(l => l.id === id);
+  const j = i + dir;
+  if (j < 0 || j >= layers.length) return;
+  [layers[i], layers[j]] = [layers[j], layers[i]];
+  updateLayerList(); redrawMemeCanvas();
+}
+
+function layerDel(id) {
+  layers = layers.filter(l => l.id !== id);
+  if (memeSelectedId === id) memeSelectedId = null;
+  updateLayerList(); syncMemePropsPanel(); redrawMemeCanvas();
+}
+
+function switchMemeTab(tab) {
+  memeTab = tab;
+  ['text','emoji','image','draw'].forEach(t => {
+    document.getElementById('mtab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('mpanel-' + t).style.display = t === tab ? '' : 'none';
+  });
+  const mc = document.getElementById('memeCanvas');
+  if (mc) mc.style.cursor = tab === 'draw' ? 'crosshair' : 'default';
+}
+
+function setDrawTool(tool) {
+  memeDrawTool = tool;
+  document.querySelectorAll('.dtool').forEach(b => b.classList.toggle('active', b.id === 'dtool-' + tool));
+}
+
+function buildColorSwatches(containerId, colors, activeColor, onPick) {
+  const row = document.getElementById(containerId);
+  if (!row) return;
+  row.innerHTML = '';
+  colors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'meme-swatch' + (c === activeColor ? ' active' : '');
+    s.style.background = c;
+    if (c === '#ffffff') s.style.border = '2px solid rgba(255,255,255,0.3)';
+    s.onclick = () => {
+      onPick(c);
+      row.querySelectorAll('.meme-swatch').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+    };
+    row.appendChild(s);
+  });
+  // Custom color picker
+  const wrap = document.createElement('div');
+  wrap.className = 'meme-color-pick';
+  wrap.style.background = 'conic-gradient(red,yellow,lime,cyan,blue,magenta,red)';
+  const inp = document.createElement('input');
+  inp.type = 'color'; inp.value = activeColor;
+  inp.oninput = () => {
+    onPick(inp.value);
+    row.querySelectorAll('.meme-swatch').forEach(x => x.classList.remove('active'));
+  };
+  wrap.appendChild(inp);
+  row.appendChild(wrap);
+}
+
+function buildEmojiGrid() {
+  const g = document.getElementById('emojiGrid');
+  if (!g) return;
+  g.innerHTML = '';
+  MEME_EMOJIS.forEach(em => {
+    const b = document.createElement('button');
+    b.className = 'emoji-pick';
+    b.textContent = em;
+    b.onclick = () => addEmojiLayer(em);
+    g.appendChild(b);
+  });
+}
+</script>
+</body>
+</html>
