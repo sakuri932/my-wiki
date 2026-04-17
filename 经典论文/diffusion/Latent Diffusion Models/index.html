@@ -1,0 +1,3039 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sakuri932.github.io/my-wiki/%E7%BB%8F%E5%85%B8%E8%AE%BA%E6%96%87/diffusion/Latent%20Diffusion%20Models/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../../Transformer/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Latent Diffusion Models - 老中传习录</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="red">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#latent-diffusion-models" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../.." title="老中传习录" class="md-header__button md-logo" aria-label="老中传习录" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            老中传习录
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Latent Diffusion Models
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="red"  aria-label="切换到深色模式"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="切换到深色模式" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="切换到浅色模式"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="切换到浅色模式" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  
+    
+  
+  🏠 首页：新手村
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../%E6%9C%80%E8%BF%91%E6%9B%B4%E6%96%B0/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  🔔 最近更新
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../video/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  🎬 视频区
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../data/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  📊 数据区
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="老中传习录" class="md-nav__button md-logo" aria-label="老中传习录" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    老中传习录
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../.." class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 首页：新手村
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🏠 首页：新手村
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../%E5%BC%80%E5%B1%80%E7%A5%9E%E8%A3%85/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ❤️ 开局神装
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_2" id="__nav_1_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ❤️ 开局神装
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E5%BC%80%E5%B1%80%E7%A5%9E%E8%A3%85/latex/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LaTeX与模板使用方法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E5%BC%80%E5%B1%80%E7%A5%9E%E8%A3%85/AI%E5%B7%A5%E5%85%B7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📚 修仙课程
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_3" id="__nav_1_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    📚 修仙课程
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_3_2" id="__nav_1_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数学基础
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    数学基础
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/%E5%BE%AE%E7%A7%AF%E5%88%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MIT Calculus Course
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MIT18.06: Linear Algebra/丘维声高等代数
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/%E5%87%B8%E4%BC%98%E5%8C%96/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    凌青凸优化/Stanford EE364A: Convex Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_3_3" id="__nav_1_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    编程语言
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    编程语言
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/python/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CS61A: Structure and Interpretation of Computer Programs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CS61B: Data Structures and Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_3_4" id="__nav_1_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    深度学习
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    深度学习
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/%E6%9D%8E%E5%AE%8F%E6%AF%85%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    国立台湾大学：李宏毅机器学习
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/MIT%206.S184/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MIT 6.S184: Generative AI with SDE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_3_5" id="__nav_1_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    计算机架构
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    计算机架构
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%BF%AE%E4%BB%99%E8%AF%BE%E7%A8%8B/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%9E%B6%E6%9E%84/nand2tetris/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coursera: Nand2Tetris
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔧 满级法宝
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_4" id="__nav_1_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🔧 满级法宝
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7/latex2img/latex2img/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LaTeX公式图片生成器
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📜 经典论文选读
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    📜 经典论文选读
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_5_2" id="__nav_1_5_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diffusion
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Latent Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Latent Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1、读后感
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-by-claude-opus-46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2、论文精讲 by Claude Opus 4.6
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3、实验与训练
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4、附全文重点翻译
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../Transformer/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Transformer
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../GAN/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GAN
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GAN
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../%E8%B5%84%E6%BA%90%E5%BD%92%E6%A1%A3/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📂 资源归档
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    📂 资源归档
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E8%B5%84%E6%BA%90%E5%BD%92%E6%A1%A3/26%EF%BD%9E27%E5%AE%9E%E4%B9%A0%E8%B5%84%E8%AE%AF/26%EF%BD%9E27%E5%AE%9E%E4%B9%A0%E8%B5%84%E8%AE%AF%E6%95%B4%E7%90%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26～27实习资讯
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E8%B5%84%E6%BA%90%E5%BD%92%E6%A1%A3/VibeVibe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VibeVibe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E8%B5%84%E6%BA%90%E5%BD%92%E6%A1%A3/%E7%A7%AF%E5%88%86%E6%B1%82%E6%B3%95%E5%A4%A7%E6%80%BB%E7%BB%93/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    积分求法大总结
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../%E4%B8%8D%E5%8A%A1%E6%AD%A3%E4%B8%9A/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🤔 不务正业
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_7" id="__nav_1_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🤔 不务正业
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%B8%8D%E5%8A%A1%E6%AD%A3%E4%B8%9A/%E6%96%97%E5%9C%B0%E4%B8%BB.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    斗地主
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E4%B8%8D%E5%8A%A1%E6%AD%A3%E4%B8%9A/%E6%89%93%E5%83%B5%E5%B0%B8.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    打僵尸
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🗂️ 杂七杂八
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_8" id="__nav_1_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🗂️ 杂七杂八
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../blog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/%E5%A6%82%E4%BD%95%E6%92%B0%E5%86%99blog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    博客建造
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB/%E5%8D%9A%E5%AE%A2%E5%BB%BA%E9%80%A0index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    原版index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../%E6%9C%80%E8%BF%91%E6%9B%B4%E6%96%B0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔔 最近更新
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../video/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🎬 视频区
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📊 数据区
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1、读后感
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-by-claude-opus-46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2、论文精讲 by Claude Opus 4.6
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3、实验与训练
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4、附全文重点翻译
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="latent-diffusion-models">Latent Diffusion Models 隐空间扩散模型</h1>
+<p>文章地址：https://arxiv.org/abs/2112.10752</p>
+<h2 id="1">1、读后感</h2>
+<p>这篇论文是如此经典，以至于很难没见过它。什么，你真没见过？那下面这张图你大概率是见过的：</p>
+<p><img alt="image-20260415215709373" src="../Latent%20Diffusion%20Models.assets/image-20260415215709373.png" style="zoom:25%;" /></p>
+<p>这张最经典的图就是出自这篇论文。这篇论文主要讲的就是图片集空间在一个很高维空间里，但实际上只是里面的一个低维流形，所以有没有办法把这个流形在进行一定程度保形映射，到一个低维空间去呢？因为这样就只需要在一个低维度上训练，极大节省计算量和训练、推理时间。这篇文章的结论是：可以，只需要用一个VAE就行，想法既简单又自然。</p>
+<p>完全复刻文章中训练出来的模型至少需要4卡A100，以及二三十天的训练时间。听起来很夸张，但相比原来的模型已经快了几十倍了。当然，如果你不需要完美复刻，只是想在一个小一点的数据集上，比如MINST、COCO这种，那大概用5090跑几天甚至几个小时就结束了。想练手并没有想象中那么难。当然，微调可能是更好的选择，两三个小时就搞定了。</p>
+<h2 id="2-by-claude-opus-46">2、论文精讲 by Claude Opus 4.6</h2>
+<p>这篇论文提出了<strong>潜在扩散模型（Latent Diffusion Models, LDMs）</strong>，也就是后来大名鼎鼎的 <strong>Stable Diffusion</strong> 的基础工作。核心思路可以用一句话概括：</p>
+<p><strong>把扩散模型从像素空间搬到压缩后的潜在空间里运行，从而大幅降低计算成本，同时保持生成质量。</strong></p>
+<p>具体来说，论文解决的问题和方法如下：</p>
+<p><strong>问题：</strong> 传统扩散模型（如 DDPM）直接在高分辨率像素空间上做去噪，计算量极大，训练和推理都非常昂贵。</p>
+<p><strong>解决方案分两步：</strong></p>
+<ol>
+<li><strong>压缩阶段</strong> — 先用一个预训练的自编码器（autoencoder）把图像压缩到低维的潜在空间（latent space）。编码器把图像压小，解码器再还原回来。这个压缩保留了图像的核心语义信息，去掉了大量感知上不重要的高频细节。</li>
+<li><strong>扩散阶段</strong> — 在这个压缩后的潜在空间里训练扩散模型（加噪→去噪）。因为操作的"画布"小了很多（比如从 512×512 压到 64×64），计算量大幅下降。</li>
+</ol>
+<p><strong>条件生成的关键设计：</strong> 论文引入了<strong>交叉注意力（cross-attention）</strong>机制，让模型可以接受文本、语义图、布局等各种条件输入来引导生成。这就是后来文生图（text-to-image）能力的基础。</p>
+<p><strong>成果：</strong> LDMs 在图像修复（inpainting）、超分辨率、文生图等多个任务上达到了当时最优水平，同时训练资源需求比像素空间的扩散模型低得多——让普通研究者也能训练和使用高质量的图像生成模型。</p>
+<h3 id="high-resolution-image-synthesis-with-latent-diffusion-models">《High-Resolution Image Synthesis with Latent Diffusion Models》精读笔记</h3>
+<blockquote>
+<p><strong>作者</strong>：Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, Björn Ommer
+ <strong>机构</strong>：Ludwig Maximilian University of Munich &amp; IWR, Heidelberg University; Runway ML
+ <strong>发表</strong>：CVPR 2022（arXiv: 2112.10752）
+ <strong>地位</strong>：这篇论文就是 <strong>Stable Diffusion</strong> 的奠基论文，是 AI 图像生成领域最具影响力的工作之一。</p>
+</blockquote>
+<hr />
+<h3 id="_1">一、论文要解决什么问题？</h3>
+<h4 id="11">1.1 背景：扩散模型很强，但太贵</h4>
+<p>扩散模型（Diffusion Models, DMs）在图像生成领域已经取得了最优结果，超越了 GAN、VAE 和自回归模型。但它有一个致命问题：<strong>计算成本极高</strong>。</p>
+<ul>
+<li><strong>训练贵</strong>：最强的扩散模型（如 ADM）训练需要 150～1000 个 V100 GPU 天</li>
+<li><strong>推理慢</strong>：生成一张图需要跑 25～1000 步去噪，在单张 A100 上生成 50k 张样本大约需要 5 天</li>
+<li><strong>根本原因</strong>：传统扩散模型直接在像素空间（pixel space）操作，每一步都要在高维 RGB 图像上做前向/反向传播</li>
+</ul>
+<blockquote>
+<p><strong>💡 难点解释：什么是"像素空间"？</strong>
+ 一张 512×512 的 RGB 图像有 512×512×3 = 786,432 个数值。扩散模型每一步去噪都要在这 78 万维空间上运行整个神经网络。这就好比你想编辑一篇文章的主题思想，却不得不逐字逐句地修改每一个字——效率极低。</p>
+</blockquote>
+<h4 id="12">1.2 关键洞察：图像的两种压缩</h4>
+<p>论文作者分析了已训练的像素空间扩散模型，发现学习过程可以分为两个阶段：</p>
+<ol>
+<li><strong>感知压缩（Perceptual Compression）</strong>：去除高频细节（如细微纹理、噪声），这些细节人眼几乎感知不到</li>
+<li><strong>语义压缩（Semantic Compression）</strong>：学习数据的语义结构和概念组成（如"一只猫坐在桌上"）</li>
+</ol>
+<p><strong>核心思路</strong>：既然扩散模型花了大量算力在"感知压缩"这件人眼都分辨不出的事情上，何不把这件事交给一个单独的压缩模型来做，让扩散模型专注于"语义压缩"？</p>
+<hr />
+<h3 id="latent-diffusion-models-ldms">二、方法：Latent Diffusion Models (LDMs)</h3>
+<p>LDM 的整体架构分为两个阶段，非常清晰：</p>
+<h4 id="21">2.1 第一阶段：感知压缩——训练自编码器</h4>
+<p><strong>目标</strong>：把图像压缩到一个低维的「潜在空间」（latent space），去掉人眼不敏感的信息，保留核心视觉内容。</p>
+<p><strong>架构</strong>：</p>
+<ul>
+<li><strong>编码器 E</strong>：将图像 x ∈ ℝ^{H×W×3} 编码为潜在表示 z = E(x) ∈ ℝ^{h×w×c}</li>
+<li><strong>解码器 D</strong>：从潜在表示重建图像 x̃ = D(z) = D(E(x))</li>
+<li><strong>下采样因子 f = H/h = W/w</strong>：例如 f=4 意味着 512×512 的图变成 128×128 的潜在表示；f=8 则变成 64×64</li>
+</ul>
+<p><strong>训练目标</strong>（多项损失联合）：</p>
+<div class="arithmatex">\[\mathcal{L}*{\text{Autoencoder}} = \min*{E,D} \max_{\psi} \Big( \mathcal{L}*{\text{rec}} + \mathcal{L}*{\text{reg}} - \mathcal{L}*{\text{adv}}(D(E(x))) + \log D*\psi(x) \Big)\]</div>
+<p>各项含义：</p>
+<table>
+<thead>
+<tr>
+<th>损失项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(\mathcal{L}_{\text{rec}}\)</span></td>
+<td>重建损失，让输出和输入尽量一致</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\mathcal{L}_{\text{reg}}\)</span></td>
+<td>正则化损失，防止潜在空间退化（方差爆炸等）</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\mathcal{L}*{\text{adv}}\)</span> + <span class="arithmatex">\(\log D*\psi(x)\)</span></td>
+<td>对抗损失 + 判别器，确保重建图像真实，避免模糊</td>
+</tr>
+</tbody>
+</table>
+<p><strong>正则化有两种方式</strong>：</p>
+<ul>
+<li><strong>KL 正则化</strong>：像 VAE 一样，让潜在分布接近标准正态分布 <span class="arithmatex">\(\mathcal{N}(0,1)\)</span>，但权重极小（~10⁻⁶）</li>
+<li><strong>VQ 正则化</strong>：像 VQ-GAN 一样，使用向量量化码本</li>
+</ul>
+<blockquote>
+<p><strong>💡 难点解释：为什么正则化权重这么小？</strong>
+ 传统 VAE 的 KL 正则化会强力约束潜在空间，代价是重建质量下降（"模糊"）。本文发现只需要极轻微的正则化就够了——因为后续的扩散模型本身就能很好地建模潜在空间的分布，不需要潜在空间严格服从标准正态。这是 LDM 相比传统 VAE 的一个重要优势：<strong>解耦了重建质量和生成能力的权衡</strong>。</p>
+</blockquote>
+<h4 id="22">2.2 第二阶段：潜在扩散——在压缩空间中训练扩散模型</h4>
+<p>自编码器训练好后固定参数，在其潜在空间中训练扩散模型。</p>
+<p><strong>前向过程</strong>（加噪）：对潜在表示 z 逐步添加高斯噪声</p>
+<div class="arithmatex">\[q(z_t | z_0) = \mathcal{N}(z_t; \alpha_t z_0, \sigma_t^2 I)\]</div>
+<p><strong>训练目标</strong>：训练一个去噪网络 <span class="arithmatex">\(\epsilon_\theta\)</span> 预测加入的噪声</p>
+<div class="arithmatex">\[\mathcal{L}*{\text{LDM}} = \mathbb{E}*{E(x), \epsilon \sim \mathcal{N}(0,1), t} \Big[ | \epsilon - \epsilon_\theta(z_t, t) |_2^2 \Big]\]</div>
+<p><strong>生成流程</strong>：</p>
+<ol>
+<li>从标准正态分布采样一个随机噪声 <span class="arithmatex">\(z_T\)</span></li>
+<li>用训练好的去噪网络逐步去噪：<span class="arithmatex">\(z_T → z_{T-1} → \cdots → z_0\)</span></li>
+<li>用解码器一步还原为图像：<span class="arithmatex">\(\tilde{x} = D(z_0)\)</span></li>
+</ol>
+<blockquote>
+<p><strong>💡 难点解释：为什么在潜在空间做扩散效率更高？</strong>
+ 以 f=8 为例：</p>
+<ul>
+<li>像素空间：操作 512×512×3 = <strong>786,432</strong> 维数据</li>
+<li>潜在空间：操作 64×64×4 = <strong>16,384</strong> 维数据</li>
+<li>数据量缩小了 <strong>48 倍</strong>！</li>
+</ul>
+<p>而且 UNet 的计算量大致与空间分辨率的平方成正比，所以实际加速远不止 48 倍。关键是，被丢掉的那些信息（高频细节）对人眼来说几乎不可见。</p>
+</blockquote>
+<h4 id="23-cross-attention">2.3 条件生成机制——交叉注意力（Cross-Attention）</h4>
+<p>这是论文的第二个核心贡献：设计了一个<strong>通用的条件注入机制</strong>，让 LDM 可以根据各种输入（文本、语义图、布局框等）来引导生成。</p>
+<p><strong>机制</strong>：</p>
+<ol>
+<li>条件输入 y（如文本）先通过一个<strong>领域特定编码器</strong> <span class="arithmatex">\(\tau_\theta\)</span> 映射为中间表示 <span class="arithmatex">\(\tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}\)</span></li>
+<li>对于文本：<span class="arithmatex">\(\tau_\theta\)</span> 是一个 Transformer（使用 BERT tokenizer）</li>
+<li>对于类别标签：<span class="arithmatex">\(\tau_\theta\)</span> 是一个可学习的嵌入层</li>
+<li>对于布局：将边界框坐标离散化后编码</li>
+<li>在 UNet 的中间层插入<strong>交叉注意力层</strong>：</li>
+</ol>
+<div class="arithmatex">\[\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}}\right) \cdot V\]</div>
+<p>其中：</p>
+<ul>
+<li><span class="arithmatex">\(Q = W_Q^{(i)} \cdot \varphi_i(z_t)\)</span>（查询来自 UNet 的特征图）</li>
+<li><span class="arithmatex">\(K = W_K^{(i)} \cdot \tau_\theta(y)\)</span>（键来自条件编码）</li>
+<li><span class="arithmatex">\(V = W_V^{(i)} \cdot \tau_\theta(y)\)</span>（值来自条件编码）</li>
+</ul>
+<blockquote>
+<p><strong>💡 难点解释：交叉注意力在这里干了什么？</strong>
+ 可以这样理解：UNet 在去噪时，每一层都会"询问"条件信息——"你想要什么样的图？"。Query 是图像特征的"问题"，Key 和 Value 是条件信息的"回答"。通过注意力机制，图像的每个空间位置都能选择性地关注条件中最相关的部分。</p>
+<p>比如在文生图中，生成天空区域的像素时，注意力会更多地关注 "blue sky" 这样的词；生成猫的区域时，会关注 "cat" 这个词。</p>
+</blockquote>
+<p><strong>两种条件注入方式对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>适用场景</th>
+<th>原理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>拼接（Concatenation）</strong></td>
+<td>空间对齐的条件（低分辨率图、遮罩）</td>
+<td>直接把条件拼接到 UNet 输入</td>
+</tr>
+<tr>
+<td><strong>交叉注意力（Cross-Attention）</strong></td>
+<td>非空间条件（文本、类别）</td>
+<td>通过注意力机制融合</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="_2">三、关键实验与发现</h3>
+<h4 id="31-f">3.1 下采样因子 f 的最佳选择</h4>
+<p>论文系统地对比了 f ∈ {1, 2, 4, 8, 16, 32}（LDM-1 就是普通像素空间扩散模型）：</p>
+<table>
+<thead>
+<tr>
+<th>下采样因子 f</th>
+<th>表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>f = 1, 2</td>
+<td>训练极慢，大量算力浪费在感知压缩上</td>
+</tr>
+<tr>
+<td><strong>f = 4 ~ 8</strong></td>
+<td><strong>最佳平衡点</strong>——效率高、质量好</td>
+</tr>
+<tr>
+<td>f = 16, 32</td>
+<td>压缩太狠，信息丢失严重，质量饱和</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>在 ImageNet 上训练 2M 步后，LDM-8 的 FID 比像素空间的 LDM-1 低了 38 分，同时训练速度快了数倍。</p>
+</blockquote>
+<h4 id="32">3.2 无条件图像生成</h4>
+<p>在多个数据集上与 SOTA 方法对比（FID 越低越好）：</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>LDM</th>
+<th>之前最优</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CelebA-HQ 256²</td>
+<td><strong>5.11</strong></td>
+<td>LSGM 7.22</td>
+<td>超越所有扩散和 VAE 方法</td>
+</tr>
+<tr>
+<td>FFHQ 256²</td>
+<td><strong>4.98</strong></td>
+<td>UDM 5.54</td>
+<td>接近 ProjectedGAN (3.08)</td>
+</tr>
+<tr>
+<td>LSUN-Churches 256²</td>
+<td><strong>4.02</strong></td>
+<td>StyleGAN2 3.86</td>
+<td>非常接近</td>
+</tr>
+<tr>
+<td>LSUN-Bedrooms 256²</td>
+<td><strong>2.95</strong></td>
+<td>ADM 1.90</td>
+<td>略逊于 ADM，但参数量仅一半</td>
+</tr>
+</tbody>
+</table>
+<h4 id="33-text-to-image">3.3 文本到图像生成（Text-to-Image）</h4>
+<p>在 MS-COCO 256² 上（使用 1.45B 参数的 KL-正则化 LDM-8）：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>FID↓</th>
+<th>参数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CogView</td>
+<td>27.10</td>
+<td>4B</td>
+</tr>
+<tr>
+<td>LAFITE</td>
+<td>26.94</td>
+<td>75M</td>
+</tr>
+<tr>
+<td>GLIDE</td>
+<td>12.24</td>
+<td><strong>6B</strong></td>
+</tr>
+<tr>
+<td>Make-A-Scene</td>
+<td>11.84</td>
+<td><strong>4B</strong></td>
+</tr>
+<tr>
+<td><strong>LDM-KL-8-G（本文）</strong></td>
+<td><strong>12.63</strong></td>
+<td><strong>1.45B</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>关键发现：LDM 在参数量仅为 GLIDE 的 1/4 的情况下，达到了几乎相同的性能。这正是"潜在空间"策略的威力。</p>
+</blockquote>
+<h4 id="34-class-conditional-imagenet">3.4 类别条件生成（Class-Conditional, ImageNet）</h4>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>FID↓</th>
+<th>IS↑</th>
+<th>参数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADM-G (引导)</td>
+<td>4.59</td>
+<td>186.7</td>
+<td>608M</td>
+</tr>
+<tr>
+<td><strong>LDM-4-G (本文, 引导)</strong></td>
+<td><strong>3.60</strong></td>
+<td><strong>247.67</strong></td>
+<td><strong>400M</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>LDM 以更少的参数量击败了 ADM-G</strong>，取得了当时 ImageNet 类别条件生成的新 SOTA。</p>
+</blockquote>
+<h4 id="35-inpainting">3.5 图像修复（Inpainting）</h4>
+<p>对比专门为修复设计的 LaMa 模型：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>LaMa</th>
+<th>LDM-4 (本文)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FID (全图)</td>
+<td>—</td>
+<td><strong>1.50</strong> (SOTA)</td>
+</tr>
+<tr>
+<td>用户偏好（Task 2）</td>
+<td>31.9%</td>
+<td><strong>68.1%</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>LDM 不仅 FID 更优，而且在人类评测中以压倒性优势获胜。更重要的是，LDM 是<strong>通用生成模型</strong>，而 LaMa 是专门为修复设计的架构。</p>
+</blockquote>
+<h4 id="36-super-resolution-4">3.6 超分辨率（Super-Resolution, 4× 放大）</h4>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>FID↓</th>
+<th>IS↑</th>
+<th>参数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SR3</td>
+<td>5.2</td>
+<td>180.1</td>
+<td>625M</td>
+</tr>
+<tr>
+<td><strong>LDM-4 (本文)</strong></td>
+<td><strong>2.8</strong></td>
+<td>166.3</td>
+<td>169M</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>LDM 在 FID 上大幅超越 SR3，且参数量仅为其 1/4。用户研究中，70.6% 的人更偏好 LDM 的结果。</p>
+</blockquote>
+<h4 id="37">3.7 效率对比</h4>
+<p>在图像修复任务上，LDM-4 vs 像素空间扩散模型 LDM-1：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>LDM-1（像素空间）</th>
+<th>LDM-4（潜在空间）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>训练吞吐量</td>
+<td>0.11 samples/sec</td>
+<td><strong>0.32 samples/sec</strong>（2.9×）</td>
+</tr>
+<tr>
+<td>采样吞吐量 (256²)</td>
+<td>0.26 samples/sec</td>
+<td><strong>0.97 samples/sec</strong>（3.7×）</td>
+</tr>
+<tr>
+<td>采样吞吐量 (512²)</td>
+<td>0.07 samples/sec</td>
+<td><strong>0.34 samples/sec</strong>（4.9×）</td>
+</tr>
+<tr>
+<td>FID (6 epochs)</td>
+<td>24.74</td>
+<td><strong>15.21</strong>（质量也更好）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="_3">四、技术细节补充</h3>
+<h4 id="41-unet">4.1 UNet 骨干网络</h4>
+<p>去噪网络 <span class="arithmatex">\(\epsilon_\theta\)</span> 使用的是带时间条件的 UNet：</p>
+<ul>
+<li>基于 "ablated UNet"（来自 DDPM/ADM 的简化版）</li>
+<li>使用 2D 卷积层（利用图像的空间归纳偏置）</li>
+<li>含跳跃连接（skip connections）</li>
+<li>在 UNet 的特征层级上加入 self-attention 和 cross-attention</li>
+</ul>
+<h4 id="42">4.2 采样策略</h4>
+<p>论文使用 <strong>DDIM（Denoising Diffusion Implicit Models）</strong> 采样器来加速推理，通常使用 50～250 步（而非原始 DDPM 的 1000 步）。</p>
+<h4 id="43-classifier-free-guidance">4.3 Classifier-Free Guidance（无分类器引导）</h4>
+<p>用于提升条件生成质量的关键技巧：</p>
+<ul>
+<li>训练时以一定概率丢弃条件（unconditional training）</li>
+<li>推理时同时预测有条件和无条件的噪声，用引导系数 s 控制偏向：</li>
+</ul>
+<div class="arithmatex">\[\hat{\epsilon} = \epsilon_\theta(z_t, t) + s \cdot (\epsilon_\theta(z_t, t, y) - \epsilon_\theta(z_t, t))\]</div>
+<p>s &gt; 1 时会让生成结果更贴合条件描述，但牺牲一些多样性。</p>
+<blockquote>
+<p><strong>💡 难点解释：为什么 classifier-free guidance 有效？</strong>
+ 直觉上，这相当于"把有条件方向和无条件方向的差值放大"。如果条件是"一只猫"，引导会让模型更加坚定地朝"猫"的方向生成，远离那些"什么都可能是"的模糊区域。s 越大，结果越精准但越不多样。</p>
+</blockquote>
+<hr />
+<h3 id="_4">五、局限性</h3>
+<p>论文诚实地指出了几个局限：</p>
+<ol>
+<li><strong>仍然比 GAN 慢</strong>：虽然比像素空间扩散模型快很多，但序列化的去噪过程仍不如 GAN 的单步前向</li>
+<li><strong>精度上限</strong>：自编码器的重建能力成为瓶颈——当任务需要像素级精确时（如超分辨率的极细纹理），f=4 的压缩会导致细节损失</li>
+<li><strong>社会影响</strong>：高质量图像生成技术的双刃剑问题——创作赋能 vs. 深度伪造</li>
+</ol>
+<hr />
+<h3 id="_5">六、总结：为什么这篇论文如此重要？</h3>
+<table>
+<thead>
+<tr>
+<th>贡献</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>将扩散过程搬到潜在空间</strong></td>
+<td>计算成本降低数倍，首次让高质量扩散模型在消费级硬件上可行</td>
+</tr>
+<tr>
+<td><strong>解耦压缩与生成</strong></td>
+<td>自编码器训练一次，可复用于多种任务和不同扩散模型</td>
+</tr>
+<tr>
+<td><strong>通用交叉注意力条件机制</strong></td>
+<td>文本、布局、语义图等多模态条件都可以统一接入</td>
+</tr>
+<tr>
+<td><strong>开源</strong></td>
+<td>代码和预训练模型全部公开，直接催生了 Stable Diffusion 生态</td>
+</tr>
+</tbody>
+</table>
+<p>这篇论文的核心洞察可以浓缩为一句话：<strong>在一个"对人眼来说等价"的低维空间里做扩散，比在原始像素空间里做扩散，又快又好。</strong> 这个看似简单的想法，加上精心的工程设计（自编码器的训练方式、交叉注意力的引入、适当的压缩比选择），最终彻底改变了 AI 图像生成的格局。</p>
+<h2 id="3">3、实验与训练</h2>
+<p>如果是一个学生，该怎么试呢？我们来看看Claude的建议：</p>
+<h3 id="mnist-celeba-ldm">推荐方案：在 MNIST 或 CelebA 上训练小型 LDM</h3>
+<h4 id="_6">硬件要求</h4>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>是否够用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>单张 RTX 3060 12GB</td>
+<td>✅ 够用（较慢）</td>
+</tr>
+<tr>
+<td>单张 RTX 3090/4090 24GB</td>
+<td>✅ 舒适</td>
+</tr>
+<tr>
+<td>Google Colab Pro（A100）</td>
+<td>✅ 推荐，免硬件</td>
+</tr>
+<tr>
+<td>没有 GPU，只有 CPU</td>
+<td>❌ 不现实</td>
+</tr>
+</tbody>
+</table>
+<p>如果你没有本地 GPU，<strong>Colab Pro 约 $10/月，是最低成本的入门方式</strong>。</p>
+<hr />
+<h3 id="_7">分阶段来做</h3>
+<h4 id="latent-ddpm">第一步：先不用 Latent，直接训一个 DDPM</h4>
+<p>在正式搞 LDM 之前，强烈建议先在 <strong>MNIST（28×28）或 CIFAR-10（32×32）</strong> 上跑通一个基础扩散模型：</p>
+<ul>
+<li>参数量极小，1 张普通 GPU 跑几个小时就能出结果</li>
+<li>让你真正理解前向加噪 / 反向去噪的训练循环</li>
+<li>有大量现成代码可以直接用</li>
+</ul>
+<p>推荐项目：<a href="https://github.com/lucidrains/denoising-diffusion-pytorch">denoising-diffusion-pytorch</a>，几十行配置就能跑起来。</p>
+<hr />
+<h4 id="ldm">第二步：复现小规模 LDM</h4>
+<p>在跑通基础 DDPM 之后，再加上 VAE 压缩这一层，就是完整的 LDM 流程。</p>
+<p><strong>推荐数据集</strong>：CelebA，64×64 分辨率裁剪版，约 20 万张人脸，下载约 1.4GB，规模合适。</p>
+<p><strong>大致训练配置</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>内容</th>
+<th>时间估计（RTX 3090）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 训 VAE</td>
+<td>把 64×64 图压到 16×16×4</td>
+<td>约 6-12 小时</td>
+</tr>
+<tr>
+<td>2. 训 LDM</td>
+<td>在潜在空间跑扩散</td>
+<td>约 1-3 天</td>
+</tr>
+</tbody>
+</table>
+<p>分辨率 64×64 → 潜在空间 16×16，UNet 参数量可以压到 <strong>50M 以下</strong>，完全在消费级显卡上跑。</p>
+<hr />
+<h4 id="_8">第三步：加条件（可选）</h4>
+<p>如果想体验带条件的生成（比如按类别生成），CelebA 有性别、年龄、表情等 40 个属性标注，可以用类别标签做条件，体验 CFG 的效果。</p>
+<hr />
+<h4 id="_9">现成代码推荐</h4>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/CompVis/latent-diffusion">CompVis/latent-diffusion</a></td>
+<td>论文官方代码，最权威，但配置复杂</td>
+</tr>
+<tr>
+<td><a href="https://github.com/lucidrains/denoising-diffusion-pytorch">lucidrains/denoising-diffusion-pytorch</a></td>
+<td>代码极简洁，适合入门</td>
+</tr>
+<tr>
+<td><a href="https://github.com/huggingface/diffusers">huggingface/diffusers</a></td>
+<td>工程化最好，有大量教程</td>
+</tr>
+</tbody>
+</table>
+<p>对于复现入门，<strong>建议从 lucidrains 的仓库开始</strong>，代码量少、注释清晰，跑通之后再去看官方代码。</p>
+<hr />
+<h4 id="_10">最小可行路线总结</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Week 1：跑通 DDPM on MNIST/CIFAR-10
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Week 2：训 VAE on CelebA 64×64，验证重建效果
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Week 3：在 VAE 潜在空间上训扩散模型
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Week 4：加条件 + 体验 CFG
+</code></pre></div>
+<p>四周左右你就能有一个完整的、自己训出来的小型 LDM。</p>
+<h2 id="4">4、附全文重点翻译</h2>
+<h3 id="_11">基于潜在扩散模型的高分辨率图像合成</h3>
+<p><strong>Robin Rombach¹* · Andreas Blattmann¹* · Dominik Lorenz¹ · Patrick Esser · Björn Ommer¹</strong></p>
+<p>¹ 慕尼黑路德维希·马克西米利安大学 &amp; 海德堡大学 IWR，德国；Runway ML</p>
+<p>https://github.com/CompVis/latent-diffusion</p>
+<hr />
+<h4 id="_12">摘要</h4>
+<p>通过将图像生成过程分解为去噪自编码器的序列化应用，扩散模型（DM）在图像数据及其他领域上取得了最先进的合成结果。此外，其公式化方式允许在无需重新训练的情况下，通过一种引导机制来控制图像生成过程。然而，由于这些模型通常直接在像素空间中运行，强大扩散模型的优化往往需要消耗数百个 GPU 天，且由于需要顺序求值，推理代价也十分昂贵。为了在有限计算资源下实现扩散模型训练，同时保留其质量与灵活性，我们将扩散模型应用于强大的预训练自编码器的潜在空间中。与此前工作不同，在这样的表示空间上训练扩散模型，首次使得在复杂度降低与细节保留之间达到近乎最优的平衡点成为可能，从而大幅提升了视觉保真度。通过在模型架构中引入交叉注意力层，我们将扩散模型转变为功能强大且灵活的生成器，能够接受文本或边界框等通用条件输入，并以卷积方式实现高分辨率图像合成。我们的潜在扩散模型（LDM）在图像修复和类条件图像合成方面取得了新的最先进分数，在文本到图像合成、无条件图像生成和超分辨率等多项任务上也表现出极具竞争力的性能，同时相较于基于像素的扩散模型，显著降低了计算需求。</p>
+<hr />
+<h4 id="1_1">1. 引言</h4>
+<p>图像合成是计算机视觉领域近年来发展最为壮观的方向之一，但也是计算需求最大的方向之一。尤其是复杂自然场景的高分辨率合成，目前主要由不断扩大规模的基于似然的模型所主导，这些模型可能包含自回归（AR）Transformer 中的数十亿参数 [66, 67]。相比之下，GAN [3, 27, 40] 的有前景的结果已被证明大多局限于变化相对有限的数据，因为其对抗学习过程不容易扩展到对复杂多模态分布的建模。最近，扩散模型 [82] 由去噪自编码器的层次结构构建而成，已在图像合成 [30, 85] 及其他领域 [7, 45, 48, 57] 取得了令人印象深刻的结果，并在类条件图像合成 [15, 31] 和超分辨率 [72] 方面定义了最先进水平。此外，即使是无条件扩散模型也可以直接用于图像修复和着色 [85] 或基于笔触的合成 [53] 等任务，这与其他类型的生成模型不同 [19, 46, 69]。作为基于似然的模型，它们不像 GAN 那样表现出模式崩溃和训练不稳定性，并且通过大量利用参数共享，可以在不涉及自回归模型 [67] 中数十亿参数的情况下对自然图像的高度复杂分布进行建模。</p>
+<p><strong>普及高分辨率图像合成。</strong> 扩散模型属于基于似然的模型，其模式覆盖行为使其容易将过多的容量（以及计算资源）花费在对数据中难以察觉的细节的建模上 [16, 73]。尽管重加权变分目标 [30] 旨在通过对初始去噪步骤进行欠采样来解决这一问题，但扩散模型在计算上仍然要求很高，因为训练和评估此类模型需要在 RGB 图像的高维空间中进行反复的函数求值（以及梯度计算）。举例而言，训练最强大的扩散模型通常需要数百个 GPU 天（例如 [15] 中需要 150 到 1000 个 V100 天），而在输入空间噪声版本上的反复评估也使推理代价高昂——生成 50,000 个样本在单张 A100 GPU 上大约需要 5 天 [15]。这对研究界和普通用户产生了两方面影响：其一，训练此类模型需要只有极少数人才能获取的大量计算资源，同时留下巨大的碳足迹 [65, 86]；其二，评估一个已训练好的模型也在时间和内存上代价高昂，因为相同的模型架构必须顺序运行大量步骤（例如 [15] 中为 25 到 1000 步）。</p>
+<p>为了提高这一强大模型类别的可及性，同时降低其显著的资源消耗，我们需要一种能够降低训练和采样计算复杂度的方法。因此，在不损害性能的前提下降低扩散模型的计算需求，是提升其可及性的关键。</p>
+<p><strong>迈向潜在空间。</strong> 我们的方法从分析已在像素空间训练好的扩散模型开始：图 2 展示了一个训练模型的率失真权衡。与任何基于似然的模型一样，学习过程大致可以分为两个阶段：首先是感知压缩阶段，该阶段去除高频细节，但仍学到少量语义变化；在第二阶段，实际的生成模型学习数据的语义和概念组成（语义压缩）。因此，我们的目标是首先找到一个在感知上等价但在计算上更为合适的空间，在该空间中训练用于高分辨率图像合成的扩散模型。</p>
+<p>遵循通常的做法 [11, 23, 66, 67, 96]，我们将训练分为两个不同的阶段：首先，我们训练一个自编码器，该自编码器提供一个低维（因而高效）的表示空间，在感知上等价于数据空间。重要的是，与此前工作 [23, 66] 不同，我们不需要依赖过度的空间压缩，因为我们在所学的潜在空间中训练扩散模型，该潜在空间在空间维度方面表现出更好的缩放特性。降低的复杂度还通过单次网络前向传播，提供了从潜在空间高效生成图像的能力。我们将得到的模型类称为<strong>潜在扩散模型（LDM）</strong>。</p>
+<p>这一方法的一个显著优势是，我们只需训练一次通用的自编码阶段，因此可以将其复用于多次扩散模型训练，或探索完全不同的任务 [81]。这使得对各种图像到图像和文本到图像任务的大量扩散模型进行高效探索成为可能。对于后者，我们设计了一种将 Transformer 连接到扩散模型 UNet 主干 [71] 的架构，并支持任意类型的基于 token 的条件机制，见第 3.3 节。</p>
+<p>总而言之，我们的工作做出了以下贡献：</p>
+<p><strong>(i)</strong> 与纯粹基于 Transformer 的方法 [23, 66] 相比，我们的方法能更优雅地扩展到更高维度的数据，因此可以 (a) 在比以往工作更忠实、更详细的压缩水平上工作（见图 1），以及 (b) 可以高效地应用于百万像素图像的高分辨率合成。</p>
+<p><strong>(ii)</strong> 我们在多项任务（无条件图像合成、图像修复、随机超分辨率）和数据集上取得了有竞争力的性能，同时显著降低了计算成本。与基于像素的扩散方法相比，我们也显著降低了推理成本。</p>
+<p><strong>(iii)</strong> 我们表明，与此前同时学习编码器/解码器架构和基于分数的先验的工作 [93] 不同，我们的方法不需要对重建能力和生成能力进行难以权衡的加权。这确保了极其忠实的重建，并且仅需对潜在空间进行极少的正则化。</p>
+<p><strong>(iv)</strong> 我们发现，对于超分辨率、图像修复和语义合成等密集条件任务，我们的模型可以以卷积方式应用，并渲染约 <span class="arithmatex">\(1024^2\)</span> 像素的大型一致图像。</p>
+<p><strong>(v)</strong> 此外，我们设计了一种基于交叉注意力的通用条件机制，支持多模态训练。我们利用它训练了类条件、文本到图像和布局到图像模型。</p>
+<p><strong>(vi)</strong> 最后，我们在 https://github.com/CompVis/latent-diffusion 发布了预训练的潜在扩散模型和自编码模型，这些模型可能可复用于扩散模型训练 [81] 之外的各种任务。</p>
+<hr />
+<h4 id="2">2. 相关工作</h4>
+<p><strong>图像合成的生成模型。</strong> 图像的高维特性对生成建模提出了独特的挑战。生成对抗网络（GAN）[27] 允许高效采样具有良好感知质量的高分辨率图像 [3, 42]，但难以优化 [2, 28, 54]，且难以捕捉完整的数据分布 [55]。相比之下，基于似然的方法强调良好的密度估计，使优化过程更加稳定。变分自编码器（VAE）[46] 和基于流的模型 [18, 19] 能够高效合成高分辨率图像 [9, 44, 92]，但样本质量不及 GAN。尽管自回归模型（ARM）[6, 10, 94, 95] 在密度估计方面表现出色，但计算密集型的架构 [97] 和顺序采样过程将其限制于低分辨率图像。由于图像的基于像素的表示包含难以察觉的高频细节 [16, 73]，最大似然训练在对其建模上花费了不成比例的容量，导致训练时间很长。为了扩展到更高分辨率，一些两阶段方法 [23, 67, 101, 103] 使用自回归模型来对压缩后的潜在图像空间而非原始像素进行建模。</p>
+<p>最近，扩散概率模型（DM）[82] 在密度估计 [45] 和样本质量 [15] 方面均取得了最先进的结果。这些模型的生成能力源于其底层神经网络主干实现为 UNet [15, 30, 71, 85] 时与图像类数据归纳偏置的自然契合。最佳合成质量通常在使用重加权目标 [30] 进行训练时实现。在这种情况下，扩散模型对应于一个有损压缩器，可以在图像质量和压缩能力之间进行权衡。然而，在像素空间中对这些模型进行评估和优化，存在推理速度慢和训练成本极高的缺点。虽然前者可以通过先进的采样策略 [47, 75, 84] 和层次化方法 [31, 93] 得到部分缓解，但在高分辨率图像数据上训练始终需要计算昂贵的梯度。我们通过提出在低维压缩潜在空间中工作的 LDM 来解决这两个缺点，这使得训练在计算上更加经济，并以几乎不损失合成质量的代价加速了推理（见图 1）。</p>
+<p><strong>两阶段图像合成。</strong> 为了缓解各类生成方法的不足，大量研究 [11, 23, 67, 70, 101, 103] 致力于通过两阶段方法将不同方法的优势结合成更高效、性能更强的模型。VQ-VAE [67, 101] 使用自回归模型在离散化潜在空间上学习一个富有表现力的先验。文献 [66] 通过学习离散化图像和文本表示的联合分布，将这一方法扩展到文本到图像生成。更一般地，文献 [70] 使用条件可逆网络在不同域的潜在空间之间提供通用迁移。与 VQ-VAE 不同，VQGAN [23, 103] 采用具有对抗性和感知目标的第一阶段，将自回归 Transformer 扩展到更大的图像。然而，可行的 ARM 训练所需的高压缩率引入了数十亿可训练参数 [23, 66]，限制了此类方法的整体性能，而降低压缩率则需付出高计算成本的代价 [23, 66]。我们的工作避免了此类权衡，因为我们提出的 LDM 由于其卷积主干，能够更平缓地扩展到更高维的潜在空间。因此，我们可以自由选择最优地在学习强大的第一阶段之间进行调节的压缩水平，既不将过多的感知压缩留给生成扩散模型，又保证高保真度重建（见图 1）。</p>
+<p>虽然存在联合 [93] 或分开 [80] 学习编码/解码模型与基于分数的先验的方法，但前者仍然需要在重建能力和生成能力之间进行困难的权衡 [11]，且被我们的方法所超越（第 4 节），而后者则专注于人脸等高度结构化的图像。</p>
+<hr />
+<h4 id="3_1">3. 方法</h4>
+<p>为了降低训练扩散模型以实现高分辨率图像合成的计算需求，我们注意到，尽管扩散模型允许通过对相应损失项进行欠采样来忽略感知上无关的细节 [30]，但它们在像素空间中仍然需要昂贵的函数求值，这在计算时间和能源资源方面带来了巨大需求。</p>
+<p>我们提出通过引入压缩学习阶段与生成学习阶段的显式分离来规避这一缺点（见图 2）。为实现这一点，我们利用一个自编码模型，该模型学习一个在感知上等价于图像空间但提供显著降低计算复杂度的空间。</p>
+<p>这种方法具有以下几个优势：<strong>(i)</strong> 通过离开高维图像空间，我们得到了在计算上更高效的扩散模型，因为采样在低维空间中进行。<strong>(ii)</strong> 我们利用扩散模型从其 UNet 架构 [71] 中继承的归纳偏置，这使其对具有空间结构的数据特别有效，从而缓解了以往方法 [23, 66] 所要求的、会导致质量下降的激进压缩水平需求。<strong>(iii)</strong> 最后，我们获得了通用压缩模型，其潜在空间可以用于训练多个生成模型，也可以用于其他下游应用，例如单图像 CLIP 引导合成 [25]。</p>
+<h4 id="31">3.1 感知图像压缩</h4>
+<p>我们的感知压缩模型基于以往工作 [23]，由一个通过感知损失 [106] 和基于 patch 的 [33] 对抗目标 [20, 23, 103] 组合训练的自编码器组成。这确保了重建被约束在图像流形上，通过强制局部真实感来避免仅依赖像素空间损失（如 L2 或 L1 目标）所引入的模糊性。</p>
+<p>更精确地，给定 RGB 空间中的图像 <span class="arithmatex">\(x \in \mathbb{R}^{H \times W \times 3}\)</span>，编码器 <span class="arithmatex">\(\mathcal{E}\)</span> 将 <span class="arithmatex">\(x\)</span> 编码为潜在表示 <span class="arithmatex">\(z = \mathcal{E}(x)\)</span>，解码器 <span class="arithmatex">\(\mathcal{D}\)</span> 从潜在量重建图像，给出 <span class="arithmatex">\(\tilde{x} = \mathcal{D}(z) = \mathcal{D}(\mathcal{E}(x))\)</span>，其中 <span class="arithmatex">\(z \in \mathbb{R}^{h \times w \times c}\)</span>。重要的是，编码器以因子 <span class="arithmatex">\(f = H/h = W/w\)</span> 对图像进行下采样，我们研究了不同的下采样因子 <span class="arithmatex">\(f = 2^m\)</span>，其中 <span class="arithmatex">\(m \in \mathbb{N}\)</span>。</p>
+<p>为了避免任意高方差的潜在空间，我们尝试了两种不同的正则化方式。第一种变体 KL-reg. 对所学潜在量施加轻微的 KL 惩罚，使其趋向标准正态分布，类似于 VAE [46, 69]；而 VQ-reg. 则在解码器中使用向量量化层 [96]。该模型可以被解释为一个 VQGAN [23]，但量化层被吸收在解码器中。由于我们后续的扩散模型被设计为与所学潜在空间 <span class="arithmatex">\(z = \mathcal{E}(x)\)</span> 的二维结构配合工作，我们可以使用相对温和的压缩率并获得非常好的重建效果。这与此前工作 [23, 66] 不同，后者依赖于对所学空间 <span class="arithmatex">\(z\)</span> 的任意一维排序来自回归地对其分布进行建模，从而忽略了 <span class="arithmatex">\(z\)</span> 的大量内在结构。因此，我们的压缩模型能更好地保留 <span class="arithmatex">\(x\)</span> 的细节（见表 8）。完整的目标函数和训练细节见附录。</p>
+<h4 id="32_1">3.2 潜在扩散模型</h4>
+<p>扩散模型 [82] 是概率模型，被设计为通过对正态分布变量逐渐去噪来学习数据分布 <span class="arithmatex">\(p(x)\)</span>，这对应于学习长度为 <span class="arithmatex">\(T\)</span> 的固定马尔可夫链的逆过程。对于图像合成，最成功的模型 [15, 30, 72] 依赖于 <span class="arithmatex">\(p(x)\)</span> 变分下界的重加权变体，它与去噪分数匹配 [85] 相映照。这些模型可以被解释为等权重的去噪自编码器序列 <span class="arithmatex">\(\epsilon_\theta(x_t, t); t = 1 \ldots T\)</span>，这些自编码器被训练为预测其输入 <span class="arithmatex">\(x_t\)</span> 的去噪变体，其中 <span class="arithmatex">\(x_t\)</span> 是输入 <span class="arithmatex">\(x\)</span> 的含噪版本。对应的目标函数可以简化为（见附录 B）：</p>
+<div class="arithmatex">\[\mathcal{L}*{DM} = \mathbb{E}*{x,\epsilon\sim\mathcal{N}(0,1),t}\left[|\epsilon - \epsilon_\theta(x_t, t)|_2^2\right] \tag{1}\]</div>
+<p>其中 <span class="arithmatex">\(t\)</span> 从 <span class="arithmatex">\({1, \ldots, T}\)</span> 中均匀采样。</p>
+<p><strong>潜在表示的生成建模。</strong> 借助由 <span class="arithmatex">\(\mathcal{E}\)</span> 和 <span class="arithmatex">\(\mathcal{D}\)</span> 组成的已训练感知压缩模型，我们现在可以访问一个高效的低维潜在空间，在该空间中高频、难以察觉的细节已被抽象掉。与高维像素空间相比，该空间更适合基于似然的生成模型，因为它们现在可以 <strong>(i)</strong> 专注于数据中重要的语义比特，并且 <strong>(ii)</strong> 在维度更低、计算上更高效的空间中进行训练。</p>
+<p>与此前依赖于在高度压缩的离散潜在空间中使用基于注意力的自回归 Transformer 模型的工作 [23, 66, 103] 不同，我们可以利用我们模型所提供的图像特定归纳偏置。这包括主要由 2D 卷积层构建底层 UNet 的能力，并进一步利用重加权目标将目标集中在感知上最相关的比特上，该目标现在写为：</p>
+<div class="arithmatex">\[\mathcal{L}*{LDM} := \mathbb{E}*{\mathcal{E}(x),\epsilon\sim\mathcal{N}(0,1),t}\left[|\epsilon - \epsilon_\theta(z_t, t)|_2^2\right] \tag{2}\]</div>
+<p>我们模型的神经网络主干 <span class="arithmatex">\(\epsilon_\theta(\circ, t)\)</span> 以时间条件 UNet [71] 的形式实现。由于前向过程是固定的，<span class="arithmatex">\(z_t\)</span> 可以在训练时从 <span class="arithmatex">\(\mathcal{E}\)</span> 中高效获得，而 <span class="arithmatex">\(p(z)\)</span> 中的样本可以通过对 <span class="arithmatex">\(\mathcal{D}\)</span> 的单次前向传播解码到图像空间。</p>
+<h4 id="33">3.3 条件机制</h4>
+<p>与其他类型的生成模型 [56, 83] 类似，扩散模型原则上能够对 <span class="arithmatex">\(p(z|y)\)</span> 形式的条件分布进行建模。这可以通过条件去噪自编码器 <span class="arithmatex">\(\epsilon_\theta(z_t, t, y)\)</span> 来实现，并为通过文本 [68]、语义图 [33, 61] 或其他图像到图像翻译任务 [34] 等输入 <span class="arithmatex">\(y\)</span> 控制合成过程铺平了道路。</p>
+<p>然而，在图像合成的背景下，将扩散模型的生成能力与类标签 [15] 或输入图像的模糊变体 [72] 之外的其他类型条件相结合，目前仍是一个探索不足的研究领域。我们通过用交叉注意力机制 [97] 增强扩散模型底层的 UNet 主干，将扩散模型转变为更灵活的条件图像生成器，这对于学习各种输入模态的基于注意力的模型 [35, 36] 是有效的。为了对来自各种模态的 <span class="arithmatex">\(y\)</span>（例如语言提示）进行预处理，我们引入了一个领域特定的编码器 <span class="arithmatex">\(\tau_\theta\)</span>，将 <span class="arithmatex">\(y\)</span> 投影到中间表示 <span class="arithmatex">\(\tau_\theta(y) \in \mathbb{R}^{M \times d_\tau}\)</span>，然后通过（多头）交叉注意力层将其映射到 UNet 的中间层：</p>
+<div class="arithmatex">\[\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}}\right) \cdot V \tag{3}\]</div>
+<p>其中 <span class="arithmatex">\(Q = W_Q^{(i)} \cdot \varphi_i(z_t)\)</span>，<span class="arithmatex">\(K = W_K^{(i)} \cdot \tau_\theta(y)\)</span>，<span class="arithmatex">\(V = W_V^{(i)} \cdot \tau_\theta(y)\)</span>。这里 <span class="arithmatex">\(\varphi_i(z_t) \in \mathbb{R}^{N \times d_\epsilon^i}\)</span> 表示实现 <span class="arithmatex">\(\epsilon_\theta\)</span> 的 UNet 的（展平的）中间表示，而 <span class="arithmatex">\(W_V^{(i)} \in \mathbb{R}^{d \times d_\epsilon^i}\)</span>，<span class="arithmatex">\(W_Q^{(i)} \in \mathbb{R}^{d \times d_\tau}\)</span>，<span class="arithmatex">\(W_K^{(i)} \in \mathbb{R}^{d \times d_\tau}\)</span> 是可学习的投影矩阵。</p>
+<p>基于基于图像的条件方式，我们通过拼接对 <span class="arithmatex">\(\mathcal{E}(y)\)</span> 的空间对齐条件信息进行补充。条件 LDM 的完整学习目标为：</p>
+<div class="arithmatex">\[\mathcal{L}*{LDM} := \mathbb{E}*{\mathcal{E}(x),y,\epsilon\sim\mathcal{N}(0,1),t}\left[|\epsilon - \epsilon_\theta(z_t, t, \tau_\theta(y))|_2^2\right] \tag{4}\]</div>
+<p>其中 <span class="arithmatex">\(\tau_\theta\)</span> 和 <span class="arithmatex">\(\epsilon_\theta\)</span> 通过该目标联合优化。这种条件机制非常灵活，因为 <span class="arithmatex">\(\tau_\theta\)</span> 可以被参数化为特定领域的专家，例如（无掩码的）Transformer，当 <span class="arithmatex">\(y\)</span> 为文本提示时。</p>
+<hr />
+<h4 id="4_1">4. 实验</h4>
+<p>潜在扩散模型（LDM）以及它们作为高效、高质量图像合成工具的优势，将在 CelebA-HQ [39]、FFHQ [40]、LSUN-Churches 和 LSUN-Bedrooms [105] 以及 ImageNet [12] 和 COCO [51] 数据集上的无条件和条件实验中进行演示。实验的实现细节和超参数可在附录 E.1 和 E.2 中找到。</p>
+<h5 id="41">4.1 在感知压缩权衡上的探索</h5>
+<p>我们从感知图像压缩模型开始实验，分析在不同的下采样因子 <span class="arithmatex">\(f \in {1, 2, 4, 8, 16, 32}\)</span> 下，图像生成模型对压缩率的响应，其中 LDM-1 对应于在像素空间中操作的扩散模型。为了公平比较，我们对所有实验使用相同数量的参数并在 ImageNet 上训练所有模型相同数量的步骤。表 13（附录 E.1.4）和图 5 显示了结果。</p>
+<p>在小下采样因子（LDM-1 和 LDM-2）时，训练速度较慢。而在较大的下采样因子（LDM-{16, 32}）时，训练更快，但图像质量受到些许损害。在此范围内——以及对于本文中大多数实验——最佳的权衡点为 <span class="arithmatex">\(f \in {4, 8}\)</span>，这也表明扩散模型特别擅长于对此类空间对齐的"潜在"信号进行建模。我们在附录 D.1 中展示了更多的定性结果，并将 LDM-4 的计算需求与基于像素的扩散模型进行比较。</p>
+<h5 id="42_1">4.2 图像生成</h5>
+<p>我们对无条件模型进行训练，使用 CelebA-HQ [39]（256² 分辨率下 30k 张图像）、FFHQ [40]（256² 分辨率下 70k 张图像）、LSUN-Churches（256² 分辨率）和 LSUN-Bedrooms（256² 分辨率）数据集。附录 F 中的表 18 给出了所有模型的详细训练计算需求，并与目前最先进的方法进行了比较。</p>
+<p><strong>CelebA-HQ 和 FFHQ。</strong> 我们在 CelebA-HQ 上以 500 步采样得到 FID 为 5.11，在 FFHQ 上以 200 步采样得到 FID 为 4.98。我们的 LDM-4 模型在 CelebA-HQ 上仅使用了 14.4 个 V100 天，在 FFHQ 上使用了 26 个 V100 天，而 StyleGAN2 在 FFHQ 上使用了约 32 个 V100 天。</p>
+<p><strong>LSUN-Bedrooms。</strong> 在 LSUN-Bedrooms 上，我们的 LDM-4 以 200 步采样获得 FID 为 2.95。相比之下，ADM [15] 的 FID 为 1.9，但使用了 232 个 V100 天，而我们仅使用了约 55 个 V100 天（在单张 A100 上训练约 25 个 A100 天）。</p>
+<p><strong>LSUN-Churches。</strong> 在 LSUN-Churches 上，我们的 LDM-8 以 100 步采样获得 FID 为 4.02，与 StyleGAN2 的 3.86 相当。StyleGAN2 使用了 64 个 V100 天，我们仅使用了 18 个 V100 天。</p>
+<p>此外，LDM 在 Precision 和 Recall 方面也一贯优于基于 GAN 的方法，从而证实了其模式覆盖的基于似然的训练目标相对于对抗方法的优势。图 4 中还展示了每个数据集的定性结果。</p>
+<h5 id="43">4.3 条件潜在扩散</h5>
+<h6 id="431-ldm-transformer">4.3.1 用于 LDM 的 Transformer 编码器</h6>
+<p>通过将基于交叉注意力的条件引入 LDM，我们将其开放给以往未针对扩散模型探索的各种条件模态。对于文本到图像建模，我们在 LAION-400M [78] 上训练一个 1.45B 参数的 KL 正则化 LDM，条件为语言提示。我们使用 BERT 分词器 [14] 并将 <span class="arithmatex">\(\tau_\theta\)</span> 实现为 Transformer [97]，以推断通过（多头）交叉注意力（第 3.3 节）映射到 UNet 的潜在代码。领域特定的语言表示学习专家与视觉合成的结合产生了一个强大的模型，能够很好地泛化到复杂的、用户自定义的文本提示，见图 8 和图 5。</p>
+<p>对于定量分析，我们遵循此前工作，在 MS-COCO [51] 验证集上评估文本到图像生成，我们的模型超越了强大的自回归 [17, 66] 和基于 GAN 的 [109] 方法，见表 2。我们注意到，应用无分类器扩散引导 [32] 极大地提升了样本质量，使得引导后的 LDM-KL-8-G 在文本到图像合成上与最近最先进的自回归 [26] 和扩散模型 [59] 相当，同时显著减少了参数量。为了进一步分析基于交叉注意力的条件机制的灵活性，我们还训练了在 OpenImages [49] 上基于语义布局合成图像的模型，并在 COCO [4] 上进行了微调，见图 8。定量评估和实现细节见附录 D.3。</p>
+<p>最后，遵循此前工作 [3, 15, 21, 23]，我们在 ImageNet 上评估了表现最佳的类条件模型，见表 3。在无分类器引导（scale = 1.5）下，我们的 LDM-4 以 250 DDIM 步达到 FID 为 3.60，IS 为 247.67，超越了 ADM-G [15]（FID 4.59）等方法。我们的 LDM-4 总计使用了 271 个 V100 天，远少于 ADM-G 的 962 个 V100 天（生成器 916 天 + 分类器 46 天）。</p>
+<h6 id="432">4.3.2 卷积采样超出训练分辨率</h6>
+<p>通过将下采样的语义图版本与 <span class="arithmatex">\(f = 4\)</span> 模型（VQ-reg.，见表 8）的潜在图像表示进行拼接，我们在输入分辨率 256²（从 384² 裁切）上进行训练，但发现我们的模型可以泛化到更大的分辨率，并在以卷积方式评估时可生成高达百万像素分辨率的图像（见图 9）。我们利用这一特性，将第 4.4 节的超分辨率模型和第 4.5 节的图像修复模型也用于生成 512² 到 1024² 之间的大型图像。对于此类应用，潜在空间尺度所引发的信噪比会显著影响结果。我们在附录 D.1 中对此进行了说明，分别对 (i) <span class="arithmatex">\(f=4\)</span> 模型（KL-reg.）提供的潜在空间和 (ii) 按逐通道标准差缩放后的版本进行了学习。</p>
+<p>后者与无分类器引导 [32] 结合，还可以直接为文本条件 LDM-KL-8-G 合成大于 256² 的图像，如图 13 所示。</p>
+<h5 id="44">4.4 使用潜在扩散进行超分辨率</h5>
+<p>潜在扩散模型可以通过拼接方式直接以低分辨率图像为条件，高效地进行超分辨率训练（参见第 3.3 节）。在第一个实验中，我们遵循 SR3 [72] 并在 ImageNet 上训练一个 4× 上采样模型。我们使用双三次退化，分辨率为 64²→256²。结果如表 5 所示，我们的模型 LDM-4（100 步）在 ImageNet-Val 上获得 FID 为 2.8（验证集特征）/4.8（训练集特征），明显优于 SR3 的 5.2，同时参数量也更少（169M vs 625M），在单张 A100 上的采样吞吐量为 4.62 样本/秒。</p>
+<p>由于双三次退化过程不能很好地泛化到不遵循此预处理的图像，我们还通过使用更多样化的退化过程训练了一个通用模型 LDM-BSR。结果见附录 D.6.1。</p>
+<p>在用户研究（表 4）中，对于超分辨率任务，受试者在任务 1（与真实图像比较）中更倾向于我们的 LDM-4（30.4%）而非基于像素的 DM（16.0%）；在任务 2（两个生成结果对比）中，受试者偏好 LDM-4 的比例高达 70.6%。</p>
+<h5 id="45">4.5 使用潜在扩散进行图像修复</h5>
+<p>图像修复是指在已知其余部分的情况下，填充图像的缺失部分的任务。我们评估了我们的通用条件图像生成方法与针对此任务的更专业的最先进方法的比较。我们的评估遵循 LaMa [88] 的协议，LaMa 是一种引入基于快速傅里叶卷积 [8] 的专用架构的最近图像修复模型。在 Places [108] 上的确切训练和评估协议见附录 E.2.2。</p>
+<p>我们首先分析了第一阶段不同设计选择的影响。特别地，我们比较了 LDM-1（即基于像素的条件 DM）和 LDM-4 在 KL 和 VQ 正则化方面的修复效率，以及不在第一阶段使用注意力的 VQ-LDM-4（见表 8），后者可以在高分辨率解码时减少 GPU 内存。为了可比性，我们固定所有模型的参数量。表 6 报告了在分辨率 256² 和 512² 下的训练和采样吞吐量、每轮训练的总时间（小时）以及六轮后在验证集上的 FID 分数。总体而言，我们观察到基于像素与基于潜在空间的扩散模型之间至少有 2.7× 的速度提升，同时 FID 分数至少提升了 1.6×。</p>
+<p>与表 7 中其他图像修复方法的比较表明，我们带注意力的模型改善了以 FID 衡量的总体图像质量，优于文献 [88]。未遮罩图像与我们样本之间的 LPIPS 略高于 [88]，我们将此归因于 [88] 只产生一个结果，倾向于恢复更平均的图像，而我们的 LDM 产生的是多样化结果（见图 21）。此外，在用户研究（表 4）中，对于图像修复任务，受试者偏好我们结果的比例在任务 2 中达到 68.1%，而 LaMa 仅为 31.9%。</p>
+<p>基于这些初步结果，我们还在不带注意力的 VQ 正则化第一阶段的潜在空间中训练了一个更大的扩散模型（表 7 中的"big"）。遵循 [15]，该扩散模型的 UNet 在其特征层次的三个级别上使用注意力层，并使用 BigGAN [3] 残差块（总参数量为 387M，而非 215M）。训练后，我们注意到在 256² 和 512² 分辨率下产生的样本质量存在差异，我们认为这是由额外的注意力模块引起的。然而，在 512² 分辨率下对模型微调半轮，允许模型适应新的特征统计，并在图像修复上创造了新的最先进 FID（表 7 中 big, w/o attn, w/ ft，图 11）。该模型在所有样本上的 FID 为 1.50，LPIPS 为 0.137，超越了 LaMa [88]（FID 2.21，LPIPS 0.14）和 CoModGAN [107]（FID 1.82）等方法。</p>
+<hr />
+<h4 id="5">5. 局限性与社会影响</h4>
+<p><strong>局限性。</strong> 尽管 LDM 与基于像素的方法相比显著降低了计算需求，但其顺序采样过程仍然比 GAN 慢。此外，当需要高精度时，使用 LDM 可能存在疑问：尽管在我们的 <span class="arithmatex">\(f = 4\)</span> 自编码模型中图像质量损失非常小（见图 1），但其重建能力可能成为需要像素空间精细精度的任务的瓶颈。我们推测我们的超分辨率模型（第 4.4 节）在这方面已经受到一定程度的限制。</p>
+<p><strong>社会影响。</strong> 像图像这样的媒体生成模型是一把双刃剑：一方面，它们支持各种创意应用，特别是像我们这样降低训练和推理成本的方法，有潜力促进对这一技术的访问并推动其普及探索。另一方面，这也意味着创建和传播被操纵的数据或传播错误信息与垃圾邮件变得更加容易。特别是，故意操纵图像（"深度伪造"）是这一背景下的常见问题，女性尤其受到其不成比例的影响 [13, 24]。</p>
+<p>生成模型还可能泄露其训练数据 [5, 90]，当数据包含敏感或个人信息且未经明确同意收集时，这令人十分担忧。然而，这在多大程度上也适用于图像扩散模型，目前尚未完全理解。</p>
+<p>最后，深度学习模块往往会重现或加剧数据中已存在的偏见 [22, 38, 91]。尽管扩散模型比基于 GAN 的方法实现了更好的数据分布覆盖，但我们结合了对抗训练和基于似然目标的两阶段方法在多大程度上错误表示了数据，仍然是一个重要的研究问题。</p>
+<p>关于深度生成模型伦理考量的更一般、更详细的讨论，见 [13]。</p>
+<hr />
+<h4 id="6">6. 结论</h4>
+<p>我们提出了潜在扩散模型，这是一种简单而高效的方法，可以在不降低质量的前提下显著提升去噪扩散模型的训练和采样效率。基于此以及我们的交叉注意力条件机制，我们的实验能够证明，在广泛的条件图像合成任务中，无需特定任务架构，即可获得优于最先进方法的结果。</p>
+<p>本工作受到德国联邦经济事务和能源部在"KI-Absicherung——自动驾驶安全 AI"项目下的支持，以及德国研究基金会（DFG）项目 421703927 的支持。</p>
+<hr />
+<h4 id="b">附录 B：扩散模型目标函数推导（摘要）</h4>
+<p>标准扩散模型的训练目标来自变分下界（VLB）。完整的 VLB 由一系列 KL 散度和重建项组成。Ho et al. [30] 表明，使用重加权变体——即直接预测每步噪声 <span class="arithmatex">\(\epsilon\)</span>——比预测 <span class="arithmatex">\(x_0\)</span> 或方差能获得更好的样本质量。具体地，在时间步 <span class="arithmatex">\(t\)</span> 处，含噪样本为：</p>
+<div class="arithmatex">\[x_t = \sqrt{\bar\alpha_t}, x_0 + \sqrt{1 - \bar\alpha_t}, \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)\]</div>
+<p>模型 <span class="arithmatex">\(\epsilon_\theta(x_t, t)\)</span> 被训练为预测添加的噪声 <span class="arithmatex">\(\epsilon\)</span>，从而得到公式 (1)。</p>
+<hr />
+<h4 id="f">附录 F：计算需求详细对比</h4>
+<p>在表 18 中，我们提供了对所用计算资源的更详细分析，并使用 [15] 提供的数字，将我们在 CelebA-HQ、FFHQ、LSUN 和 ImageNet 数据集上表现最佳的模型与近期最先进模型进行比较。由于 [15] 以 V100 天为单位报告其使用的计算量，而我们所有模型均在单张 NVIDIA A100 GPU 上训练，我们通过假设 A100 相对于 V100 有 ×2.2 的加速 [74] 来将 A100 天转换为 V100 天。为了评估样本质量，我们还额外报告了各数据集上的 FID 分数。我们紧密接近 StyleGAN2 [42] 和 ADM [15] 等最先进方法的性能，同时显著减少了所需的计算资源。</p>
+<p>脚注 4：该因子对应 A100 相较于 V100 在 U-Net 上的加速倍率，如 [74] 中图 1 所定义。</p>
+<p><strong>关键数据汇总（V100 天）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>方法</th>
+<th>训练算力（V100天）</th>
+<th>FID↓</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LSUN-Churches 256²</td>
+<td>StyleGAN2</td>
+<td>64</td>
+<td>3.86</td>
+</tr>
+<tr>
+<td>LSUN-Churches 256²</td>
+<td>LDM-8（我们，100步，410K）</td>
+<td><strong>18</strong></td>
+<td>4.02</td>
+</tr>
+<tr>
+<td>LSUN-Bedrooms 256²</td>
+<td>ADM（1000步）</td>
+<td>232</td>
+<td>1.9</td>
+</tr>
+<tr>
+<td>LSUN-Bedrooms 256²</td>
+<td>LDM-4（我们，200步，1.9M）</td>
+<td><strong>55</strong></td>
+<td>2.95</td>
+</tr>
+<tr>
+<td>CelebA-HQ 256²</td>
+<td>LDM-4（我们，500步，410K）</td>
+<td><strong>14.4</strong></td>
+<td>5.11</td>
+</tr>
+<tr>
+<td>FFHQ 256²</td>
+<td>StyleGAN2</td>
+<td>~32</td>
+<td>3.8</td>
+</tr>
+<tr>
+<td>FFHQ 256²</td>
+<td>LDM-4（我们，200步，635K）</td>
+<td><strong>26</strong></td>
+<td>4.98</td>
+</tr>
+<tr>
+<td>ImageNet 256²</td>
+<td>ADM-G（250步）</td>
+<td>962（生成器916+分类器46）</td>
+<td>4.59</td>
+</tr>
+<tr>
+<td>ImageNet 256²</td>
+<td>LDM-4-G（我们，250步，178K，CFG=1.5）</td>
+<td><strong>271</strong></td>
+<td><strong>3.60</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>注：本译文覆盖论文正文全部核心章节（摘要、第 1–6 节）及关键附录，逐句翻译，参考文献列表未纳入。</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "navigation.top", "navigation.tracking", "toc.follow", "content.code.copy", "search.suggest", "search.highlight", "search.share"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

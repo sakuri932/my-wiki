@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaTeX Formula Studio</title>
+
+<script>
+window.MathJax = {
+  loader: { load: ['[tex]/ams','[tex]/mhchem','[tex]/physics','[tex]/boldsymbol',
+                   '[tex]/color','[tex]/cancel','[tex]/bbox','[tex]/braket',
+                   '[tex]/unicode','[tex]/enclose','[tex]/newcommand','[tex]/noerrors'] },
+  tex: {
+    // 'cases' 不是独立包，已内置于 'ams'；移除避免 404 破坏扩展加载链
+    packages: {'[+]': ['ams','mhchem','physics','boldsymbol','color',
+                       'cancel','bbox','braket','unicode','enclose','newcommand','noerrors']},
+    inlineMath:  [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']],
+  },
+  svg: { fontCache: 'local' },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+
+<style>
+/* ── Reset & Base ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; }
+
+:root {
+  --bg-page:    #f2f4f8;
+  --bg-card:    #ffffff;
+  --bg-input:   #f7f8fc;
+  --bg-header:  #ffffff;
+
+  --blue:       #3b82f6;
+  --blue-dark:  #1d4ed8;
+  --blue-soft:  #eff6ff;
+  --indigo:     #6366f1;
+  --purple:     #8b5cf6;
+  --teal:       #14b8a6;
+  --rose:       #f43f5e;
+  --amber:      #f59e0b;
+  --green:      #22c55e;
+
+  --text-1:     #111827;
+  --text-2:     #6b7280;
+  --text-3:     #9ca3af;
+
+  --border:     #e5e7eb;
+  --border-focus: #3b82f6;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.09), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:  0 10px 30px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+
+  --font-ui:    -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC',
+                'Hiragino Sans', 'Yu Gothic UI', 'Noto Sans CJK SC', sans-serif;
+  --font-mono:  'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-page);
+  color: var(--text-1);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+.app-header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,.9);
+}
+
+.logo-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+.app-title { font-size: 15px; font-weight: 650; letter-spacing: -.3px; }
+.app-subtitle { font-size: 12px; color: var(--text-3); }
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pill-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+/* ── Main Layout ────────────────────────────────────────────────── */
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Cards ─────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fafbfd;
+}
+.card-header-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+.icon-blue   { background: #eff6ff; }
+.icon-purple { background: #f5f3ff; }
+.icon-teal   { background: #f0fdfa; }
+
+.card-title {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--text-1);
+  letter-spacing: -.2px;
+}
+.card-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+
+/* ── Symbol Tabs ────────────────────────────────────────────────── */
+.sym-tabs-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: #fafbfd;
+  border-bottom: 1px solid var(--border);
+}
+.sym-tabs-bar {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
+  padding: 0 2px;
+  gap: 2px;
+  scroll-behavior: smooth;
+}
+.sym-tabs-bar::-webkit-scrollbar { display: none; }
+
+.sym-scroll-btn {
+  flex-shrink: 0;
+  width: 26px;
+  border: none;
+  background: #fafbfd;
+  color: var(--text-2);
+  cursor: pointer;
+  font-size: 12px;
+  display: none;           /* shown by JS when overflow detected */
+  align-items: center;
+  justify-content: center;
+  transition: background .12s, color .12s;
+  border-left: 1px solid var(--border);
+}
+.sym-scroll-btn:first-child {
+  border-left: none;
+  border-right: 1px solid var(--border);
+}
+.sym-scroll-btn:hover { background: var(--blue-soft); color: var(--blue); }
+.sym-scroll-btn.visible { display: flex; }
+
+.sym-tab {
+  flex-shrink: 0;
+  padding: 7px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+}
+.sym-tab:hover { color: var(--text-1); }
+.sym-tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+
+.sym-panel {
+  display: none;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 8px 10px;
+  max-height: 118px;
+  overflow-y: auto;
+  background: #fafbfd;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.sym-panel.active { display: flex; }
+
+.sym-btn {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  padding: 4px 7px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12.5px;
+  min-width: 32px;
+  text-align: center;
+  transition: all .12s;
+  font-family: 'Latin Modern Math', 'STIX Two Math', serif;
+  line-height: 1.4;
+}
+.sym-btn:hover {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  color: var(--blue);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+/* Tooltip */
+.sym-btn[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-1);
+  color: #fff;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 3px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* ── Input Toolbar ──────────────────────────────────────────────── */
+.input-toolbar {
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  background: #fafbfd;
+}
+
+.toolbar-label { font-size: 11.5px; color: var(--text-2); font-weight: 500; }
+
+.seg-control {
+  display: flex;
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 2px;
+  gap: 1px;
+}
+.seg-btn {
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  border-radius: 5px;
+  border: none;
+  background: none;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-ui);
+}
+.seg-btn.active {
+  background: var(--bg-card);
+  color: var(--text-1);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+.lang-bar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 5px 12px;
+  border-bottom: 1px solid var(--border);
+  background: #fafbfd;
+}
+.lang-btn {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-ui);
+}
+.lang-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+.ghost-btn {
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all .12s;
+  font-family: var(--font-ui);
+}
+.ghost-btn:hover { background: var(--bg-page); color: var(--text-1); }
+
+/* ── Textarea ───────────────────────────────────────────────────── */
+#latex-input {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text-1);
+  background: var(--bg-input);
+  padding: 14px 16px;
+  min-height: 170px;
+  tab-size: 2;
+}
+#latex-input::placeholder { color: var(--text-3); }
+#latex-input:focus { background: #fefeff; }
+
+.input-footer {
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  background: #fafbfd;
+}
+.char-count { font-size: 11px; color: var(--text-3); }
+
+.render-btn {
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 7px;
+  border: none;
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color: white;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-ui);
+  letter-spacing: .1px;
+}
+.render-btn:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,.35); }
+.render-btn:active { transform: translateY(0); }
+
+/* ── Examples Dropdown ──────────────────────────────────────────── */
+.ex-wrap { position: relative; }
+.ex-menu {
+  display: none;
+  /* fixed 定位：脱离所有 overflow:hidden 祖先，不被卡片裁剪 */
+  position: fixed;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 300px;
+  max-height: 360px;
+  overflow-y: auto;
+  z-index: 9999;
+  scrollbar-width: thin;
+}
+.ex-menu.open { display: block; }
+.ex-cat {
+  padding: 6px 12px 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-bottom: 1px solid var(--border);
+}
+.ex-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background .1s;
+}
+.ex-item:hover { background: var(--blue-soft); }
+.ex-item-label { font-size: 12px; font-weight: 600; color: var(--text-1); margin-bottom: 2px; }
+.ex-item-code  { font-size: 11px; font-family: var(--font-mono); color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Settings Panel ─────────────────────────────────────────────── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.setting-cell {
+  padding: 10px 14px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.setting-cell:nth-child(even) { border-right: none; }
+
+.setting-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.setting-val {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  font-family: var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Sliders */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--blue) 0%, var(--border) 0%);
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--blue);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(59,130,246,.3);
+  transition: transform .1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* Color pickers */
+.color-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+input[type=color] {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 22px;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  background: none;
+  padding: 1px;
+}
+input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type=color]::-webkit-color-swatch { border-radius: 3px; border: none; }
+
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all .15s;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.1);
+}
+.color-swatch:hover { transform: scale(1.2); border-color: var(--blue); }
+
+/* Select */
+select {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  color: var(--text-1);
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+select:focus { border-color: var(--blue-focus); }
+
+input[type=number] {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  color: var(--text-1);
+  outline: none;
+  width: 58px;
+}
+input[type=number]:focus { border-color: var(--blue); }
+
+/* ── Preview ────────────────────────────────────────────────────── */
+.preview-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 24px;
+  min-height: 150px;
+  cursor: crosshair;
+}
+
+/* Checkered background for transparency */
+.checker-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(45deg, #e8eaf0 25%, transparent 25%),
+    linear-gradient(-45deg, #e8eaf0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e8eaf0 75%),
+    linear-gradient(-45deg, transparent 75%, #e8eaf0 75%);
+  background-size: 14px 14px;
+  background-position: 0 0, 0 7px, 7px -7px, -7px 0;
+  opacity: .5;
+}
+
+#preview-box {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, padding .2s;
+  min-width: 80px;
+  min-height: 48px;
+}
+
+.preview-hint {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.6;
+}
+.preview-hint code {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+.error-card {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: #b91c1c;
+  max-width: 340px;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+/* ── Export Panel ───────────────────────────────────────────────── */
+.export-panel {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: #fafbfd;
+}
+
+.export-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+.export-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--text-2);
+}
+
+.export-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.exp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 650;
+  border-radius: 7px;
+  border: 1.5px solid;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-ui);
+  letter-spacing: .3px;
+}
+.exp-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.exp-btn:active { transform: translateY(0); }
+
+.exp-png  { background:#f0fdf4; border-color:#86efac; color:#15803d; }
+.exp-png:hover  { background:#22c55e; border-color:#22c55e; color:white; }
+.exp-jpg  { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; }
+.exp-jpg:hover  { background:#3b82f6; border-color:#3b82f6; color:white; }
+.exp-webp { background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce; }
+.exp-webp:hover { background:#8b5cf6; border-color:#8b5cf6; color:white; }
+.exp-svg  { background:#fff7ed; border-color:#fdba74; color:#c2410c; }
+.exp-svg:hover  { background:#f97316; border-color:#f97316; color:white; }
+.exp-pdf  { background:#fff1f2; border-color:#fda4af; color:#be123c; }
+.exp-pdf:hover  { background:#f43f5e; border-color:#f43f5e; color:white; }
+.exp-copy-svg   { background:#f0fdfa; border-color:#5eead4; color:#0f766e; }
+.exp-copy-svg:hover   { background:#14b8a6; border-color:#14b8a6; color:white; }
+.exp-copy-tex   { background:#fafafa; border-color:#d1d5db; color:#374151; }
+.exp-copy-tex:hover   { background:#374151; border-color:#374151; color:white; }
+
+/* ── Size Row ───────────────────────────────────────────────────── */
+.size-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  background: #fafbfd;
+}
+.size-label { font-size: 11px; color: var(--text-2); font-weight: 600; }
+.size-chip {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all .12s;
+  font-family: var(--font-ui);
+}
+.size-chip:hover { border-color: var(--blue); color: var(--blue); }
+.size-chip.active { background: var(--blue-soft); border-color: var(--blue); color: var(--blue); font-weight: 600; }
+
+/* ── Status Bar ─────────────────────────────────────────────────── */
+.status-bar {
+  height: 28px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  background: #fafbfd;
+  font-size: 11px;
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #d1d5db;
+  transition: background .3s;
+}
+.status-dot.ok     { background: var(--green); box-shadow: 0 0 0 2px rgba(34,197,94,.2); }
+.status-dot.err    { background: var(--rose); box-shadow: 0 0 0 2px rgba(244,63,94,.2); }
+.status-dot.busy   { background: var(--amber); box-shadow: 0 0 0 2px rgba(245,158,11,.2);
+                     animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.status-text { color: var(--text-2); }
+.status-time { margin-left: auto; color: var(--text-3); font-family: var(--font-mono); font-size: 10.5px; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #c5c8d0; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+/* 中等窗口：切单列 */
+@media (max-width: 860px) {
+  .workspace {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 10px;
+  }
+  .preview-area { min-height: 120px; }
+  #latex-input  { min-height: 130px; }
+}
+
+/* 小窗口：隐藏 header 装饰徽章，压缩间距 */
+@media (max-width: 640px) {
+  .pill-badge { display: none; }
+
+  .app-header { padding: 0 12px; gap: 8px; height: 46px; }
+  .logo-mark  { width: 26px; height: 26px; font-size: 13px; }
+  .app-title  { font-size: 13.5px; }
+
+  .workspace  { padding: 8px; gap: 8px; }
+
+  .card-header { padding: 8px 10px; }
+  .sym-panel   { max-height: 96px; }
+
+  .settings-grid { grid-template-columns: 1fr 1fr; }
+  .setting-cell  { padding: 8px 10px; }
+
+  .size-row  { padding: 6px 10px; gap: 4px; }
+  .size-chip { padding: 2px 6px; font-size: 10.5px; }
+
+  .export-panel { padding: 10px; }
+  .exp-btn { padding: 4px 9px; font-size: 11px; }
+
+  #latex-input { min-height: 110px; padding: 10px 12px; font-size: 13px; }
+
+  .lang-switch { margin-left: 4px; }
+  .lang-switch-btn { padding: 2px 6px; font-size: 10.5px; }
+}
+
+/* 超小窗口：进一步压缩，设置改单列，隐藏尺寸文字标签 */
+@media (max-width: 420px) {
+  .app-title  { display: none; }
+  .app-header { height: 42px; }
+
+  .workspace  { padding: 6px; gap: 6px; }
+
+  .sym-tab  { padding: 6px 7px; font-size: 11px; }
+  .sym-panel { max-height: 80px; }
+
+  .settings-grid { grid-template-columns: 1fr; }
+  .setting-cell  { border-right: none; }
+  .setting-cell:nth-child(even) { border-right: none; }
+
+  .size-row { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .size-row::-webkit-scrollbar { display: none; }
+  .size-chip, input[type=number] { flex-shrink: 0; }
+
+  .export-btns { gap: 4px; }
+  .exp-btn { padding: 3px 8px; font-size: 10.5px; }
+
+  #latex-input { min-height: 90px; font-size: 12.5px; }
+
+  /* 语言切换在超小屏只显示缩写 */
+  .lang-switch-btn[data-lang="zh"]::before { content: "中"; }
+  .lang-switch-btn[data-lang="en"]::before { content: "EN"; }
+  .lang-switch-btn[data-lang="ja"]::before { content: "日"; }
+  .lang-switch-btn[data-lang="ko"]::before { content: "한"; }
+  .lang-switch-btn { font-size: 0; padding: 2px 5px; }
+  .lang-switch-btn::before { font-size: 10.5px; }
+}
+
+/* ── Language Switcher ──────────────────────────────────────────── */
+.lang-switch {
+  display: flex;
+  gap: 2px;
+  background: #f0f2f5;
+  border-radius: 8px;
+  padding: 3px;
+  margin-left: 8px;
+}
+.lang-switch-btn {
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-2);
+  transition: all .15s;
+  font-family: var(--font-ui);
+  line-height: 1.4;
+}
+.lang-switch-btn:hover { color: var(--text-1); }
+.lang-switch-btn.active {
+  background: #fff;
+  color: var(--blue);
+  box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+
+/* ── Hidden typeset sink ────────────────────────────────────────── */
+#mj-sink {
+  position: fixed;      /* fixed 定位保证布局上下文稳定，getBoundingClientRect 可靠 */
+  visibility: hidden;
+  pointer-events: none;
+  left: -99999px;
+  top: 0;
+  font-size: 18px;
+}
+</style>
+</head>
+<body>
+
+<!-- Hidden MathJax rendering sink -->
+<div id="mj-sink" aria-hidden="true"></div>
+
+<!-- ── Header ─────────────────────────────────────────────────── -->
+<header class="app-header">
+  <div class="logo-mark">∑</div>
+  <div>
+    <div class="app-title">LaTeX Formula Studio</div>
+  </div>
+  <div class="header-right">
+    <span class="pill-badge">MathJax 3</span>
+    <span class="pill-badge" style="background:#f5f3ff;color:var(--indigo)">mhchem</span>
+    <span class="pill-badge" style="background:#f0fdfa;color:var(--teal)">physics</span>
+    <div class="lang-switch" id="lang-switch">
+      <button class="lang-switch-btn active" data-lang="zh" onclick="applyLang('zh')">中文</button>
+      <button class="lang-switch-btn" data-lang="en" onclick="applyLang('en')">EN</button>
+      <button class="lang-switch-btn" data-lang="ja" onclick="applyLang('ja')">日本語</button>
+      <button class="lang-switch-btn" data-lang="ko" onclick="applyLang('ko')">한국어</button>
+    </div>
+  </div>
+</header>
+
+<!-- ── Workspace ───────────────────────────────────────────────── -->
+<div class="workspace">
+
+  <!-- LEFT: Input Card -->
+  <div class="card">
+    <!-- Symbol panel header -->
+    <div class="card-header">
+      <div class="card-header-icon icon-blue">⌨</div>
+      <span class="card-title" data-i18n="sym_input">符号 & 公式输入</span>
+      <div class="card-actions">
+        <div class="ex-wrap">
+          <button class="ghost-btn" id="ex-btn" onclick="toggleExMenu()" data-i18n="examples_btn">示例 ▾</button>
+          <div class="ex-menu" id="ex-menu"></div>
+        </div>
+        <div class="ex-wrap" id="tpl-wrap">
+          <button class="ghost-btn" id="tpl-btn" onclick="toggleTplMenu()" style="border-color:#f59e0b;color:#b45309;" data-i18n="templates_btn">大型方程 ▾</button>
+          <div class="ex-menu" id="tpl-menu"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Symbol tabs -->
+    <div class="sym-tabs-wrap">
+      <button class="sym-scroll-btn" id="sym-scroll-l" onclick="symScroll(-1)" tabindex="-1">‹</button>
+      <div class="sym-tabs-bar" id="sym-tabs"></div>
+      <button class="sym-scroll-btn" id="sym-scroll-r" onclick="symScroll(1)"  tabindex="-1">›</button>
+    </div>
+    <div id="sym-panels"></div>
+
+    <!-- Mode toolbar -->
+    <div class="input-toolbar">
+      <span class="toolbar-label" data-i18n="display_mode">显示模式</span>
+      <div class="seg-control">
+        <button class="seg-btn active" id="btn-display" onclick="setMode('display')">Display $$…$$</button>
+        <button class="seg-btn" id="btn-inline"  onclick="setMode('inline')">Inline $…$</button>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:5px;">
+        <button class="ghost-btn" onclick="doClear()" data-i18n="clear">清空</button>
+      </div>
+    </div>
+
+    <!-- Textarea -->
+    <textarea id="latex-input" data-i18n="placeholder" data-i18n-attr="placeholder" placeholder="在此输入 LaTeX 公式，Ctrl/⌘+Enter 立即渲染
+示例：\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
+化学：\ce{H2O + CO2 -> H2CO3}
+量子：\bra{\psi}\hat{H}\ket{\psi}
+中文：f(x) = \text{正弦函数}" spellcheck="false"></textarea>
+
+    <div class="input-footer">
+      <span class="char-count" id="char-count">0 字符</span>
+      <button class="render-btn" onclick="renderNow()" data-i18n="render_btn">▶ 立即渲染</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Preview + Settings Card -->
+  <div class="card">
+    <!-- Settings -->
+    <div class="card-header">
+      <div class="card-header-icon icon-purple">⚙</div>
+      <span class="card-title" data-i18n="render_settings">渲染设置</span>
+    </div>
+
+    <div class="settings-grid">
+      <!-- Font size -->
+      <div class="setting-cell">
+        <div class="setting-label"><span data-i18n="font_size">字体大小</span> <span class="setting-val" id="lbl-fs">18 px</span></div>
+        <input type="range" id="sl-fs" min="8" max="100" value="18" oninput="onSetting()">
+      </div>
+      <!-- Export scale -->
+      <div class="setting-cell">
+        <div class="setting-label"><span data-i18n="export_scale">导出缩放</span> <span class="setting-val" id="lbl-sc">2 ×</span></div>
+        <input type="range" id="sl-sc" min="1" max="8" value="2" step="0.5" oninput="onSetting()">
+      </div>
+      <!-- Formula color -->
+      <div class="setting-cell">
+        <div class="setting-label" data-i18n="formula_color">公式颜色</div>
+        <div class="color-row">
+          <input type="color" id="col-formula" value="#1a1a2e" oninput="onSetting()">
+          <div id="swatches-formula"></div>
+        </div>
+      </div>
+      <!-- Background color -->
+      <div class="setting-cell">
+        <div class="setting-label" data-i18n="bg_color">背景颜色</div>
+        <div class="color-row">
+          <input type="color" id="col-bg" value="#ffffff" oninput="onSetting()">
+          <div id="swatches-bg"></div>
+        </div>
+      </div>
+      <!-- BG alpha -->
+      <div class="setting-cell">
+        <div class="setting-label"><span data-i18n="bg_alpha">背景透明度</span> <span class="setting-val" id="lbl-al">100%</span></div>
+        <input type="range" id="sl-al" min="0" max="100" value="100" oninput="onSetting()">
+      </div>
+      <!-- Padding -->
+      <div class="setting-cell">
+        <div class="setting-label"><span data-i18n="padding">内边距</span> <span class="setting-val" id="lbl-pd">20 px</span></div>
+        <input type="range" id="sl-pd" min="0" max="80" value="20" oninput="onSetting()">
+      </div>
+    </div>
+
+    <!-- Export size chips -->
+    <div class="size-row">
+      <span class="size-label" data-i18n="export_size">导出尺寸:</span>
+      <button class="size-chip active" onclick="setSize('auto')" data-size="auto" data-i18n="size_auto">自动</button>
+      <button class="size-chip" onclick="setSize('hd')" data-size="hd">HD 720p</button>
+      <button class="size-chip" onclick="setSize('fhd')" data-size="fhd">FHD 1080p</button>
+      <button class="size-chip" onclick="setSize('2k')" data-size="2k">2K</button>
+      <button class="size-chip" onclick="setSize('4k')" data-size="4k">4K</button>
+      <input type="number" id="inp-w" data-i18n="width_ph" data-i18n-attr="placeholder" placeholder="宽" min="1" max="9999" oninput="setSize('custom')">
+      <span style="font-size:11px;color:var(--text-3)">×</span>
+      <input type="number" id="inp-h" data-i18n="height_ph" data-i18n-attr="placeholder" placeholder="高" min="1" max="9999" oninput="setSize('custom')">
+      <span style="font-size:11px;color:var(--text-3)">px</span>
+    </div>
+
+    <!-- Preview -->
+    <div class="card-header" style="border-top:1px solid var(--border);">
+      <div class="card-header-icon icon-teal">👁</div>
+      <span class="card-title" data-i18n="preview">实时预览</span>
+      <div class="card-actions" style="font-size:10.5px;color:var(--text-3);" data-i18n="transparency_checker">透明度检查板</div>
+    </div>
+
+    <div class="preview-area" id="preview-area">
+      <div class="checker-bg"></div>
+      <div id="preview-box">
+        <div class="preview-hint">在左侧输入公式<code>Ctrl/⌘+Enter 快速渲染</code></div>
+      </div>
+    </div>
+
+    <!-- Export buttons -->
+    <div class="export-panel">
+      <div class="export-title-row">
+        <span class="export-section-title" data-i18n="export_copy">导出 / 复制</span>
+      </div>
+      <div class="export-btns">
+        <button class="exp-btn exp-png"      onclick="exportRaster('png')">PNG</button>
+        <button class="exp-btn exp-jpg"      onclick="exportRaster('jpeg')">JPG</button>
+        <button class="exp-btn exp-webp"     onclick="exportRaster('webp')">WebP</button>
+        <button class="exp-btn exp-svg"      onclick="exportSVG()">SVG</button>
+        <button class="exp-btn exp-pdf"      onclick="exportPDF()">PDF</button>
+        <button class="exp-btn exp-copy-svg" onclick="copySVGCode()" data-i18n="copy_svg">复制 SVG</button>
+        <button class="exp-btn exp-copy-tex" onclick="copyLatex()" data-i18n="copy_latex">复制 LaTeX</button>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="status-dot" id="status-dot"></div>
+      <span class="status-text" id="status-text">等待 MathJax 加载…</span>
+      <span class="status-time" id="status-time"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Script ──────────────────────────────────────────────────── -->
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  SYMBOL DATA
+// ═══════════════════════════════════════════════════════════════
+const SYM = {
+  '希腊': [
+    ['α','\\alpha'],['β','\\beta'],['γ','\\gamma'],['δ','\\delta'],
+    ['ε','\\epsilon'],['ζ','\\zeta'],['η','\\eta'],['θ','\\theta'],
+    ['ι','\\iota'],['κ','\\kappa'],['λ','\\lambda'],['μ','\\mu'],
+    ['ν','\\nu'],['ξ','\\xi'],['π','\\pi'],['ρ','\\rho'],
+    ['σ','\\sigma'],['τ','\\tau'],['υ','\\upsilon'],['φ','\\phi'],
+    ['χ','\\chi'],['ψ','\\psi'],['ω','\\omega'],
+    ['Γ','\\Gamma'],['Δ','\\Delta'],['Θ','\\Theta'],['Λ','\\Lambda'],
+    ['Ξ','\\Xi'],['Π','\\Pi'],['Σ','\\Sigma'],['Υ','\\Upsilon'],
+    ['Φ','\\Phi'],['Ψ','\\Psi'],['Ω','\\Omega'],
+    ['ϑ','\\vartheta'],['ϕ','\\varphi'],['ϵ','\\varepsilon'],['ϱ','\\varrho'],
+    ['ς','\\varsigma'],['ϖ','\\varpi'],['ϰ','\\varkappa'],
+  ],
+  '运算': [
+    ['±','\\pm'],['∓','\\mp'],['×','\\times'],['÷','\\div'],
+    ['⋅','\\cdot'],['∗','\\ast'],['∘','\\circ'],['•','\\bullet'],['⋆','\\star'],
+    ['⊕','\\oplus'],['⊖','\\ominus'],['⊗','\\otimes'],['⊙','\\odot'],['⊘','\\oslash'],
+    ['∫','\\int'],['∬','\\iint'],['∭','\\iiint'],['∮','\\oint'],
+    ['∑','\\sum'],['∏','\\prod'],['∐','\\coprod'],
+    ['∇','\\nabla'],['∂','\\partial'],['□','\\Box'],
+    ['√','\\sqrt{}'],['∛','\\sqrt[3]{}'],['∜','\\sqrt[4]{}'],
+    ['∞','\\infty'],['ℓ','\\ell'],['ℑ','\\Im'],['ℜ','\\Re'],
+    ['|x|','\\lvert x\\rvert'],['‖x‖','\\lVert x\\rVert'],
+  ],
+  '关系': [
+    ['≠','\\neq'],['≤','\\leq'],['≥','\\geq'],['≪','\\ll'],['≫','\\gg'],
+    ['≦','\\leqq'],['≧','\\geqq'],['⩽','\\leqslant'],['⩾','\\geqslant'],
+    ['≲','\\lesssim'],['≳','\\gtrsim'],['≺','\\prec'],['≻','\\succ'],
+    ['≼','\\preceq'],['≽','\\succeq'],
+    ['≈','\\approx'],['≉','\\napprox'],['∼','\\sim'],['≃','\\simeq'],
+    ['≅','\\cong'],['≡','\\equiv'],['≜','\\triangleq'],['≐','\\doteq'],['∝','\\propto'],
+    ['⊂','\\subset'],['⊃','\\supset'],['⊆','\\subseteq'],['⊇','\\supseteq'],
+    ['⊊','\\subsetneq'],['⊋','\\supsetneq'],
+    ['∈','\\in'],['∉','\\notin'],['∋','\\ni'],['∅','\\varnothing'],
+    ['⊥','\\perp'],['∥','\\parallel'],['∦','\\nparallel'],['⋈','\\bowtie'],
+    ['∀','\\forall'],['∃','\\exists'],['∄','\\nexists'],
+    ['∴','\\therefore'],['∵','\\because'],
+  ],
+  '箭头': [
+    ['→','\\to'],['←','\\leftarrow'],['↔','\\leftrightarrow'],
+    ['⇒','\\Rightarrow'],['⇐','\\Leftarrow'],['⇔','\\Leftrightarrow'],
+    ['↦','\\mapsto'],['⟼','\\longmapsto'],
+    ['↑','\\uparrow'],['↓','\\downarrow'],['↕','\\updownarrow'],
+    ['⇑','\\Uparrow'],['⇓','\\Downarrow'],
+    ['↗','\\nearrow'],['↘','\\searrow'],['↙','\\swarrow'],['↖','\\nwarrow'],
+    ['⟶','\\longrightarrow'],['⟵','\\longleftarrow'],
+    ['⟹','\\Longrightarrow'],['⟸','\\Longleftarrow'],['⟺','\\Longleftrightarrow'],
+    ['⇌','\\rightleftharpoons'],['⇋','\\leftrightharpoons'],
+    ['↪','\\hookrightarrow'],['↩','\\hookleftarrow'],
+    ['↠','\\twoheadrightarrow'],['↝','\\rightsquigarrow'],
+    ['⇝','\\leadsto'],['⇢','\\dashrightarrow'],
+  ],
+  '集合': [
+    ['∪','\\cup'],['∩','\\cap'],['⊎','\\uplus'],['⊔','\\sqcup'],['⊓','\\sqcap'],
+    ['∖','\\setminus'],['∁','\\complement'],
+    ['¬','\\neg'],['∧','\\land'],['∨','\\lor'],
+    ['⊤','\\top'],['⊢','\\vdash'],['⊣','\\dashv'],
+    ['⊨','\\models'],['⊬','\\nvdash'],['⊭','\\nvDash'],
+    ['ℵ','\\aleph'],['ℶ','\\beth'],['ℷ','\\gimel'],
+    ['ℕ','\\mathbb{N}'],['ℤ','\\mathbb{Z}'],['ℚ','\\mathbb{Q}'],
+    ['ℝ','\\mathbb{R}'],['ℂ','\\mathbb{C}'],['𝔽','\\mathbb{F}'],
+  ],
+  '微积分': [
+    ['lim','\\lim_{x \\to }'],['lim→0','\\lim_{x \\to 0}'],['lim→∞','\\lim_{x\\to\\infty}'],
+    ['limsup','\\limsup_{n\\to\\infty}'],['liminf','\\liminf_{n\\to\\infty}'],
+    ['sup','\\sup'],['inf','\\inf'],['max','\\max'],['min','\\min'],
+    ['d/dx','\\frac{d}{dx}'],['d²/dx²','\\frac{d^2}{dx^2}'],['dⁿ/dxⁿ','\\frac{d^n}{dx^n}'],
+    ['∂/∂x','\\frac{\\partial}{\\partial x}'],['∂²/∂x²','\\frac{\\partial^2}{\\partial x^2}'],
+    ['∂²/∂x∂y','\\frac{\\partial^2}{\\partial x\\,\\partial y}'],
+    ['∫₀¹','\\int_0^1'],['∫₋∞^∞','\\int_{-\\infty}^{\\infty}'],
+    ['∑ₙ₌₀^∞','\\sum_{n=0}^{\\infty}'],['∑ₖ₌₁ⁿ','\\sum_{k=1}^{n}'],['∏ₖ','\\prod_{k=1}^{n}'],
+    ['f\'','f\'(x)'],['f\'\'','f\'\'(x)'],['ẋ','\\dot{x}'],['ẍ','\\ddot{x}'],
+    ['dx','\\,dx'],['dt','\\,dt'],['dμ','\\,d\\mu'],
+    ['Δx','\\Delta x'],['δx','\\delta x'],['→0','\\to 0'],['→∞','\\to\\infty'],
+    ['O(n)','O(n)'],['o(n)','o(n)'],['Θ(n)','\\Theta(n)'],
+  ],
+  '三角': [
+    ['sin','\\sin'],['cos','\\cos'],['tan','\\tan'],
+    ['cot','\\cot'],['sec','\\sec'],['csc','\\csc'],
+    ['arcsin','\\arcsin'],['arccos','\\arccos'],['arctan','\\arctan'],
+    ['sinh','\\sinh'],['cosh','\\cosh'],['tanh','\\tanh'],['coth','\\coth'],
+    ['sin²+cos²=1','\\sin^2\\theta+\\cos^2\\theta=1'],
+    ['exp','\\exp'],['ln','\\ln'],['log','\\log'],['log₂','\\log_2'],['lg','\\lg'],
+    ['deg','{}^{\\circ}'],['rad','\\,\\mathrm{rad}'],
+    ['sgn','\\operatorname{sgn}'],['rank','\\operatorname{rank}'],
+    ['det','\\det'],['tr','\\operatorname{tr}'],['ker','\\ker'],['dim','\\dim'],
+    ['arg','\\arg'],['hom','\\hom'],['Hom','\\operatorname{Hom}'],
+  ],
+  '数论': [
+    ['mod','\\bmod'],['pmod','\\pmod{}'],['gcd','\\gcd'],['lcm','\\operatorname{lcm}'],
+    ['⌊x⌋','\\lfloor x\\rfloor'],['⌈x⌉','\\lceil x\\rceil'],
+    ['C(n,k)','\\binom{n}{k}'],['C large','\\dbinom{n}{k}'],
+    ['a|b','a\\mid b'],['a∤b','a\\nmid b'],['a≡b(n)','a\\equiv b\\pmod{n}'],
+    ['∑_{d|n}','\\sum_{d\\mid n}'],['φ(n)','\\varphi(n)'],['μ(n)','\\mu(n)'],
+    ['ζ(s)','\\zeta(s)'],['Γ(s)','\\Gamma(s)'],['B(a,b)','\\mathrm{B}(a,b)'],
+  ],
+  '结构': [
+    ['frac','\\frac{}{}'],['dfrac','\\dfrac{}{}'],['tfrac','\\tfrac{}{}'],['cfrac','\\cfrac{}{}'],
+    ['binom','\\binom{}{}'],['dbinom','\\dbinom{}{}'],
+    ['( )','\\left(\\right)'],['[ ]','\\left[\\right]'],['{ }','\\left\\{\\right\\}'],
+    ['| |','\\left|\\right|'],['‖ ‖','\\left\\|\\right\\|'],
+    ['⟨ ⟩','\\left\\langle\\right\\rangle'],
+    ['⌊ ⌋','\\left\\lfloor\\right\\rfloor'],['⌈ ⌉','\\left\\lceil\\right\\rceil'],
+    ['hat','\\hat{}'],['bar','\\bar{}'],['vec','\\vec{}'],
+    ['dot','\\dot{}'],['ddot','\\ddot{}'],['dddot','\\dddot{}'],
+    ['tilde','\\tilde{}'],['check','\\check{}'],
+    ['wide hat','\\widehat{}'],['wide tilde','\\widetilde{}'],['wide vec','\\overrightarrow{}'],
+    ['overline','\\overline{}'],['underline','\\underline{}'],
+    ['overbrace','\\overbrace{}^{}'],['underbrace','\\underbrace{}_{}'],
+    ['√[]{}','\\sqrt[]{}'],['overset','\\overset{}{}'],['underset','\\underset{}{}'],
+    ['stackrel','\\stackrel{}{}'],['xrightarrow','\\xrightarrow{}'],['xleftarrow','\\xleftarrow{}'],
+  ],
+  '矩阵': [
+    ['pmat','\\begin{pmatrix} a & b \\\\\\\\ c & d \\end{pmatrix}'],
+    ['bmat','\\begin{bmatrix} a & b \\\\\\\\ c & d \\end{bmatrix}'],
+    ['Bmat','\\begin{Bmatrix} a & b \\\\\\\\ c & d \\end{Bmatrix}'],
+    ['vmat','\\begin{vmatrix} a & b \\\\\\\\ c & d \\end{vmatrix}'],
+    ['Vmat','\\begin{Vmatrix} a & b \\\\\\\\ c & d \\end{Vmatrix}'],
+    ['mat','\\begin{matrix} a & b \\\\\\\\ c & d \\end{matrix}'],
+    ['cases','\\begin{cases} a & x>0 \\\\\\\\ b & x\\leq 0 \\end{cases}'],
+    ['rcases','\\begin{rcases} a \\\\\\\\ b \\end{rcases}'],
+    ['align*','\\begin{align*} a &= b \\\\\\\\ c &= d \\end{align*}'],
+    ['aligned','\\begin{aligned} a &= b \\\\\\\\ c &= d \\end{aligned}'],
+    ['alignat','\\begin{alignat}{2} a &= b &\\quad c &= d \\end{alignat}'],
+    ['gather*','\\begin{gather*} a \\\\\\\\ b \\end{gather*}'],
+    ['multline*','\\begin{multline*} a+b \\\\\\\\ +c+d \\end{multline*}'],
+    ['split','\\begin{split} a &= b \\\\\\\\ &= c \\end{split}'],
+    ['array','\\begin{array}{lcr} a & b & c \\end{array}'],
+  ],
+  '字体': [
+    ['𝒜','\\mathcal{A}'],['𝓛','\\mathcal{L}'],['𝒩','\\mathcal{N}'],['𝒪','\\mathcal{O}'],
+    ['𝔤','\\mathfrak{g}'],['𝔥','\\mathfrak{h}'],['𝔰𝔩','\\mathfrak{sl}'],
+    ['bf','\\mathbf{v}'],['rm','\\mathrm{d}'],['sf','\\mathsf{A}'],['tt','\\mathtt{x}'],['it','\\mathit{x}'],
+    ['cancel','\\cancel{x}'],['bcancel','\\bcancel{x}'],['xcancel','\\xcancel{x}'],['cancelto','\\cancelto{0}{x}'],
+    ['boxed','\\boxed{E=mc^2}'],
+    ['color red','\\color{red}{x}'],['color blue','\\color{blue}{x}'],
+    ['text','\\text{文字}'],['textbf','\\textbf{粗}'],['textit','\\textit{斜}'],
+    ['quad','\\quad'],['qquad','\\qquad'],[',','\\,'],[';','\\;'],
+  ],
+  '化学': [
+    ['H₂O','\\ce{H2O}'],['CO₂','\\ce{CO2}'],
+    ['A→B','\\ce{A -> B}'],['A⇌B','\\ce{A <=> B}'],
+    ['Na⁺','\\ce{Na+}'],['OH⁻','\\ce{OH-}'],['Fe²⁺','\\ce{Fe^{2+}}'],
+    ['¹⁴C','\\ce{^{14}C}'],['CaCO₃','\\ce{CaCO3}'],
+    ['H₂↑','\\ce{H2 ^}'],['AgCl↓','\\ce{AgCl v}'],['ΔH','\\ce{$\\Delta$H}'],
+  ],
+  '物理': [
+    ['⟨ψ|','\\bra{\\psi}'],['|ψ⟩','\\ket{\\psi}'],
+    ['⟨φ|ψ⟩','\\braket{\\phi|\\psi}'],['⟨H⟩','\\ev{H}'],['⟨m|H|n⟩','\\mel{m}{H}{n}'],
+    ['[A,B]','\\comm{A}{B}'],
+    ['∇','\\grad'],['∇·','\\div'],['∇×','\\curl'],['∇²','\\laplacian'],
+    ['df/dx','\\dv{f}{x}'],['∂f/∂x','\\pdv{f}{x}'],
+    ['Ĥ','\\hat{H}'],['p̂','\\hat{p}'],['ℏ','\\hbar'],
+  ],
+};
+
+const EXAMPLES = [
+  // 经典单行公式
+  {c:'经典',l:'欧拉公式',t:'e^{i\\pi} + 1 = 0'},
+  {c:'经典',l:'高斯积分',t:'\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}'},
+  {c:'经典',l:'傅里叶变换',t:'\\hat{f}(\\xi) = \\int_{-\\infty}^{\\infty} f(x)\\,e^{-2\\pi i x\\xi}\\,dx'},
+  {c:'经典',l:'泰勒展开',t:'f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!}(x-a)^n'},
+  {c:'经典',l:'二项式定理',t:'(x+y)^n = \\sum_{k=0}^{n} \\binom{n}{k} x^k y^{n-k}'},
+  {c:'经典',l:'黎曼 ζ 函数',t:'\\zeta(s) = \\sum_{n=1}^{\\infty} \\frac{1}{n^s} = \\prod_{p\\,\\text{素}} \\frac{1}{1-p^{-s}}'},
+  {c:'经典',l:'Gamma 函数',t:'\\Gamma(n) = \\int_0^{\\infty} t^{n-1} e^{-t}\\,dt = (n-1)!'},
+  // 物理（单行或极短）
+  {c:'物理',l:'薛定谔方程',t:'i\\hbar\\dfrac{\\partial}{\\partial t}\\Psi = \\hat{H}\\Psi'},
+  {c:'物理',l:'不确定原理',t:'\\Delta x\\cdot\\Delta p \\geq \\dfrac{\\hbar}{2}'},
+  {c:'物理',l:'狄拉克记号',t:'\\langle\\phi|\\hat{H}|\\psi\\rangle = E\\langle\\phi|\\psi\\rangle'},
+  {c:'物理',l:'相对论质能',t:'E^2 = (pc)^2 + (m_0 c^2)^2'},
+  {c:'物理',l:'洛伦兹变换',t:'x\' = \\gamma(x - vt),\\quad t\' = \\gamma\\!\\left(t - \\frac{vx}{c^2}\\right)'},
+  // 矩阵（小型，不需要多行排版）
+  {c:'矩阵',l:'2×2 行列式',t:'\\det(A) = \\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc'},
+  {c:'矩阵',l:'特征方程',t:'\\det(A - \\lambda I) = 0'},
+  {c:'矩阵',l:'3×3 矩阵',t:'\\mathbf{A} = \\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{pmatrix}'},
+  {c:'矩阵',l:'正交矩阵',t:'A^\\top A = A A^\\top = I'},
+  // 化学
+  {c:'化学',l:'酸碱中和',t:'\\ce{HCl + NaOH -> NaCl + H2O}'},
+  {c:'化学',l:'燃烧反应',t:'\\ce{CH4 + 2O2 -> CO2 + 2H2O}'},
+  {c:'化学',l:'离子方程',t:'\\ce{Fe^{3+} + 3OH- -> Fe(OH)3 v}'},
+  // 多语言文字示例
+  {c:'多语言',l:'中文注释',t:'\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1 \\quad \\text{（重要极限）}'},
+  {c:'多语言',l:'日文注释',t:'e = \\lim_{n\\to\\infty}\\left(1+\\frac{1}{n}\\right)^n \\quad \\text{（自然対数の底）}'},
+  {c:'多语言',l:'韩文注释',t:'\\int_a^b f(x)\\,dx = F(b)-F(a) \\quad \\text{(미적분학의 기본 정리)}'},
+  {c:'多语言',l:'分段+中文',t:'f(x) = \\begin{cases} x^2 & \\text{当 } x \\geq 0 \\\\ -x & \\text{当 } x < 0 \\end{cases}'},
+];
+
+// 大型方程模板：打字量多、结构复杂、适合直接套用的公式骨架
+const TEMPLATES = [
+  // ── 多行对齐 ───────────────────────────────────────────────
+  { c:'多行对齐', l:'align* 双栏对齐', t:
+`\\begin{align*}
+  f(x) &= ax^2 + bx + c \\\\
+       &= a\\left(x + \\frac{b}{2a}\\right)^2 - \\frac{b^2 - 4ac}{4a}
+\\end{align*}` },
+  { c:'多行对齐', l:'aligned 内嵌对齐', t:
+`f(x) = \\begin{aligned}[t]
+  &a_0 + a_1 x + a_2 x^2 \\\\
+  &+ a_3 x^3 + \\cdots + a_n x^n
+\\end{aligned}` },
+  { c:'多行对齐', l:'alignat 多栏对齐', t:
+`\\begin{alignat}{3}
+  x &= 1, &\\quad y &= 2, &\\quad z &= 3 \\\\
+  a &= 4, &\\quad b &= 5, &\\quad c &= 6
+\\end{alignat}` },
+  { c:'多行对齐', l:'gather* 居中多行', t:
+`\\begin{gather*}
+  \\frac{\\partial u}{\\partial x} = \\frac{\\partial v}{\\partial y} \\\\
+  \\frac{\\partial u}{\\partial y} = -\\frac{\\partial v}{\\partial x} \\\\
+  f'(z) = \\frac{\\partial u}{\\partial x} + i\\frac{\\partial v}{\\partial x}
+\\end{gather*}` },
+  { c:'多行对齐', l:'multline* 长公式换行', t:
+`\\begin{multline*}
+  (a+b+c)^3 = a^3 + b^3 + c^3 \\\\
+  + 3a^2b + 3a^2c + 3b^2a + 3b^2c + 3c^2a + 3c^2b \\\\
+  + 6abc
+\\end{multline*}` },
+  { c:'多行对齐', l:'split 单编号长推导', t:
+`\\begin{equation}
+\\begin{split}
+  \\int_0^\\pi \\sin^2 x\\,dx
+    &= \\int_0^\\pi \\frac{1-\\cos 2x}{2}\\,dx \\\\
+    &= \\frac{1}{2}\\left[x - \\frac{\\sin 2x}{2}\\right]_0^\\pi \\\\
+    &= \\frac{\\pi}{2}
+\\end{split}
+\\end{equation}` },
+  // ── 求和/积分 ──────────────────────────────────────────────
+  { c:'求和/积分', l:'双重求和', t:
+`\\sum_{i=1}^{m}\\sum_{j=1}^{n} a_{ij}
+= \\sum_{j=1}^{n}\\sum_{i=1}^{m} a_{ij}` },
+  { c:'求和/积分', l:'级数展开带余项', t:
+`f(x) = \\sum_{n=0}^{N} \\frac{f^{(n)}(a)}{n!}(x-a)^n
++ \\underbrace{\\frac{f^{(N+1)}(\\xi)}{(N+1)!}(x-a)^{N+1}}_{R_{N+1}(x)}` },
+  { c:'求和/积分', l:'二重积分换序', t:
+`\\int_0^1\\int_0^x f(x,y)\\,dy\\,dx
+= \\int_0^1\\int_y^1 f(x,y)\\,dx\\,dy` },
+  { c:'求和/积分', l:'曲线积分 Green 公式', t:
+`\\oint_{\\partial D} P\\,dx + Q\\,dy
+= \\iint_D \\left(\\frac{\\partial Q}{\\partial x} - \\frac{\\partial P}{\\partial y}\\right)dx\\,dy` },
+  { c:'求和/积分', l:'Stokes 公式', t:
+`\\oiint_{\\partial\\Omega} \\mathbf{F}\\cdot d\\mathbf{S}
+= \\iiint_\\Omega \\nabla\\cdot\\mathbf{F}\\,dV` },
+  // ── 连分数/嵌套 ────────────────────────────────────────────
+  { c:'嵌套结构', l:'连分数', t:
+`x = a_0 + \\cfrac{1}{a_1 + \\cfrac{1}{a_2 + \\cfrac{1}{a_3 + \\cfrac{1}{\\ddots}}}}` },
+  { c:'嵌套结构', l:'嵌套根号', t:
+`\\sqrt{1 + \\sqrt{1 + \\sqrt{1 + \\sqrt{1 + \\cdots}}}}` },
+  { c:'嵌套结构', l:'大括号标注', t:
+`\\underbrace{a_1 + a_2 + \\cdots + a_k}_{k\\text{ 项}}
++ \\underbrace{a_{k+1} + \\cdots + a_n}_{n-k\\text{ 项}}` },
+  // ── 方程组 ─────────────────────────────────────────────────
+  { c:'方程组', l:'线性方程组', t:
+`\\begin{cases}
+  a_{11}x_1 + a_{12}x_2 + \\cdots + a_{1n}x_n = b_1 \\\\
+  a_{21}x_1 + a_{22}x_2 + \\cdots + a_{2n}x_n = b_2 \\\\
+  \\quad\\vdots \\\\
+  a_{m1}x_1 + a_{m2}x_2 + \\cdots + a_{mn}x_n = b_m
+\\end{cases}` },
+  { c:'方程组', l:'Maxwell 方程组 align', t:
+`\\begin{align*}
+  \\nabla \\cdot  \\mathbf{E}  &= \\frac{\\rho}{\\varepsilon_0} \\\\
+  \\nabla \\cdot  \\mathbf{B}  &= 0 \\\\
+  \\nabla \\times \\mathbf{E}  &= -\\frac{\\partial \\mathbf{B}}{\\partial t} \\\\
+  \\nabla \\times \\mathbf{B}  &= \\mu_0\\!\\left(\\mathbf{J}
+      + \\varepsilon_0\\frac{\\partial\\mathbf{E}}{\\partial t}\\right)
+\\end{align*}` },
+  { c:'方程组', l:'Navier-Stokes（简）', t:
+`\\frac{\\partial \\mathbf{u}}{\\partial t}
++ (\\mathbf{u}\\cdot\\nabla)\\mathbf{u}
+= -\\frac{1}{\\rho}\\nabla p + \\nu\\nabla^2\\mathbf{u} + \\mathbf{f}` },
+  // ── 概率/统计 ──────────────────────────────────────────────
+  { c:'概率/统计', l:'正态分布密度', t:
+`f(x\\mid\\mu,\\sigma^2)
+= \\frac{1}{\\sigma\\sqrt{2\\pi}}
+  \\exp\\!\\left(-\\frac{(x-\\mu)^2}{2\\sigma^2}\\right)` },
+  { c:'概率/统计', l:'贝叶斯公式（全概率展开）', t:
+`P(A\\mid B) = \\frac{P(B\\mid A)\\,P(A)}{P(B)}
+= \\frac{P(B\\mid A)\\,P(A)}{\\displaystyle\\sum_{i} P(B\\mid A_i)\\,P(A_i)}` },
+  { c:'概率/统计', l:'期望与方差', t:
+`\\begin{aligned}
+  \\mathbb{E}[X]   &= \\int_{-\\infty}^{\\infty} x\\,f(x)\\,dx \\\\
+  \\mathrm{Var}(X) &= \\mathbb{E}[X^2] - (\\mathbb{E}[X])^2
+\\end{aligned}` },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  I18N — to add a new language: (1) add a new key to STRINGS,
+//  SYM_LABELS, EX_I18N, TPL_I18N; (2) add a button in #lang-switch.
+//  To add a new UI string: (1) add data-i18n="key" to the element,
+//  (2) add the key to all four language objects in STRINGS.
+// ═══════════════════════════════════════════════════════════════
+const STRINGS = {
+  zh: {
+    sym_input:'符号 & 公式输入', render_settings:'渲染设置', preview:'实时预览',
+    examples_btn:'示例 ▾', templates_btn:'大型方程 ▾',
+    display_mode:'显示模式', clear:'清空',
+    placeholder:'在此输入 LaTeX 公式，Ctrl/⌘+Enter 立即渲染\n示例：\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}\n化学：\\ce{H2O + CO2 -> H2CO3}\n量子：\\bra{\\psi}\\hat{H}\\ket{\\psi}\n中文：f(x) = \\text{正弦函数}',
+    chars_suffix:' 字符', render_btn:'▶ 立即渲染',
+    font_size:'字体大小', export_scale:'导出缩放', formula_color:'公式颜色',
+    bg_color:'背景颜色', bg_alpha:'背景透明度', padding:'内边距',
+    export_size:'导出尺寸:', size_auto:'自动', width_ph:'宽', height_ph:'高',
+    transparency_checker:'透明度检查板',
+    preview_hint:'在左侧输入公式<code>Ctrl/⌘+Enter 快速渲染</code>',
+    export_copy:'导出 / 复制', copy_svg:'复制 SVG', copy_latex:'复制 LaTeX',
+    s_waiting:'等待 MathJax 加载…', s_rendering:'渲染中…', s_ready:'就绪',
+    s_render_ok:'渲染成功', s_render_fail:'渲染失败: ',
+    s_exporting:'导出中…', s_export_ok:'导出成功', s_export_fail:'导出失败',
+    s_svg_ok:'SVG 导出成功', s_pdf_ok:'PDF 打印窗口已打开',
+    s_svg_copied:'SVG 已复制到剪贴板', s_latex_copied:'LaTeX 已复制',
+    s_mj_ready:'MathJax 就绪 ✓', s_mj_fail:'MathJax 加载失败: ',
+    a_render_first:'请先渲染公式', a_empty:'公式为空',
+    a_export_fail:'导出失败: ', a_pdf_fail:'PDF 失败: ', a_timeout:'加载超时，请刷新页面',
+  },
+  en: {
+    sym_input:'Symbols & Formula Input', render_settings:'Render Settings', preview:'Live Preview',
+    examples_btn:'Examples ▾', templates_btn:'Templates ▾',
+    display_mode:'Display Mode', clear:'Clear',
+    placeholder:'Enter LaTeX formula here, Ctrl/⌘+Enter to render\nExample: \\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}\nChemistry: \\ce{H2O + CO2 -> H2CO3}\nQuantum: \\bra{\\psi}\\hat{H}\\ket{\\psi}\nText: f(x) = \\text{sine function}',
+    chars_suffix:' chars', render_btn:'▶ Render',
+    font_size:'Font Size', export_scale:'Export Scale', formula_color:'Formula Color',
+    bg_color:'Background', bg_alpha:'Background Alpha', padding:'Padding',
+    export_size:'Export Size:', size_auto:'Auto', width_ph:'W', height_ph:'H',
+    transparency_checker:'Transparency Checker',
+    preview_hint:'Enter formula on the left<code>Ctrl/⌘+Enter to render</code>',
+    export_copy:'Export / Copy', copy_svg:'Copy SVG', copy_latex:'Copy LaTeX',
+    s_waiting:'Waiting for MathJax…', s_rendering:'Rendering…', s_ready:'Ready',
+    s_render_ok:'Rendered', s_render_fail:'Render error: ',
+    s_exporting:'Exporting…', s_export_ok:'Exported', s_export_fail:'Export failed',
+    s_svg_ok:'SVG exported', s_pdf_ok:'PDF print window opened',
+    s_svg_copied:'SVG copied to clipboard', s_latex_copied:'LaTeX copied',
+    s_mj_ready:'MathJax ready ✓', s_mj_fail:'MathJax load failed: ',
+    a_render_first:'Please render a formula first', a_empty:'Formula is empty',
+    a_export_fail:'Export failed: ', a_pdf_fail:'PDF failed: ', a_timeout:'Load timeout, please refresh',
+  },
+  ja: {
+    sym_input:'記号 & 数式入力', render_settings:'レンダリング設定', preview:'リアルタイムプレビュー',
+    examples_btn:'例 ▾', templates_btn:'テンプレート ▾',
+    display_mode:'表示モード', clear:'クリア',
+    placeholder:'LaTeX 数式を入力してください。Ctrl/⌘+Enter でレンダリング\n例：\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}\n化学：\\ce{H2O + CO2 -> H2CO3}\n量子：\\bra{\\psi}\\hat{H}\\ket{\\psi}\nテキスト：f(x) = \\text{正弦関数}',
+    chars_suffix:' 文字', render_btn:'▶ レンダリング',
+    font_size:'フォントサイズ', export_scale:'エクスポート倍率', formula_color:'数式の色',
+    bg_color:'背景色', bg_alpha:'背景の不透明度', padding:'パディング',
+    export_size:'エクスポートサイズ:', size_auto:'自動', width_ph:'幅', height_ph:'高さ',
+    transparency_checker:'透明度チェッカー',
+    preview_hint:'左側に数式を入力してください<code>Ctrl/⌘+Enter でレンダリング</code>',
+    export_copy:'エクスポート / コピー', copy_svg:'SVG をコピー', copy_latex:'LaTeX をコピー',
+    s_waiting:'MathJax を読み込み中…', s_rendering:'レンダリング中…', s_ready:'準備完了',
+    s_render_ok:'レンダリング完了', s_render_fail:'レンダリングエラー: ',
+    s_exporting:'エクスポート中…', s_export_ok:'エクスポート完了', s_export_fail:'エクスポート失敗',
+    s_svg_ok:'SVG エクスポート完了', s_pdf_ok:'PDF 印刷ウィンドウを開きました',
+    s_svg_copied:'SVG をクリップボードにコピーしました', s_latex_copied:'LaTeX をコピーしました',
+    s_mj_ready:'MathJax 準備完了 ✓', s_mj_fail:'MathJax 読み込み失敗: ',
+    a_render_first:'先に数式をレンダリングしてください', a_empty:'数式が空です',
+    a_export_fail:'エクスポート失敗: ', a_pdf_fail:'PDF 失敗: ', a_timeout:'タイムアウト、ページを更新してください',
+  },
+  ko: {
+    sym_input:'기호 & 수식 입력', render_settings:'렌더링 설정', preview:'실시간 미리보기',
+    examples_btn:'예제 ▾', templates_btn:'대형 수식 ▾',
+    display_mode:'표시 모드', clear:'지우기',
+    placeholder:'여기에 LaTeX 수식을 입력하세요. Ctrl/⌘+Enter로 렌더링\n예제: \\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}\n화학: \\ce{H2O + CO2 -> H2CO3}\n양자: \\bra{\\psi}\\hat{H}\\ket{\\psi}\n텍스트: f(x) = \\text{사인 함수}',
+    chars_suffix:' 자', render_btn:'▶ 렌더링',
+    font_size:'글꼴 크기', export_scale:'내보내기 배율', formula_color:'수식 색상',
+    bg_color:'배경 색상', bg_alpha:'배경 투명도', padding:'패딩',
+    export_size:'내보내기 크기:', size_auto:'자동', width_ph:'폭', height_ph:'높이',
+    transparency_checker:'투명도 체커',
+    preview_hint:'왼쪽에 수식을 입력하세요<code>Ctrl/⌘+Enter로 렌더링</code>',
+    export_copy:'내보내기 / 복사', copy_svg:'SVG 복사', copy_latex:'LaTeX 복사',
+    s_waiting:'MathJax 로딩 중…', s_rendering:'렌더링 중…', s_ready:'준비 완료',
+    s_render_ok:'렌더링 완료', s_render_fail:'렌더링 오류: ',
+    s_exporting:'내보내는 중…', s_export_ok:'내보내기 완료', s_export_fail:'내보내기 실패',
+    s_svg_ok:'SVG 내보내기 완료', s_pdf_ok:'PDF 인쇄 창이 열렸습니다',
+    s_svg_copied:'SVG가 클립보드에 복사되었습니다', s_latex_copied:'LaTeX 복사 완료',
+    s_mj_ready:'MathJax 준비 완료 ✓', s_mj_fail:'MathJax 로드 실패: ',
+    a_render_first:'먼저 수식을 렌더링해 주세요', a_empty:'수식이 비어 있습니다',
+    a_export_fail:'내보내기 실패: ', a_pdf_fail:'PDF 실패: ', a_timeout:'로드 타임아웃, 페이지를 새로고침하세요',
+  },
+};
+
+// Symbol tab display names per language (SYM keys remain Chinese as stable IDs)
+const SYM_LABELS = {
+  zh: {'希腊':'希腊','运算':'运算','关系':'关系','箭头':'箭头','集合':'集合','微积分':'微积分','三角':'三角','数论':'数论','结构':'结构','矩阵':'矩阵','字体':'字体','化学':'化学','物理':'物理'},
+  en: {'希腊':'Greek','运算':'Ops','关系':'Rel','箭头':'Arrows','集合':'Sets','微积分':'Calculus','三角':'Trig','数论':'N.Theory','结构':'Struct','矩阵':'Matrix','字体':'Fonts','化学':'Chem','物理':'Physics'},
+  ja: {'希腊':'ギリシャ','运算':'演算子','关系':'関係','箭头':'矢印','集合':'集合','微积分':'微積分','三角':'三角','数论':'数論','结构':'構造','矩阵':'行列','字体':'フォント','化学':'化学','物理':'物理'},
+  ko: {'希腊':'그리스','运算':'연산자','关系':'관계','箭头':'화살표','集合':'집합','微积分':'미적분','三角':'삼각','数论':'수론','结构':'구조','矩阵':'행렬','字体':'글꼴','化学':'화학','物理':'물리'},
+};
+
+// Example & template label translations (keyed by Chinese strings for stability)
+const EX_I18N = {
+  cats: {
+    en: {'经典':'Classic','物理':'Physics','矩阵':'Matrices','化学':'Chemistry','多语言':'Multilingual'},
+    ja: {'经典':'クラシック','物理':'物理','矩阵':'行列','化学':'化学','多语言':'多言語'},
+    ko: {'经典':'고전','物理':'물리','矩阵':'행렬','化学':'화학','多语言':'다국어'},
+  },
+  labels: {
+    en: {
+      '欧拉公式':"Euler's Formula",'高斯积分':'Gaussian Integral','傅里叶变换':'Fourier Transform',
+      '泰勒展开':'Taylor Series','二项式定理':'Binomial Theorem','黎曼 ζ 函数':'Riemann ζ Function',
+      'Gamma 函数':'Gamma Function','薛定谔方程':'Schrödinger Equation','不确定原理':'Uncertainty Principle',
+      '狄拉克记号':'Dirac Notation','相对论质能':'Mass-Energy Equiv.','洛伦兹变换':'Lorentz Transform',
+      '2×2 行列式':'2×2 Determinant','特征方程':'Characteristic Eqn','3×3 矩阵':'3×3 Matrix',
+      '正交矩阵':'Orthogonal Matrix','酸碱中和':'Acid-Base Neutralization','燃烧反应':'Combustion Reaction',
+      '离子方程':'Ionic Equation','中文注释':'Chinese Annotation','日文注释':'Japanese Annotation',
+      '韩文注释':'Korean Annotation','分段+中文':'Piecewise + Chinese',
+    },
+    ja: {
+      '欧拉公式':'オイラーの公式','高斯积分':'ガウス積分','傅里叶变换':'フーリエ変換',
+      '泰勒展开':'テイラー展開','二项式定理':'二項定理','黎曼 ζ 函数':'リーマン ζ 関数',
+      'Gamma 函数':'Gamma 関数','薛定谔方程':'シュレーディンガー方程式','不确定原理':'不確定性原理',
+      '狄拉克记号':'ディラック記法','相对论质能':'質量エネルギー等価','洛伦兹变换':'ローレンツ変換',
+      '2×2 行列式':'2×2 行列式','特征方程':'特性方程式','3×3 矩阵':'3×3 行列',
+      '正交矩阵':'直交行列','酸碱中和':'酸塩基中和','燃烧反应':'燃焼反応',
+      '离子方程':'イオン方程式','中文注释':'中国語注釈','日文注释':'日本語注釈',
+      '韩文注释':'韓国語注釈','分段+中文':'区分関数+中国語',
+    },
+    ko: {
+      '欧拉公式':'오일러 공식','高斯积分':'가우스 적분','傅里叶变换':'푸리에 변환',
+      '泰勒展开':'테일러 전개','二项式定理':'이항 정리','黎曼 ζ 函数':'리만 ζ 함수',
+      'Gamma 函数':'Gamma 함수','薛定谔方程':'슈뢰딩거 방정식','不确定原理':'불확정성 원리',
+      '狄拉克记号':'디랙 표기법','相对论质能':'질량-에너지 등가','洛伦兹变换':'로렌츠 변환',
+      '2×2 行列式':'2×2 행렬식','特征方程':'특성 방정식','3×3 矩阵':'3×3 행렬',
+      '正交矩阵':'직교 행렬','酸碱中和':'산염기 중화','燃烧反应':'연소 반응',
+      '离子方程':'이온 방정식','中文注释':'중국어 주석','日文注释':'일본어 주석',
+      '韩文注释':'한국어 주석','分段+中文':'분류함수+중국어',
+    },
+  },
+};
+const TPL_I18N = {
+  cats: {
+    en: {'多行对齐':'Multi-line Align','求和/积分':'Sums & Integrals','嵌套结构':'Nested Structures','方程组':'Systems of Eqns','概率/统计':'Prob. & Stats'},
+    ja: {'多行对齐':'複数行整列','求和/积分':'和分/積分','嵌套结构':'入れ子構造','方程组':'連立方程式','概率/统计':'確率/統計'},
+    ko: {'多行对齐':'다중 줄 정렬','求和/积分':'합산/적분','嵌套结构':'중첩 구조','方程组':'연립방정식','概率/统计':'확률/통계'},
+  },
+  labels: {
+    en: {
+      'align* 双栏对齐':'align* Two-column','aligned 内嵌对齐':'aligned Inline',
+      'alignat 多栏对齐':'alignat Multi-col','gather* 居中多行':'gather* Centered',
+      'multline* 长公式换行':'multline* Wrap','split 单编号长推导':'split Numbered',
+      '双重求和':'Double Sum','级数展开带余项':'Series + Remainder',
+      '二重积分换序':'Double Integral Swap','曲线积分 Green 公式':"Green's Theorem",
+      'Stokes 公式':"Stokes' Theorem",'连分数':'Continued Fraction',
+      '嵌套根号':'Nested Radicals','大括号标注':'Brace Annotation',
+      '线性方程组':'Linear System','Maxwell 方程组 align':'Maxwell Equations',
+      'Navier-Stokes（简）':'Navier-Stokes (brief)','正态分布密度':'Normal Distribution',
+      '贝叶斯公式（全概率展开）':"Bayes' Theorem",'期望与方差':'Expectation & Variance',
+    },
+    ja: {
+      'align* 双栏对齐':'align* 2列整列','aligned 内嵌对齐':'aligned 内嵌',
+      'alignat 多栏对齐':'alignat 多列','gather* 居中多行':'gather* 中央揃え',
+      'multline* 长公式换行':'multline* 長い数式','split 单编号长推导':'split 番号付き',
+      '双重求和':'二重和','级数展开带余项':'級数+剰余項',
+      '二重积分换序':'二重積分換順','曲线积分 Green 公式':'グリーンの定理',
+      'Stokes 公式':'ストークスの定理','连分数':'連分数',
+      '嵌套根号':'入れ子根号','大括号标注':'大括弧注釈',
+      '线性方程组':'線形方程式系','Maxwell 方程组 align':'マクスウェル方程式',
+      'Navier-Stokes（简）':'ナビエ-ストークス（簡）','正态分布密度':'正規分布密度',
+      '贝叶斯公式（全概率展开）':'ベイズの定理（展開）','期望与方差':'期待値と分散',
+    },
+    ko: {
+      'align* 双栏对齐':'align* 2열 정렬','aligned 内嵌对齐':'aligned 내장',
+      'alignat 多栏对齐':'alignat 다열','gather* 居中多行':'gather* 가운데',
+      'multline* 长公式换行':'multline* 줄 바꿈','split 单编号长推导':'split 번호 있는',
+      '双重求和':'이중 합','级数展开带余项':'급수+나머지',
+      '二重积分换序':'이중 적분 순서 교환','曲线积分 Green 公式':'그린 정리',
+      'Stokes 公式':'스토크스 정리','连分数':'연분수',
+      '嵌套根号':'중첩 근호','大括号标注':'중괄호 표기',
+      '线性方程组':'선형 연립방정식','Maxwell 方程组 align':'맥스웰 방정식',
+      'Navier-Stokes（简）':'나비에-스토크스 (간략)','正态分布密度':'정규분포 밀도',
+      '贝叶斯公式（全概率展开）':'베이즈 정리','期望与方差':'기댓값과 분산',
+    },
+  },
+};
+
+let currentLang = localStorage.getItem('lx2png-lang') || 'zh';
+
+function t(key) {
+  return (STRINGS[currentLang] || STRINGS.zh)[key] ?? STRINGS.zh[key] ?? key;
+}
+
+function applyLang(code) {
+  currentLang = code;
+  localStorage.setItem('lx2png-lang', code);
+  // Update switcher button states
+  document.querySelectorAll('.lang-switch-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.lang === code)
+  );
+  // Update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const val = (STRINGS[code] || STRINGS.zh)[key];
+    if (val === undefined) return;
+    const attr = el.dataset.i18nAttr;
+    if (attr) el.setAttribute(attr, val);
+    else el.textContent = val;
+  });
+  // Rebuild dynamic symbol tabs and dropdown menus
+  document.querySelectorAll('.sym-tab').forEach(tab => {
+    tab.textContent = (SYM_LABELS[code] || SYM_LABELS.zh)[tab.dataset.c] || tab.dataset.c;
+  });
+  document.getElementById('ex-menu').innerHTML = '';
+  document.getElementById('tpl-menu').innerHTML = '';
+  buildExamples();
+  buildTemplates();
+  // Refresh char count suffix
+  updateCC();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let renderMode = 'display';
+let currentSVGEl = null;
+let debounceTimer = null;
+let mjReady = false;
+let exportW = 0, exportH = 0;
+
+const inp = document.getElementById('latex-input');
+
+// ═══════════════════════════════════════════════════════════════
+//  BUILD UI
+// ═══════════════════════════════════════════════════════════════
+function buildSymbols() {
+  const tabBar = document.getElementById('sym-tabs');
+  const panels = document.getElementById('sym-panels');
+  let first = true;
+  for (const [cat, syms] of Object.entries(SYM)) {
+    const tab = document.createElement('button');
+    tab.className = 'sym-tab' + (first?' active':'');
+    tab.textContent = (SYM_LABELS[currentLang] || SYM_LABELS.zh)[cat] || cat;
+    tab.dataset.c = cat;
+    tab.onclick = () => activateSymTab(cat);
+    tabBar.appendChild(tab);
+
+    const panel = document.createElement('div');
+    panel.className = 'sym-panel' + (first?' active':'');
+    panel.dataset.c = cat;
+    for (const [label, latex] of syms) {
+      const b = document.createElement('button');
+      b.className = 'sym-btn';
+      b.textContent = label;
+      b.dataset.tip = latex;
+      b.onclick = () => ins(latex);
+      panel.appendChild(b);
+    }
+    panels.appendChild(panel);
+    first = false;
+  }
+}
+
+function activateSymTab(cat) {
+  document.querySelectorAll('.sym-tab').forEach(t => t.classList.toggle('active', t.dataset.c===cat));
+  document.querySelectorAll('.sym-panel').forEach(p => p.classList.toggle('active', p.dataset.c===cat));
+  // Scroll active tab into view
+  const bar = document.getElementById('sym-tabs');
+  const active = bar.querySelector('.sym-tab.active');
+  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+}
+
+function symScroll(dir) {
+  const bar = document.getElementById('sym-tabs');
+  bar.scrollBy({ left: dir * 120, behavior: 'smooth' });
+}
+
+function updateSymScrollBtns() {
+  const bar = document.getElementById('sym-tabs');
+  const btnL = document.getElementById('sym-scroll-l');
+  const btnR = document.getElementById('sym-scroll-r');
+  const overflow = bar.scrollWidth > bar.clientWidth + 2;
+  btnL.classList.toggle('visible', overflow);
+  btnR.classList.toggle('visible', overflow);
+}
+
+// Update scroll buttons on resize and on tab bar scroll
+window.addEventListener('resize', updateSymScrollBtns);
+document.getElementById('sym-tabs').addEventListener('scroll', updateSymScrollBtns);
+
+function buildExamples() {
+  const menu = document.getElementById('ex-menu');
+  const catMap   = EX_I18N.cats[currentLang]   || {};
+  const labelMap = EX_I18N.labels[currentLang] || {};
+  let lastCat = '';
+  for (const ex of EXAMPLES) {
+    if (ex.c !== lastCat) {
+      const h = document.createElement('div');
+      h.className = 'ex-cat';
+      h.textContent = catMap[ex.c] || ex.c;
+      menu.appendChild(h);
+      lastCat = ex.c;
+    }
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'ex-item-label';
+    labelDiv.textContent = labelMap[ex.l] || ex.l;
+    const codeDiv = document.createElement('div');
+    codeDiv.className = 'ex-item-code';
+    codeDiv.textContent = ex.t.replace(/\n/g,' ').substring(0,60) + '…';
+    item.appendChild(labelDiv);
+    item.appendChild(codeDiv);
+    item.onclick = () => { inp.value = ex.t; updateCC(); closeExMenu(); schedule(); };
+    menu.appendChild(item);
+  }
+}
+
+function buildTemplates() {
+  const menu = document.getElementById('tpl-menu');
+  const catMap   = TPL_I18N.cats[currentLang]   || {};
+  const labelMap = TPL_I18N.labels[currentLang] || {};
+  let lastCat = '';
+  for (const tpl of TEMPLATES) {
+    if (tpl.c !== lastCat) {
+      const h = document.createElement('div');
+      h.className = 'ex-cat';
+      h.style.cssText = 'background:#fffbeb;color:#b45309;';
+      h.textContent = catMap[tpl.c] || tpl.c;
+      menu.appendChild(h);
+      lastCat = tpl.c;
+    }
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'ex-item-label';
+    labelDiv.textContent = labelMap[tpl.l] || tpl.l;
+    const codeDiv = document.createElement('div');
+    codeDiv.className = 'ex-item-code';
+    codeDiv.textContent = tpl.t.replace(/\n\s*/g,' ').slice(0, 55) + '…';
+    item.appendChild(labelDiv);
+    item.appendChild(codeDiv);
+    item.onclick = () => { inp.value = tpl.t; updateCC(); closeTplMenu(); schedule(); };
+    menu.appendChild(item);
+  }
+}
+
+function toggleTplMenu() {
+  const menu = document.getElementById('tpl-menu');
+  const btn  = document.getElementById('tpl-btn');
+  if (menu.classList.contains('open')) { closeTplMenu(); return; }
+  const r = btn.getBoundingClientRect();
+  menu.style.top  = (r.bottom + 6) + 'px';
+  menu.style.left = r.left + 'px';
+  menu.classList.add('open');
+  const mr = menu.getBoundingClientRect();
+  if (mr.right > window.innerWidth - 8) {
+    menu.style.left = (window.innerWidth - mr.width - 8) + 'px';
+  }
+}
+function closeTplMenu() { document.getElementById('tpl-menu').classList.remove('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('#tpl-wrap')) closeTplMenu(); });
+
+function toggleExMenu() {
+  const menu = document.getElementById('ex-menu');
+  const btn  = document.getElementById('ex-btn');
+  if (menu.classList.contains('open')) { closeExMenu(); return; }
+  // 定位到按钮正下方，避开 overflow:hidden 裁剪
+  const r = btn.getBoundingClientRect();
+  menu.style.top  = (r.bottom + 6) + 'px';
+  menu.style.left = r.left + 'px';
+  // 防止超出视口右侧
+  menu.classList.add('open');
+  const mr = menu.getBoundingClientRect();
+  if (mr.right > window.innerWidth - 8) {
+    menu.style.left = (window.innerWidth - mr.width - 8) + 'px';
+  }
+}
+function closeExMenu() { document.getElementById('ex-menu').classList.remove('open'); }
+document.addEventListener('click', e => { if (!e.target.closest('.ex-wrap')) closeExMenu(); });
+
+// Color swatches
+const F_COLORS = ['#1a1a2e','#000000','#ffffff','#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#ec4899','#14b8a6'];
+const B_COLORS = ['#ffffff','#000000','#f0f4ff','#fafafa','#fffde7','#f0fdf4','#eff6ff','#fdf4ff','#1a1a2e','#0f172a'];
+
+function buildSwatches() {
+  const makeRow = (colors, inputId, containerId) => {
+    const wrap = document.getElementById(containerId);
+    wrap.style.display = 'flex'; wrap.style.flexWrap = 'wrap'; wrap.style.gap = '3px';
+    colors.forEach(c => {
+      const s = document.createElement('div');
+      s.className = 'color-swatch';
+      s.style.background = c;
+      if (c === '#ffffff') s.style.boxShadow = 'inset 0 0 0 1.5px #d1d5db';
+      s.onclick = () => { document.getElementById(inputId).value = c; onSetting(); };
+      wrap.appendChild(s);
+    });
+  };
+  makeRow(F_COLORS, 'col-formula', 'swatches-formula');
+  makeRow(B_COLORS, 'col-bg',      'swatches-bg');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════════════
+inp.addEventListener('input', () => { updateCC(); schedule(); });
+inp.addEventListener('keydown', e => {
+  if (e.key === 'Tab') { e.preventDefault(); ins('  '); }
+  if ((e.ctrlKey||e.metaKey) && e.key === 'Enter') renderNow();
+});
+
+function updateCC() {
+  document.getElementById('char-count').textContent = inp.value.length + t('chars_suffix');
+}
+
+function ins(text) {
+  const s = inp.selectionStart, e2 = inp.selectionEnd;
+  inp.value = inp.value.slice(0,s) + text + inp.value.slice(e2);
+  inp.setSelectionRange(s+text.length, s+text.length);
+  inp.focus();
+  updateCC();
+  schedule();
+}
+
+function insertSample(lang) {
+  const m = { en:'\\text{where } x \\in \\mathbb{R}', zh:'\\text{其中 } x \\text{ 为实数}',
+               ja:'\\text{ただし } x \\text{ は実数}',  ko:'\\text{여기서 } x \\text{는 실수}' };
+  ins(m[lang]||'');
+}
+
+function doClear() { inp.value = ''; updateCC(); schedule(); }
+
+function setMode(m) {
+  renderMode = m;
+  document.getElementById('btn-display').classList.toggle('active', m==='display');
+  document.getElementById('btn-inline').classList.toggle('active', m==='inline');
+  schedule();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function onSetting() {
+  const fs  = +document.getElementById('sl-fs').value;
+  const sc  = +document.getElementById('sl-sc').value;
+  const al  = +document.getElementById('sl-al').value;
+  const pd  = +document.getElementById('sl-pd').value;
+
+  document.getElementById('lbl-fs').textContent = fs + ' px';
+  document.getElementById('lbl-sc').textContent = sc + ' ×';
+  document.getElementById('lbl-al').textContent = al + '%';
+  document.getElementById('lbl-pd').textContent = pd + ' px';
+
+  // Update range track fill
+  ['sl-fs','sl-sc','sl-al','sl-pd'].forEach(id => {
+    const el = document.getElementById(id);
+    const pct = (el.value - el.min) / (el.max - el.min) * 100;
+    el.style.background = `linear-gradient(to right, var(--blue) ${pct}%, var(--border) ${pct}%)`;
+  });
+
+  applyPreview();
+  schedule();
+}
+
+function applyPreview() {
+  const box   = document.getElementById('preview-box');
+  const fCol  = document.getElementById('col-formula').value;
+  const bCol  = document.getElementById('col-bg').value;
+  const alpha = document.getElementById('sl-al').value / 100;
+  const pad   = document.getElementById('sl-pd').value;
+
+  const [r,g,b] = [1,3,5].map(i => parseInt(bCol.slice(i,i+2),16));
+  box.style.background = `rgba(${r},${g},${b},${alpha})`;
+  box.style.padding = pad + 'px';
+  box.style.color = fCol;
+  if (currentSVGEl) currentSVGEl.style.color = fCol;
+}
+
+const SIZE_MAP = { auto:[0,0], hd:[1280,720], fhd:[1920,1080], '2k':[2560,1440], '4k':[3840,2160] };
+
+function setSize(key) {
+  document.querySelectorAll('.size-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.size === key);
+  });
+  if (SIZE_MAP[key]) { [exportW,exportH] = SIZE_MAP[key]; }
+  else {
+    exportW = +document.getElementById('inp-w').value || 0;
+    exportH = +document.getElementById('inp-h').value || 0;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER  — uses MathJax.typesetPromise on a hidden sink element
+// ═══════════════════════════════════════════════════════════════
+
+// 将 SVG width/height 属性（ex/em/px）转为像素，作为 getBoundingClientRect 的 fallback
+function svgPxFromAttr(svgEl, attr, fontSize) {
+  const raw = svgEl.getAttribute(attr) || '';
+  const n   = parseFloat(raw);
+  if (isNaN(n)) return 0;
+  if (raw.endsWith('ex')) return n * fontSize * 0.43;
+  if (raw.endsWith('em')) return n * fontSize;
+  return n; // already px or unitless
+}
+function schedule() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(renderNow, 550);
+}
+
+async function renderNow() {
+  if (!mjReady) { setStatus('busy', t('s_waiting')); return; }
+  clearTimeout(debounceTimer);
+
+  const latex = inp.value.trim();
+  const box = document.getElementById('preview-box');
+
+  if (!latex) {
+    box.innerHTML = `<div class="preview-hint">${t('preview_hint')}</div>`;
+    currentSVGEl = null;
+    setStatus('ok', t('s_ready'));
+    return;
+  }
+
+  setStatus('busy', t('s_rendering'));
+  const t0 = performance.now();
+  const fs = +document.getElementById('sl-fs').value;
+
+  const sink = document.getElementById('mj-sink');
+  sink.style.fontSize = fs + 'px';
+
+  // Wrap formula for MathJax to parse
+  const wrapped = renderMode === 'display'
+    ? `\\[${latex}\\]`
+    : `\\(${latex}\\)`;
+
+  // Clear previous render and set new content
+  try { if (MathJax.typesetClear) MathJax.typesetClear([sink]); } catch {}
+  sink.innerHTML = '';
+  // Use a text node so LaTeX special chars are not parsed as HTML
+  sink.appendChild(document.createTextNode(wrapped));
+
+  try {
+    await MathJax.typesetPromise([sink]);
+
+    const svgEl = sink.querySelector('svg');
+    if (!svgEl) throw new Error('未找到 SVG 输出，请检查公式语法');
+
+    // 用实际渲染像素尺寸（sink 是 visibility:hidden 仍参与布局，BoundingClientRect 可靠）
+    const rect = svgEl.getBoundingClientRect();
+    const pw = rect.width  > 1 ? rect.width  : svgPxFromAttr(svgEl, 'width',  fs);
+    const ph = rect.height > 1 ? rect.height : svgPxFromAttr(svgEl, 'height', fs);
+
+    const clone = svgEl.cloneNode(true);
+    clone.setAttribute('width',  pw);
+    clone.setAttribute('height', ph);
+    clone.style.width  = pw + 'px';
+    clone.style.height = ph + 'px';
+
+    box.innerHTML = '';
+    box.appendChild(clone);
+    currentSVGEl = clone;
+    applyPreview();
+
+    const dt = (performance.now()-t0).toFixed(0);
+    setStatus('ok', t('s_render_ok'));
+    document.getElementById('status-time').textContent = dt + ' ms';
+  } catch(err) {
+    const msg = String(err.message||err).replace(/\s+/g,' ').trim().slice(0,160);
+    box.innerHTML = `<div class="error-card">⚠ ${esc(msg)}</div>`;
+    currentSVGEl = null;
+    setStatus('err', t('s_render_fail') + msg.slice(0,40));
+  }
+}
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function setStatus(state, text) {
+  document.getElementById('status-dot').className  = 'status-dot ' + state;
+  document.getElementById('status-text').textContent = text;
+  if (state !== 'busy') document.getElementById('status-time').textContent = '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EXPORT HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+// Build a fully self-contained SVG string for export
+// - resolves currentColor → actual hex
+// - ensures explicit px width/height
+// - ensures xmlns declarations
+function buildExportSVGString(svgEl, color) {
+  const clone = svgEl.cloneNode(true);
+
+  // Walk ALL elements (including inside <defs>) and replace currentColor
+  clone.querySelectorAll('*').forEach(el => {
+    // Attribute-based
+    if (el.getAttribute('fill')   === 'currentColor') el.setAttribute('fill',   color);
+    if (el.getAttribute('stroke') === 'currentColor') el.setAttribute('stroke', color);
+    // Inline style-based
+    if (el.style) {
+      if (el.style.fill   === 'currentColor') el.style.fill   = color;
+      if (el.style.stroke === 'currentColor') el.style.stroke = color;
+      if (el.style.color  === 'currentColor') el.style.color  = color;
+    }
+  });
+  // Also set the root SVG color
+  clone.style.color = color;
+
+  // Get rendered dimensions in px
+  const rect = svgEl.getBoundingClientRect();
+  const w = rect.width  > 0 ? rect.width  : (parseFloat(svgEl.getAttribute('width'))  || 300);
+  const h = rect.height > 0 ? rect.height : (parseFloat(svgEl.getAttribute('height')) || 100);
+
+  clone.setAttribute('width',  w);
+  clone.setAttribute('height', h);
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+  // XMLSerializer produces valid SVG with all namespaces
+  const raw = new XMLSerializer().serializeToString(clone);
+  return { svgStr: raw, w, h };
+}
+
+async function makePxSVGBlob(svgEl, color) {
+  const { svgStr, w, h } = buildExportSVGString(svgEl, color);
+  return { blob: new Blob([svgStr], {type:'image/svg+xml'}), w, h };
+}
+
+async function toCanvas() {
+  if (!currentSVGEl) throw new Error('先渲染公式');
+  const scale  = +document.getElementById('sl-sc').value;
+  const fColor = document.getElementById('col-formula').value;
+  const bColor = document.getElementById('col-bg').value;
+  const alpha  = document.getElementById('sl-al').value / 100;
+  const pad    = +document.getElementById('sl-pd').value;
+
+  const { blob, w: svgW, h: svgH } = await makePxSVGBlob(currentSVGEl, fColor);
+  const url = URL.createObjectURL(blob);
+
+  let cW, cH;
+  if (exportW > 0 && exportH > 0) { cW = exportW; cH = exportH; }
+  else { cW = Math.round((svgW + pad*2)*scale); cH = Math.round((svgH + pad*2)*scale); }
+
+  return new Promise((res,rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = cW; cv.height = cH;
+      const ctx = cv.getContext('2d');
+
+      const [r,g,b] = [1,3,5].map(i=>parseInt(bColor.slice(i,i+2),16));
+      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.fillRect(0,0,cW,cH);
+
+      if (exportW>0 && exportH>0) {
+        const ratio = Math.min((cW-pad*2) / svgW, (cH-pad*2) / svgH);
+        const dw = svgW*ratio, dh = svgH*ratio;
+        ctx.drawImage(img, (cW-dw)/2, (cH-dh)/2, dw, dh);
+      } else {
+        ctx.drawImage(img, pad*scale, pad*scale, svgW*scale, svgH*scale);
+      }
+      URL.revokeObjectURL(url);
+      res(cv);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('图像加载失败')); };
+    img.src = url;
+  });
+}
+
+async function exportRaster(fmt) {
+  if (!currentSVGEl) { alert(t('a_render_first')); return; }
+  setStatus('busy', t('s_exporting'));
+  try {
+    const cv = await toCanvas();
+    cv.toBlob(blob => { dl(blob,`formula.${fmt}`,`image/${fmt}`); setStatus('ok', t('s_export_ok')); },
+              `image/${fmt}`, fmt==='jpeg'?0.95:undefined);
+  } catch(e) { alert(t('a_export_fail')+e.message); setStatus('err', t('s_export_fail')); }
+}
+
+async function exportSVG() {
+  if (!currentSVGEl) { alert(t('a_render_first')); return; }
+  const fColor = document.getElementById('col-formula').value;
+  const bColor = document.getElementById('col-bg').value;
+  const alpha  = document.getElementById('sl-al').value / 100;
+  const pad    = +document.getElementById('sl-pd').value;
+
+  const { svgStr, w, h } = buildExportSVGString(currentSVGEl, fColor);
+
+  // Parse the self-contained SVG and add background + padding
+  const parser = new DOMParser();
+  const doc  = parser.parseFromString(svgStr, 'image/svg+xml');
+  const root = doc.documentElement;
+
+  const totalW = w + pad*2, totalH = h + pad*2;
+  root.setAttribute('width',  totalW);
+  root.setAttribute('height', totalH);
+
+  const [r,g,b] = [1,3,5].map(i=>parseInt(bColor.slice(i,i+2),16));
+  const bgRect = doc.createElementNS('http://www.w3.org/2000/svg','rect');
+  bgRect.setAttribute('x','0'); bgRect.setAttribute('y','0');
+  bgRect.setAttribute('width', totalW); bgRect.setAttribute('height', totalH);
+  bgRect.setAttribute('fill', `rgba(${r},${g},${b},${alpha})`);
+  root.insertBefore(bgRect, root.firstChild);
+
+  // Wrap content in a translate group for padding
+  const grp = doc.createElementNS('http://www.w3.org/2000/svg','g');
+  grp.setAttribute('transform', `translate(${pad},${pad})`);
+  // Move all children (except bg rect we just inserted) into the group
+  const toMove = [...root.children].filter(c => c !== bgRect);
+  toMove.forEach(c => grp.appendChild(c));
+  root.appendChild(grp);
+
+  const finalStr = '<?xml version="1.0" encoding="UTF-8"?>\n'
+                 + new XMLSerializer().serializeToString(root);
+  dl(new Blob([finalStr], {type:'image/svg+xml'}), 'formula.svg');
+  setStatus('ok', t('s_svg_ok'));
+}
+
+async function exportPDF() {
+  if (!currentSVGEl) { alert(t('a_render_first')); return; }
+  try {
+    const cv = await toCanvas();
+    const imgData = cv.toDataURL('image/png');
+    const win = window.open('','_blank');
+    win.document.write(`<!DOCTYPE html><html><head><style>
+      @page{margin:0;size:${cv.width}px ${cv.height}px}
+      body{margin:0;display:flex;align-items:center;justify-content:center;height:100vh}
+      img{max-width:100%}
+    </style></head><body onload="window.print();window.close()">
+    <img src="${imgData}"></body></html>`);
+    win.document.close();
+    setStatus('ok', t('s_pdf_ok'));
+  } catch(e) { alert(t('a_pdf_fail')+e.message); setStatus('err', t('s_export_fail')); }
+}
+
+async function copySVGCode() {
+  if (!currentSVGEl) { alert(t('a_render_first')); return; }
+  const fColor = document.getElementById('col-formula').value;
+  const { svgStr: str } = buildExportSVGString(currentSVGEl, fColor);
+  try {
+    await navigator.clipboard.writeText(str);
+  } catch {
+    const ta = Object.assign(document.createElement('textarea'),{value:str});
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  setStatus('ok', t('s_svg_copied'));
+}
+
+function copyLatex() {
+  const tex = inp.value;
+  if (!tex) { alert(t('a_empty')); return; }
+  navigator.clipboard.writeText(tex).catch(() => {
+    const ta = Object.assign(document.createElement('textarea'),{value:tex});
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  setStatus('ok', t('s_latex_copied'));
+}
+
+function dl(blob, name) {
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:name});
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+buildSymbols();
+buildTemplates();
+buildExamples();
+buildSwatches();
+onSetting();
+applyLang(currentLang);  // apply saved/default language on load
+// Defer to let layout settle before measuring overflow
+requestAnimationFrame(updateSymScrollBtns);
+
+// Wait for MathJax to fully initialize
+(async () => {
+  try {
+    setStatus('busy', t('s_waiting'));
+    let tries = 0;
+    while (typeof MathJax === 'undefined' || !MathJax.startup) {
+      await new Promise(r => setTimeout(r,150));
+      if (++tries > 80) throw new Error(t('a_timeout'));
+    }
+    await MathJax.startup.promise;
+    mjReady = true;
+    setStatus('ok', t('s_mj_ready'));
+
+    // 稍等一帧让 MathJax typeset 引擎完全就绪，再渲染默认公式
+    await new Promise(r => setTimeout(r, 80));
+    clearTimeout(debounceTimer);  // 取消 onSetting() 触发的 550ms 防抖，避免覆盖首屏公式
+    inp.value = '\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx = \\sqrt{\\pi}';
+    updateCC();
+    await renderNow();
+  } catch(e) {
+    setStatus('err', t('s_mj_fail') + e.message);
+  }
+})();
+</script>
+</body>
+</html>
