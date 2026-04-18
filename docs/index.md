@@ -64,3 +64,11 @@ If your native language is not Chinese, please read [this](https://sakuri932.git
 ## 📁资源归档
 
 一些杂七杂八的东西，可能有用可能没用
+
+
+
+如果觉得不错的话，也可以给作者一个赞赏喔！
+
+可以的话最好是5的倍数，方便统计😊
+
+<img src="./index.assets/19.jpeg" alt="19"  />
