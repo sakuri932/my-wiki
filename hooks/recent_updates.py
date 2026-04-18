@@ -5,7 +5,9 @@ MkDocs hook: 自动生成最近更新文章列表。
     <!-- RECENT_UPDATES_AUTO -->
 
 构建时自动替换为最近 git 提交的文章列表（按提交时间降序，最多 5 篇）。
-排除 index.md、blog/ 目录以及本页自身。
+排除"栏目导航页"性质的 index.md（即同目录下还有其他 md 文件的情况）、
+blog/ 目录以及本页自身。
+如果某目录的 index.md 是唯一的 md 文件（如视频区），则视为内容页保留。
 """
 
 import os
@@ -14,7 +16,7 @@ import subprocess
 
 PLACEHOLDER = '<!-- RECENT_UPDATES_AUTO -->'
 MAX_COUNT = 5
-EXCLUDE_NAMES = {'index.md', '最近更新.md'}
+EXCLUDE_ALWAYS = {'最近更新.md'}
 EXCLUDE_PREFIXES = ('blog/',)
 
 
@@ -42,6 +44,18 @@ def _get_title(filepath):
     return os.path.splitext(os.path.basename(filepath))[0]
 
 
+def _is_section_index(rel, docs_dir):
+    """index.md 且同目录下还有其他 md 文件 → 栏目导航页，应排除。"""
+    if os.path.basename(rel) != 'index.md':
+        return False
+    dir_path = os.path.join(docs_dir, os.path.dirname(rel))
+    try:
+        siblings = [f for f in os.listdir(dir_path) if f.endswith('.md') and f != 'index.md']
+    except OSError:
+        return False
+    return len(siblings) > 0
+
+
 def _get_recent(docs_dir):
     repo_root = _find_repo_root(docs_dir)
     try:
@@ -63,10 +77,12 @@ def _get_recent(docs_dir):
         if re.match(r'^\d{4}-\d{2}-\d{2}$', line):
             current_date = line
         elif line.endswith('.md') and line.startswith('docs/'):
-            rel = line[len('docs/'):]   # 相对于 docs/ 的路径
-            if os.path.basename(rel) in EXCLUDE_NAMES:
+            rel = line[len('docs/'):]
+            if rel in EXCLUDE_ALWAYS:
                 continue
             if any(rel.startswith(p) for p in EXCLUDE_PREFIXES):
+                continue
+            if _is_section_index(rel, docs_dir):
                 continue
             if rel in seen:
                 continue
