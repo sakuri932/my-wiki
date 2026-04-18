@@ -71,4 +71,4 @@ If your native language is not Chinese, please read [this](https://sakuri932.git
 
 可以的话最好是5的倍数，方便统计😊
 
-<img src="./index.assets/19.jpeg" alt="19"  />
+<img src="./index.assets/19.jpeg" alt="19" style="zoom: 33%;" />
