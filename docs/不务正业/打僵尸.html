@@ -162,8 +162,11 @@ canvas{display:block;position:fixed;top:0;left:0}
     <div class="ws" id="ws2">SHOTGN</div>
     <div class="ws" id="ws3">SNIPER</div>
     <div class="ws" id="ws4">STAFF</div>
+    <div class="ws" id="ws5">GATLN</div>
   </div>
-  <div id="grc">GRENADES: 3</div>
+  <div id="grc">手雷: 3</div>
+
+  <button id="mbtn" onclick="toggleMusic()" style="position:absolute;top:16px;left:20px;background:transparent;border:1px solid #444;color:#888;font-size:14px;padding:2px 8px;cursor:pointer;border-radius:4px;font-family:inherit">🔇</button>
   <div id="rld"><div id="rldbg"><div id="rldf"></div></div><div id="rldlbl">RELOADING</div></div>
   <div id="nots"></div>
 </div>
@@ -187,28 +190,28 @@ canvas{display:block;position:fixed;top:0;left:0}
   <div class="m-lbl">SELECT MAP</div>
   <div id="maprow">
     <div class="mc sel" onclick="selMap(0)">
-      <div class="mc-icon">🏭</div>
-      <div class="mc-name">WAREHOUSE</div>
-      <div class="mc-desc">工业迷宫<br>箱子与走廊</div>
+      <div class="mc-icon">🏛️</div>
+      <div class="mc-name">PLAZA</div>
+      <div class="mc-desc">阳光广场<br>喷泉·廊柱·多掩体</div>
       <span class="mc-diff easy">NORMAL</span>
     </div>
     <div class="mc" onclick="selMap(1)">
-      <div class="mc-icon">🏙️</div>
-      <div class="mc-name">CITY STREET</div>
-      <div class="mc-desc">城市战场<br>汽车与建筑</div>
+      <div class="mc-icon">🏗️</div>
+      <div class="mc-name">ROOFTOP</div>
+      <div class="mc-desc">城市屋顶<br>空调机组·水塔</div>
       <span class="mc-diff hard">HARD</span>
     </div>
     <div class="mc" onclick="selMap(2)">
-      <div class="mc-icon">🏛️</div>
-      <div class="mc-name">ANCIENT TEMPLE</div>
-      <div class="mc-desc">神秘遗迹<br>石柱与祭坛</div>
+      <div class="mc-icon">🌿</div>
+      <div class="mc-name">JUNGLE RUINS</div>
+      <div class="mc-desc">热带丛林遗迹<br>石柱·祭坛·密林</div>
       <span class="mc-diff ex">EXPERT</span>
     </div>
   </div>
   <button id="sbtn" onclick="startGame()">▶ 开始游戏</button>
   <div class="ctrl-hint">
     <b>WASD</b> 移动 &nbsp;|&nbsp; <b>鼠标</b> 瞄准 &nbsp;|&nbsp; <b>左键</b> 射击 &nbsp;|&nbsp; <b>右键</b> 瞄准镜(狙击枪)<br>
-    <b>R</b> 换弹 &nbsp;|&nbsp; <b>G</b> 手雷 &nbsp;|&nbsp; <b>1-5</b> 切换武器 &nbsp;|&nbsp; <b>Shift</b> 冲刺 &nbsp;|&nbsp; <b>Space</b> 跳跃 &nbsp;|&nbsp; <b>Esc</b> 暂停
+    <b>R</b> 换弹 &nbsp;|&nbsp; <b>G</b> 手雷 &nbsp;|&nbsp; <b>1-6</b> 切换武器 &nbsp;|&nbsp; <b>Shift</b> 冲刺 &nbsp;|&nbsp; <b>Space</b> 跳跃 &nbsp;|&nbsp; <b>Esc</b> 暂停
   </div>
 </div>
 
@@ -236,7 +239,7 @@ const C = {
   MHP: 100,
   SEN: 0.0022,
   FOV: 75,
-  WDL: 7,      // seconds between waves
+  WDL: 2,      // seconds between waves
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -248,6 +251,7 @@ const WD = [
   {id:'shotgun',nm:'SHOTGUN', dmg:17,  fr:950,  rl:2600, mag:8,  tot:48,  sp:0.16,  auto:false, pel:9, rng:22,  mc:0x5a3010, bl:.50},
   {id:'sniper', nm:'SNIPER',  dmg:160, fr:1600, rl:2800, mag:5,  tot:30,  sp:0.002, auto:false, pel:1, rng:250, mc:0x2a4020, bl:.80},
   {id:'staff',  nm:'STAFF',   dmg:65,  fr:720,  rl:0,    mag:Infinity, tot:Infinity, sp:0.008, auto:false, pel:1, rng:90, mc:0x6600aa, bl:.60, proj:true, pspd:26, spl:3.2},
+  {id:'gatling',nm:'GATLING', dmg:18,  fr:65,   rl:3500, mag:200, tot:600,      sp:0.055, auto:true,  pel:1, rng:95,  mc:0x4a4a4a, bl:.55, gatling:true},
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -274,81 +278,106 @@ const WT = [
 
 // ─────────────────────────────────────────────────────────────
 // MAPS  walls: [cx,cy,cz, w,h,d, hexColor]
+// sun: {x,y,z,c,i} → DirectionalLight
 // ─────────────────────────────────────────────────────────────
 const MAPS = [
-  {
-    nm:'仓库', fs:64, sp:{x:0,z:12}, ez:{x1:-22,x2:22,z1:-28,z2:-10},
-    fog:0x101018, fn:16, ff:58, amb:0x484848, floor:0x222222, ceil:0x181818, wh:5.5,
+  { // ── PLAZA：阳光地中海广场 ──
+    nm:'广场', fs:54, sp:{x:0,z:20}, ez:{x1:-18,x2:18,z1:-22,z2:-6},
+    fog:0xC0D8F0, fn:26, ff:72, amb:0xB8C8D8, floor:0xD4BC88, ceil:null, wh:5.5,
+    sun:{x:20,y:30,z:15,c:0xFFEEB0,i:1.3},
     W:[
-      [0,2.75,-32,  64,5.5,1,   0x383838],[0,2.75,32,   64,5.5,1,   0x383838],
-      [-32,2.75,0,  1,5.5,64,  0x383838],[32,2.75,0,   1,5.5,64,  0x383838],
-      [-13,2.75,2,  18,5.5,1,  0x424242],[13,2.75,2,   18,5.5,1,  0x424242],
-      [-24,2.75,-14,1,5.5,20,  0x3a3a3a],[-24,2.75,-4, 8,5.5,1,  0x3a3a3a],
-      [-24,2.75,-24,8,5.5,1,   0x3a3a3a],[24,2.75,-14, 1,5.5,20, 0x3a3a3a],
-      [24,2.75,-4,  8,5.5,1,   0x3a3a3a],[24,2.75,-24, 8,5.5,1,  0x3a3a3a],
-      [-6,.5,6,  2,1,2,0x7a4510],[-8,.5,6,  2,1,2,0x7a4510],[-6,1.5,6,  2,1,2,0x6a3808],
-      [6,.5,6,   2,1,2,0x7a4510],[8,.5,6,   2,1,2,0x7a4510],[6,1.5,6,   2,1,2,0x6a3808],
-      [-4,.5,-8, 2,1,2,0x7a4510],[4,.5,-8,  2,1,2,0x7a4510],[0,.5,-8,   2,1,2,0x6a3808],
-      [-3,.5,-12,2,1,2,0x7a4510],[3,.5,-12, 2,1,2,0x7a4510],[0,1.5,-8,  2,1,2,0x6a3808],
-      [14,.5,6,  1.2,1,1.2,0x335588],[15.5,.5,6,1.2,1,1.2,0x335588],
-      [-14,.5,-6,1.2,1,1.2,0x883333],[-15.5,.5,6,1.2,1,1.2,0x883333],
-      [0,2.75,18,  1.2,5.5,1.2,0x505050],[0,2.75,-18,1.2,5.5,1.2,0x505050],
-      [0,2.75,0,   1.2,5.5,1.2,0x505050],
-      [-10,.5,-20,3,1.2,1,0x484848],[10,.5,-20,3,1.2,1,0x484848],
+      // 外围墙（建筑立面）
+      [0,2.75,-27,54,5.5,1,0xC8A870],[0,2.75,27,54,5.5,1,0xC8A870],
+      [-27,2.75,0,1,5.5,54,0xC8A870],[27,2.75,0,1,5.5,54,0xC8A870],
+      // 中央喷泉（四段低墙）
+      [0,.85,-2.6,5.5,1.7,.7,0xD0C090],[0,.85,2.6,5.5,1.7,.7,0xD0C090],
+      [-2.6,.85,0,.7,1.7,5.5,0xD0C090],[2.6,.85,0,.7,1.7,5.5,0xD0C090],
+      // 四根廊柱
+      [-10,2.75,-10,1.4,5.5,1.4,0xBEA870],[10,2.75,-10,1.4,5.5,1.4,0xBEA870],
+      [-10,2.75,10,1.4,5.5,1.4,0xBEA870],[10,2.75,10,1.4,5.5,1.4,0xBEA870],
+      // 左侧建筑内墙（创造左侧通道）
+      [-20,2.75,-14,1,5.5,20,0xBEA878],[-20,2.75,7,1,5.5,7,0xBEA878],
+      // 右侧建筑内墙
+      [20,2.75,-14,1,5.5,20,0xBEA878],[20,2.75,7,1,5.5,7,0xBEA878],
+      // 掩体箱子
+      [-16,.65,-14,2.5,1.3,2.5,0xA08858],[16,.65,-14,2.5,1.3,2.5,0xA08858],
+      [-7,.65,-17,2.2,1.3,2.2,0xA08858],[7,.65,-17,2.2,1.3,2.2,0xA08858],
+      [-16,.65,5,2.5,1.3,2.0,0xA08858],[16,.65,5,2.5,1.3,2.0,0xA08858],
+      // 远端抬高平台
+      [0,.65,-21,14,1.3,5,0xC0A868],
+      [-5,.65,-23.5,3,1.3,.7,0xC0A868],[5,.65,-23.5,3,1.3,.7,0xC0A868],
+      // 拱门廊柱（功能性掩体）
+      [-5,2.75,-5,.9,5.5,.9,0xC8AA78],[5,2.75,-5,.9,5.5,.9,0xC8AA78],
+      [0,5.3,-5,11.8,.5,.9,0xC8AA78],
     ],
-    L:[{x:0,y:5,z:18,i:1.4,c:0xffcc88,d:22},{x:0,y:5,z:-18,i:1.2,c:0xffcc88,d:22},
-       {x:16,y:5,z:0,i:.9,c:0xffbb77,d:18},{x:-16,y:5,z:0,i:.9,c:0xffbb77,d:18},
-       {x:0,y:5,z:0,i:.7,c:0xffeedd,d:16}],
+    L:[{x:0,y:6,z:0,i:.7,c:0xFFEECC,d:32},{x:-12,y:5,z:-14,i:.6,c:0xFFE8B0,d:26},
+       {x:12,y:5,z:-14,i:.6,c:0xFFE8B0,d:26},{x:0,y:5,z:14,i:.5,c:0xFFEEDD,d:22}],
   },
-  {
-    nm:'城市街道', fs:84, sp:{x:0,z:32}, ez:{x1:-16,x2:16,z1:-38,z2:-14},
-    fog:0x141420, fn:20, ff:72, amb:0x303050, floor:0x1e1e22, ceil:null, wh:9,
+  { // ── ROOFTOP：城市屋顶白天 ──
+    nm:'屋顶', fs:50, sp:{x:0,z:18}, ez:{x1:-16,x2:16,z1:-20,z2:-6},
+    fog:0xAAC8E8, fn:24, ff:65, amb:0xB0C0D0, floor:0x808080, ceil:null, wh:6,
+    sun:{x:-20,y:35,z:10,c:0xFFFFE8,i:1.5},
     W:[
-      [0,4.5,-42,  84,9,1,  0x282830],[0,4.5,42,   84,9,1,  0x282830],
-      [-42,4.5,0,  1,9,84, 0x282830],[42,4.5,0,   1,9,84, 0x282830],
-      [-28,4.5,-22,20,9,1, 0x303042],[-28,4.5,12, 20,9,1, 0x303042],
-      [-37,4.5,-5, 1,9,32, 0x303042],[-28,4.5,25, 20,9,1, 0x303042],
-      [-28,4.5,-35,20,9,1, 0x303042],
-      [28,4.5,-22, 20,9,1, 0x42302a],[28,4.5,12,  20,9,1, 0x42302a],
-      [37,4.5,-5,  1,9,32, 0x42302a],[28,4.5,25,  20,9,1, 0x42302a],
-      [28,4.5,-35, 20,9,1, 0x42302a],
-      [-7,.65,18,  4.5,1.5,2.2,0x1a3a1a],[7,.65,18,4.5,1.5,2.2,0x3a1a1a],
-      [-7,.65,5,   4.5,1.5,2.2,0x1a1a3a],[7,.65,5, 4.5,1.5,2.2,0x2a2a1a],
-      [-7,.65,-10, 4.5,1.5,2.2,0x3a2a1a],[7,.65,-10,4.5,1.5,2.2,0x1a2a3a],
-      [0,.65,-25,  4.5,1.5,2.2,0x2a1a1a],
-      [-3,.4,0,    2.2,.9,.35,0x888820],[3,.4,0,  2.2,.9,.35,0x888820],
-      [-3,.4,-18,  2.2,.9,.35,0x888820],[3,.4,-18,2.2,.9,.35,0x888820],
-      [0,.6,12,    2.5,1.2,1.2,0x336633],[0,.6,-30,2.5,1.2,1.2,0x336633],
+      // 外围女儿墙（矮）
+      [0,1,-25,50,2,1,0x707070],[0,1,25,50,2,1,0x707070],
+      [-25,1,0,1,2,50,0x707070],[25,1,0,1,2,50,0x707070],
+      // 空调机组
+      [-12,.9,-18,3.5,1.8,2.5,0x888888],[12,.9,-18,3.5,1.8,2.5,0x888888],
+      [-5,.9,-18,3.5,1.8,2.5,0x929292],[5,.9,-18,3.5,1.8,2.5,0x929292],
+      [-18,.9,-8,2.5,1.8,4.0,0x848484],[18,.9,-8,2.5,1.8,4.0,0x848484],
+      // 通风管盖
+      [-8,.5,-10,4,1,1.5,0x9a9a9a],[8,.5,-10,4,1,1.5,0x9a9a9a],
+      [0,.5,-5,4,1,1.5,0x9a9a9a],
+      // 抬高机房（两侧大型掩体）
+      [-16,1.5,-16,8,3,6,0x7a7a7a],[16,1.5,-16,8,3,6,0x7a7a7a],
+      // 水塔
+      [-20,1.5,-5,3,3,3,0x666666],[20,1.5,-5,3,3,3,0x666666],
+      // 楼梯间出口（中央）
+      [-3,.9,0,5,1.8,5,0x888888],[3,.9,0,5,1.8,5,0x888888],
+      // 通信塔基座
+      [0,3,-20,2,6,2,0x7a7a7a],
+      // 低矮混凝土挡墙
+      [-10,.65,8,8,1.3,.6,0x808080],[10,.65,8,8,1.3,.6,0x808080],
+      [-10,.65,-4,4,1.3,.6,0x808080],[10,.65,-4,4,1.3,.6,0x808080],
+      [-21,.65,14,3,1.3,3,0x888888],[21,.65,14,3,1.3,3,0x888888],
     ],
-    L:[{x:0,y:8,z:28,i:1.8,c:0xaabbff,d:34},{x:-10,y:8,z:8,i:1.2,c:0xffaa44,d:28},
-       {x:10,y:8,z:8,i:1.2,c:0xffaa44,d:28},{x:0,y:8,z:-15,i:1.4,c:0xaabbff,d:32},
-       {x:0,y:8,z:-32,i:1.0,c:0x8899ff,d:28}],
+    L:[{x:0,y:7,z:0,i:.8,c:0xFFFFEE,d:35},{x:-15,y:6,z:-15,i:.6,c:0xEEF0FF,d:28},
+       {x:15,y:6,z:-15,i:.6,c:0xEEF0FF,d:28},{x:0,y:6,z:14,i:.5,c:0xFFFFFF,d:25}],
   },
-  {
-    nm:'古代神庙', fs:72, sp:{x:0,z:26}, ez:{x1:-22,x2:22,z1:-32,z2:-10},
-    fog:0x1a0808, fn:12, ff:52, amb:0x4a2828, floor:0x3a2a18, ceil:0x281808, wh:6.5,
+  { // ── JUNGLE RUINS：热带丛林遗迹 ──
+    nm:'丛林遗迹', fs:58, sp:{x:0,z:22}, ez:{x1:-20,x2:20,z1:-26,z2:-8},
+    fog:0x90C878, fn:20, ff:62, amb:0xA8C898, floor:0x6A7A4A, ceil:null, wh:7,
+    sun:{x:10,y:40,z:-5,c:0xFFEE88,i:1.2},
     W:[
-      [0,3.25,-36,   72,6.5,1,   0x6a5030],[0,3.25,36,72,6.5,1,0x6a5030],
-      [-36,3.25,0,   1,6.5,72,  0x6a5030],[36,3.25,0,1,6.5,72,0x6a5030],
-      [-11,3.25,-10, 1,6.5,22,  0x7a5a38],[11,3.25,-10,1,6.5,22,0x7a5a38],
-      [0,3.25,-21,   22,6.5,1,  0x7a5a38],
-      [-8,3.25,11,   6,6.5,1,   0x7a5a38],[8,3.25,11,6,6.5,1,0x7a5a38],
-      [-22,3.25,-22, 2.2,6.5,2.2,0x8a6a48],[22,3.25,-22,2.2,6.5,2.2,0x8a6a48],
-      [-22,3.25,22,  2.2,6.5,2.2,0x8a6a48],[22,3.25,22, 2.2,6.5,2.2,0x8a6a48],
-      [0,3.25,-22,   2.2,6.5,2.2,0x8a6a48],
-      [-22,3.25,0,   2.2,6.5,2.2,0x8a6a48],[22,3.25,0,  2.2,6.5,2.2,0x8a6a48],
-      [-7,3.25,-5,   1.6,6.5,1.6,0x7a5a38],[7,3.25,-5,  1.6,6.5,1.6,0x7a5a38],
-      [-7,3.25,-16,  1.6,6.5,1.6,0x7a5a38],[7,3.25,-16, 1.6,6.5,1.6,0x7a5a38],
-      [0,.75,-27,    9,1.5,7,   0x9a7a50],[0,1.75,-27,5,.5,4,0xaa8a60],
-      [-28,3.25,-14, 10,6.5,1,  0x6a5030],[-28,3.25,0,10,6.5,1,0x6a5030],
-      [-28,3.25,14,  10,6.5,1,  0x6a5030],[28,3.25,-14,10,6.5,1,0x6a5030],
-      [28,3.25,0,    10,6.5,1,  0x6a5030],[28,3.25,14,10,6.5,1,0x6a5030],
-      [-14,.4,6,     2.5,.9,1.6,0x6a5030],[14,.4,6,2.5,.9,1.6,0x6a5030],
-      [-5,.4,20,     3.5,.7,1.2,0x7a6040],[5,.4,20,3.5,.7,1.2,0x7a6040],
+      // 外围树林边界
+      [0,3.5,-29,58,7,1,0x4A6A3A],[0,3.5,29,58,7,1,0x4A6A3A],
+      [-29,3.5,0,1,7,58,0x4A6A3A],[29,3.5,0,1,7,58,0x4A6A3A],
+      // 神庙入口石柱
+      [-8,3.25,-24,3,6.5,3,0x8A7A5A],[8,3.25,-24,3,6.5,3,0x8A7A5A],
+      // 残破遗迹墙
+      [-12,2,-17,1,4,12,0x7A6A4A],[-12,2,-6,1,4,8,0x7A6A4A],
+      [12,2,-17,1,4,12,0x7A6A4A],[12,2,-6,1,4,8,0x7A6A4A],
+      // 倒塌的石柱段（卧倒掩体）
+      [-6,.5,-18,5,1,1.5,0x8A7A5A],[6,.5,-18,5,1,1.5,0x8A7A5A],
+      [-6,.5,-8,4,1,1.5,0x8A7A5A],[6,.5,-8,4,1,1.5,0x8A7A5A],
+      // 竖立石柱
+      [-16,3.25,-12,1.8,6.5,1.8,0x8A7A5A],[16,3.25,-12,1.8,6.5,1.8,0x8A7A5A],
+      [-16,3.25,2,1.8,6.5,1.8,0x8A7A5A],[16,3.25,2,1.8,6.5,1.8,0x8A7A5A],
+      // 中央祭坛
+      [0,.75,-16,8,1.5,8,0x9A8A6A],[0,2,-16,4.5,.8,4.5,0xAA9A7A],
+      // 树桩掩体
+      [-4,.65,6,2,1.3,2,0x6A5030],[4,.65,6,2,1.3,2,0x6A5030],
+      [-20,.65,4,2,1.3,2.5,0x6A5030],[20,.65,4,2,1.3,2.5,0x6A5030],
+      [-8,.65,14,2.5,1.3,2.5,0x6A5030],[8,.65,14,2.5,1.3,2.5,0x6A5030],
+      // 大型岩石
+      [-22,1,-22,4,2,3.5,0x6A6A5A],[22,1,-22,4,2,3.5,0x6A6A5A],
+      // 拱门遗迹
+      [-3,3.25,0,1.2,6.5,1.2,0x8A7A5A],[3,3.25,0,1.2,6.5,1.2,0x8A7A5A],
+      [0,6.1,0,7.4,.8,1.2,0x8A7A5A],
     ],
-    L:[{x:0,y:5.5,z:-27,i:2.2,c:0xff8844,d:22},{x:-22,y:5.5,z:0,i:1.1,c:0xff6622,d:20},
-       {x:22,y:5.5,z:0,i:1.1,c:0xff6622,d:20},{x:0,y:5.5,z:10,i:.9,c:0xffaa66,d:24},
-       {x:0,y:5.5,z:-10,i:.9,c:0xff8844,d:22}],
+    L:[{x:0,y:6,z:-16,i:1.1,c:0xFFEE88,d:28},{x:-12,y:5,z:0,i:.7,c:0xCCFF88,d:24},
+       {x:12,y:5,z:0,i:.7,c:0xCCFF88,d:24},{x:0,y:6,z:12,i:.6,c:0xDDFF99,d:22},
+       {x:0,y:5,z:-24,i:.8,c:0xFFDD66,d:22}],
   },
 ];
 
@@ -415,11 +444,69 @@ function snd(type, vol) {
     case 'staff':   osc('sine',900,.3); break;
     case 'explode': noise(.6,380); break;
     case 'reload':  osc('square',320,.1,200); break;
-    case 'hit':     osc('square',640,.055,90); break;
+    case 'hit':     osc('square',640,.055,90); osc('sawtooth',320,.04,60); break;
     case 'death':   osc('sawtooth',200,.45,38); break;
     case 'step':    osc('sine',82,.055,40); break;
     case 'empty':   osc('square',190,.055); break;
+    case 'gatling': osc('sawtooth',200,.04,110); noise(.06,2200); break;
+    case 'infect':  osc('sawtooth',180,.55,40); noise(.25,600); break;
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// MUSIC SYSTEM
+// ─────────────────────────────────────────────────────────────
+let musicOn=false, _musicTO=null;
+function toggleMusic(){
+  initAudio(); musicOn=!musicOn;
+  el('mbtn').textContent=musicOn?'🔊':'🔇';
+  if(!musicOn){if(_musicTO){clearTimeout(_musicTO);_musicTO=null;}}
+  else _schedMusic();
+}
+function _schedMusic(){
+  if(!AC||!musicOn) return;
+  const scale=[82.4,87.3,98,110,116.5,130.8,146.8,164.8];
+  const pat=[0,0,4,2,0,7,4,2,5,4,0,2,4,7,5,3];
+  let step=0;
+  function tick(){
+    if(!musicOn||!AC){_musicTO=null;return;}
+    const t=AC.currentTime;
+    const si=pat[step%pat.length]; const f=scale[si];
+    function tone(fr,s,d,v,tp){
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.type=tp||'sawtooth'; o.frequency.value=fr;
+      o.connect(g); g.connect(AC.destination);
+      g.gain.setValueAtTime(0,s); g.gain.linearRampToValueAtTime(v,s+.05);
+      g.gain.exponentialRampToValueAtTime(.0001,s+d); o.start(s); o.stop(s+d+.02);
+    }
+    tone(f,t,.40,.045);
+    tone(f/2,t,.55,.035,'sine');
+    if(step%4===0){tone(55,t,.14,.065,'square');tone(110,t,.07,.030,'square');}
+    if(step%8===7) tone(scale[(si+4)%scale.length],t,.30,.025,'sine');
+    step++; _musicTO=setTimeout(tick,480);
+  }
+  tick();
+}
+
+// ─────────────────────────────────────────────────────────────
+// VOICE LINES (Web Speech API)
+// ─────────────────────────────────────────────────────────────
+const _zhVoices=[];
+if(window.speechSynthesis){
+  const _lv=()=>{speechSynthesis.getVoices().forEach(v=>{if(v.lang.startsWith('zh')&&!_zhVoices.includes(v))_zhVoices.push(v);});};
+  _lv(); speechSynthesis.onvoiceschanged=_lv;
+}
+let _lastSpeakT=0;
+function speak(text,force){
+  if(!window.speechSynthesis) return;
+  const now=Date.now();
+  if(!force&&now-_lastSpeakT<1800) return;
+  _lastSpeakT=now;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='zh-CN'; u.rate=1.05; u.pitch=1.0; u.volume=.75;
+  if(_zhVoices.length>0) u.voice=_zhVoices[0];
+  speechSynthesis.speak(u);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -435,6 +522,7 @@ let waveTmr  = 4;
 let score    = 0;
 
 let enemies = [], bullets = [], grenades = [], parts = [];
+let gatlingSpinup = 0;
 
 const PL = {
   pos: new THREE.Vector3(0, C.PH, 10),
@@ -521,6 +609,7 @@ document.addEventListener('keydown', e => {
     case 'Digit3':  switchW(2); break;
     case 'Digit4':  switchW(3); break;
     case 'Digit5':  switchW(4); break;
+    case 'Digit6':  switchW(5); break;
   }
 });
 document.addEventListener('keyup', e => { keys[e.code] = false; });
@@ -553,6 +642,17 @@ function buildMap(idx) {
   S3.background = new THREE.Color(m.fog);
   S3.add(new THREE.AmbientLight(m.amb, 1.1));
   m.L.forEach(l => { const pl=new THREE.PointLight(l.c,l.i,l.d); pl.position.set(l.x,l.y,l.z); S3.add(pl); });
+  if(m.sun) {
+    const sun = new THREE.DirectionalLight(m.sun.c, m.sun.i);
+    sun.position.set(m.sun.x, m.sun.y, m.sun.z);
+    sun.castShadow = true;
+    const sc = m.fs * .55;
+    sun.shadow.camera.left=-sc; sun.shadow.camera.right=sc;
+    sun.shadow.camera.top=sc;   sun.shadow.camera.bottom=-sc;
+    sun.shadow.camera.near=1;   sun.shadow.camera.far=150;
+    sun.shadow.mapSize.width=1024; sun.shadow.mapSize.height=1024;
+    S3.add(sun);
+  }
 
   // Floor
   const fl = new THREE.Mesh(new THREE.PlaneGeometry(m.fs,m.fs), new THREE.MeshLambertMaterial({color:m.floor}));
@@ -610,34 +710,129 @@ function makeWpMesh(idx) {
   if(wpMesh) { CAM.remove(wpMesh); wpMesh = null; }
   const d = WD[idx];
   const g = new THREE.Group();
-  const bm = new THREE.MeshLambertMaterial({color:d.mc});
-  const dm = new THREE.MeshLambertMaterial({color:0x1a1a1a});
 
-  // Body
-  const body = new THREE.Mesh(new THREE.BoxGeometry(.084,.084,d.bl), bm); g.add(body);
-  // Barrel
-  const brl = new THREE.Mesh(new THREE.BoxGeometry(.036,.036,d.bl*.5), dm);
-  brl.position.set(0,.034,-d.bl*.25); g.add(brl);
-  // Handle
-  const hdl = new THREE.Mesh(new THREE.BoxGeometry(.064,.12,.06), bm);
-  hdl.position.set(0,-.082,d.bl*.18); hdl.rotation.x=.16; g.add(hdl);
-
-  if(d.id === 'staff') {
-    const orb = new THREE.Mesh(new THREE.SphereGeometry(.072,8,8), new THREE.MeshBasicMaterial({color:0xcc44ff}));
-    orb.position.set(0,0,-d.bl*.52); g.add(orb);
-    const gw = new THREE.Mesh(new THREE.SphereGeometry(.12,8,8), new THREE.MeshBasicMaterial({color:0x8800cc,transparent:true,opacity:.3}));
-    gw.position.copy(orb.position); g.add(gw);
-  } else {
-    const mag = new THREE.Mesh(new THREE.BoxGeometry(.052,.092,.044), bm);
-    mag.position.set(0,-.05,d.bl*.12); g.add(mag);
-    if(d.id === 'sniper') {
-      const sc = new THREE.Mesh(new THREE.BoxGeometry(.052,.052,.28), dm);
-      sc.position.set(0,.072,-.05); g.add(sc);
-    }
+  function b(col, w, h, dep, x, y, z, rx, rz) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,dep),
+      new THREE.MeshLambertMaterial({color:col}));
+    m.position.set(x,y,z);
+    if(rx) m.rotation.x=rx; if(rz) m.rotation.z=rz;
+    g.add(m); return m;
   }
+  const mc=d.mc, dk=0x111111, md2=0x2a2a2a;
+
+  if(d.id==='pistol') {
+    b(mc,  .075,.060,.26,  0, .008,-.04);          // 滑套
+    b(mc,  .062,.038,.20,  0,-.018,-.01);           // 枪架
+    b(dk,  .020,.020,.32,  0, .008,-.06);           // 枪管
+    b(mc,  .054,.150,.072, 0,-.096, .07, .12);      // 握把
+    b(dk,  .052,.008,.082, 0,-.050,-.025);          // 扳机护圈
+    b(md2, .008,.028,.010, 0,-.038,-.010);          // 扳机
+    b(dk,  .008,.018,.010, 0, .042,-.140);          // 前准星
+    b(dk,  .038,.014,.010, 0, .042, .040);          // 后缺口准星
+    b(md2, .042,.006,.062, 0,-.172, .070);          // 弹匣底部
+  } else if(d.id==='ak47') {
+    b(mc,  .076,.072,.44,  0,  0,   .01);           // 机匣
+    b(dk,  .024,.024,.54,  0, .004,-.22);           // 枪管
+    b(dk,  .015,.015,.34,  0, .042,-.16);           // 导气管
+    b(0x4a3822,.050,.044,.22,0,.002,-.12);           // 护木
+    b(0x2a1e10,.052,.112,.074,0,-.058,.08);          // 弹匣上段
+    b(0x2a1e10,.052,.080,.064,0,-.115,.045,-.25);   // 弹匣中段（弧形）
+    b(0x2a1e10,.052,.055,.050,0,-.150, .00,-.4);    // 弹匣下段
+    b(mc,  .052,.155,.068, 0,-.090, .155);          // 手枪握把
+    b(mc,  .058,.065,.28,  0,-.018, .28);           // 枪托主体
+    b(mc,  .040,.082,.058, 0,-.035, .41);           // 枪托底板
+    b(dk,  .028,.020,.010, 0, .048, .10);           // 后准星
+    b(dk,  .010,.028,.010, 0, .050,-.26);           // 前准星
+  } else if(d.id==='shotgun') {
+    b(mc,  .090,.088,.28,  0,  0,   .04);           // 机匣
+    b(dk,  .058,.058,.54,  0, .018,-.18);           // 枪管
+    b(dk,  .068,.068,.020, 0, .018,-.44);           // 枪口扩口
+    b(dk,  .030,.030,.48,  0,-.018,-.16);           // 管状弹仓
+    b(0x6a4018,.064,.058,.14,0,.018,-.05);          // 泵动护木
+    b(0x7a4820,.065,.078,.30,0,-.008, .25);         // 木质枪托
+    b(0x7a4820,.058,.135,.068,0,-.082,.16);         // 手枪握把区
+    b(dk,  .056,.008,.080, 0,-.048, .05);           // 扳机护圈
+  } else if(d.id==='sniper') {
+    b(mc,  .065,.070,.58,  0,  0,  -.02);           // 机匣
+    b(dk,  .020,.020,.88,  0, .008,-.28);           // 长枪管
+    b(dk,  .036,.036,.055, 0, .008,-.68);           // 枪口制退器
+    b(dk,  .044,.022,.006, 0, .008,-.67);           // 制退器槽口
+    b(dk,  .026,.026,.34,  0, .072,-.06);           // 瞄准镜镜身
+    b(dk,  .038,.038,.050, 0, .072,-.24);           // 前物镜钟罩
+    b(dk,  .034,.034,.042, 0, .072, .10);           // 后目镜钟罩
+    b(0x222222,.048,.010,.016,0,.072,-.04);         // 镜环1
+    b(0x222222,.048,.010,.016,0,.072,-.12);         // 镜环2
+    b(mc,  .055,.065,.34,  0,-.012, .26);           // 枪托
+    b(mc,  .048,.028,.14,  0, .030, .20);           // 贴腮板
+    b(mc,  .050,.148,.065, 0,-.088, .15);           // 手枪握把
+    b(md2, .048,.065,.050, 0,-.062, .06);           // 弹匣（箱式）
+    b(dk,  .006,.10,.006, -.065,-.060,-.30, 0,.40); // 两脚架左腿
+    b(dk,  .006,.10,.006,  .065,-.060,-.30, 0,-.40);// 两脚架右腿
+  } else if(d.id==='staff') {
+    b(0x3a0060,.022,.022,.68, 0, 0, .04);           // 法杖杆
+    b(0x9900ff,.034,.034,.016,0, 0,-.08);           // 装饰环1
+    b(0x9900ff,.034,.034,.016,0, 0, .08);           // 装饰环2
+    b(0x9900ff,.034,.034,.016,0, 0, .22);           // 装饰环3
+    b(0x7700cc,.050,.050,.050,0, 0,-.28);           // 水晶笼
+    const ob=new THREE.Mesh(new THREE.SphereGeometry(.068,12,12),new THREE.MeshBasicMaterial({color:0xcc44ff}));
+    ob.position.set(0,0,-.38); g.add(ob);
+    const gw=new THREE.Mesh(new THREE.SphereGeometry(.108,8,8),new THREE.MeshBasicMaterial({color:0x8800cc,transparent:true,opacity:.35}));
+    gw.position.set(0,0,-.38); g.add(gw);
+    const cm=new THREE.MeshBasicMaterial({color:0xee66ff,transparent:true,opacity:.75});
+    for(let i=0;i<4;i++){
+      const cr=new THREE.Mesh(new THREE.OctahedronGeometry(.020),cm);
+      cr.position.set(Math.cos(i*Math.PI/2)*.068, Math.sin(i*Math.PI/2)*.068,-.38);
+      g.add(cr);
+    }
+  } else if(d.id==='gatling') {
+    const cluster=new THREE.Group();
+    for(let i=0;i<6;i++){
+      const angle=(i/6)*Math.PI*2;
+      const brl=new THREE.Mesh(new THREE.CylinderGeometry(.011,.011,.52,6),new THREE.MeshLambertMaterial({color:0x252525}));
+      brl.rotation.x=Math.PI/2; brl.position.set(Math.cos(angle)*.055,Math.sin(angle)*.055,-.10); cluster.add(brl);
+    }
+    const hub=new THREE.Mesh(new THREE.CylinderGeometry(.038,.038,.56,8),new THREE.MeshLambertMaterial({color:0x3a3a3a}));
+    hub.rotation.x=Math.PI/2; hub.position.z=-.10; cluster.add(hub);
+    g.add(cluster); g.barrelCluster=cluster;
+    b(mc, .17,.13,.30,  0,-.018, .16);
+    b(mc, .13,.09,.22,  0,-.018, .32);
+    b(mc, .19,.11,.10,  0,-.018, .07);
+    b(0x3a2a18,.10,.15,.09, 0,-.115,.22);
+    b(mc, .23,.06,.14,  0, .068, .16);
+    b(mc, .11,.07,.30,  0,-.018, .28);
+  }
+
   g.position.set(.19,-.175,-.38);
   g.rotation.y = Math.PI;
   CAM.add(g); wpMesh = g;
+}
+
+// ─────────────────────────────────────────────────────────────
+// GRENADE MODEL
+// ─────────────────────────────────────────────────────────────
+function makeGrenadeMesh() {
+  const g = new THREE.Group();
+  function bm(col){ return new THREE.MeshLambertMaterial({color:col}); }
+  // 主体（圆柱）
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.076,.076,.14,8),bm(0x3a6a3a)); g.add(body);
+  // 顶部半球
+  const top=new THREE.Mesh(new THREE.SphereGeometry(.076,8,6,0,Math.PI*2,0,Math.PI/2),bm(0x3a6a3a));
+  top.position.y=.07; g.add(top);
+  // 横向肋条（4条）
+  for(let i=0;i<4;i++){
+    const r=new THREE.Mesh(new THREE.TorusGeometry(.079,.007,4,8),bm(0x2a5a2a));
+    r.position.y=-.055+i*.04; g.add(r);
+  }
+  // 安全片（铁片）
+  const lever=new THREE.Mesh(new THREE.BoxGeometry(.012,.115,.022),bm(0x888888));
+  lever.position.set(.082,.015,0); lever.rotation.z=.18; g.add(lever);
+  // 拉环底座
+  const pb=new THREE.Mesh(new THREE.BoxGeometry(.020,.020,.020),bm(0xaaaaaa));
+  pb.position.set(0,.145,0); g.add(pb);
+  // 拉环
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.022,.006,6,8),bm(0xcccccc));
+  ring.position.set(0,.162,0); ring.rotation.x=Math.PI/2; g.add(ring);
+  return g;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -706,6 +901,7 @@ function spawnWave(n) {
       spawnEnemy(type,px,pz);
     }
   });
+  speak('第'+n+'波，注意！',true);
   showWaveAnn(n);
 }
 
@@ -745,16 +941,18 @@ function shoot() {
   const wi = PL.wpns[PL.curW]; if(!wi) return;
   if(wi.reloading) return;
   if(wi.ammo <= 0) { snd('empty',.2); if(wi.res>0) startReload(); return; }
+  if(wi.gatling && gatlingSpinup < 0.25) return;
   const now = performance.now();
-  if(now - lastFire < wi.fr) return;
+  const effectiveFr = wi.gatling ? wi.fr / Math.max(0.01, gatlingSpinup) : wi.fr;
+  if(now - lastFire < effectiveFr) return;
   lastFire = now;
 
   wi.ammo--;
   wi.recoil = .038;
   PL.pitch += (Math.random()-.25)*.018;
 
-  const smap = {pistol:'pistol',ak47:'ak47',shotgun:'shotgun',sniper:'sniper',staff:'staff'};
-  snd(smap[wi.id]||'pistol', .42);
+  const smap = {pistol:'pistol',ak47:'ak47',shotgun:'shotgun',sniper:'sniper',staff:'staff',gatling:'gatling'};
+  snd(smap[wi.id]||'pistol', .38);
   muzzleFlashFX();
 
   // Magic projectile
@@ -817,12 +1015,14 @@ function dmgEnemy(en, dmg, pt) {
   if(en.hp <= 0) killEnemy(en);
 }
 
+const _killLines=['消灭一个！','干掉了！','精准！','继续！','好样的！'];
 function killEnemy(en) {
   en.dead = true;
   score += en.sc; updScoreUI();
   snd('death',.28);
   spawnParts(en.mesh.position.clone().setY(1), 0xaa0000, 14, 4.5);
   addKF(en.type); S3.remove(en.mesh);
+  speak(_killLines[Math.floor(Math.random()*_killLines.length)]);
 }
 
 function splash(pos, dmg, rad) {
@@ -833,10 +1033,12 @@ function splash(pos, dmg, rad) {
   if(dp < rad) dmgPlayer(dmg*.5*(1-dp/rad));
 }
 
+const _dmgLines=['受伤了！','注意！','撤！','掩护！'];
 function dmgPlayer(amt) {
   if(PL.dmgCooldown>0) return;
   PL.hp = Math.max(0, PL.hp - amt);
   PL.dmgCooldown = .12;
+  speak(_dmgLines[Math.floor(Math.random()*_dmgLines.length)]);
   el('dmg').style.boxShadow = 'inset 0 0 80px rgba(255,0,0,.65)';
   setTimeout(()=> el('dmg').style.boxShadow='', 160);
   updHpUI();
@@ -849,7 +1051,7 @@ function dmgPlayer(amt) {
 function startReload() {
   const wi = PL.wpns[PL.curW];
   if(!wi || wi.reloading || wi.mag===Infinity || wi.ammo>=wi.mag || wi.res<=0) return;
-  wi.reloading = true; snd('reload',.28);
+  wi.reloading = true; wi.reloadStartT = performance.now(); snd('reload',.28);
   const rld=el('rld'), rdf=el('rldf');
   rld.style.display='block'; rdf.style.transition='none'; rdf.style.width='0%';
   requestAnimationFrame(()=>{ rdf.style.transition=`width ${wi.rl}ms linear`; rdf.style.width='100%'; });
@@ -875,7 +1077,7 @@ function throwGrenade() {
   if(PL.grenades<=0) return;
   PL.grenades--; updGrenUI();
   const dir=new THREE.Vector3(); CAM.getWorldDirection(dir);
-  const m=new THREE.Mesh(new THREE.SphereGeometry(.1,6,6),new THREE.MeshLambertMaterial({color:0x44aa44}));
+  const m=makeGrenadeMesh();
   m.position.copy(PL.pos).addScaledVector(dir,.6); S3.add(m);
   const vel=dir.clone().multiplyScalar(13); vel.y+=5.5;
   grenades.push({mesh:m, vel, timer:3.0});
@@ -944,8 +1146,14 @@ function updPlayer(dt) {
   CAM.position.copy(PL.pos);
   CAM.position.y += Math.sin(bobT)*.04*bobAmt;
 
-  // Auto-fire
+  // Gatling spinup
   const wi=PL.wpns[PL.curW];
+  if(wi&&wi.gatling){
+    gatlingSpinup=mb[0]&&locked ? Math.min(1,gatlingSpinup+dt*1.8) : Math.max(0,gatlingSpinup-dt*2.5);
+  } else {
+    gatlingSpinup=0;
+  }
+  // Auto-fire
   if(wi && wi.auto && mb[0] && locked) shoot();
 
   // Damage cooldown
@@ -959,9 +1167,25 @@ function updWpAnim(dt) {
   if(!wpMesh) return;
   const wi=PL.wpns[PL.curW]; if(!wi) return;
   if(wi.recoil>0) { wi.recoil-=dt*.28; if(wi.recoil<0) wi.recoil=0; }
+
+  let offY=0, rotZ=0, rotX=0;
+  if(wi.reloading && wi.reloadStartT && wi.rl>0) {
+    const p=Math.min((performance.now()-wi.reloadStartT)/wi.rl, 1.0);
+    // 0~0.28: 枪下沉并右倾（弹匣脱出）
+    // 0.28~0.65: 保持低位（换弹匣）
+    // 0.65~1.0: 枪复位（推弹上膛）
+    if(p<.28)      { const t=p/.28;   offY=-.10*t; rotZ= .40*t; rotX= .22*t; }
+    else if(p<.65) {                   offY=-.10;   rotZ= .40;   rotX= .22;   }
+    else           { const t=(p-.65)/.35; offY=-.10*(1-t); rotZ=.40*(1-t); rotX=.22*(1-t); }
+  }
+
   wpMesh.position.z = -.38 + (wi.recoil||0);
-  wpMesh.position.y = -.175 + Math.sin(bobT*.5)*.013*bobAmt;
+  wpMesh.position.y = -.175 + offY + Math.sin(bobT*.5)*.013*bobAmt;
   wpMesh.position.x = .19   + Math.cos(bobT*.25)*.006*bobAmt;
+  wpMesh.rotation.y = Math.PI;
+  wpMesh.rotation.z = rotZ;
+  wpMesh.rotation.x = rotX;
+  if(wi.gatling && wpMesh.barrelCluster) wpMesh.barrelCluster.rotation.z += dt * gatlingSpinup * 18;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1120,7 +1344,7 @@ function updAmmoUI() {
   an.classList.toggle('loammo', w.mag!==Infinity && w.ammo<=Math.ceil(w.mag*.25));
 }
 function updScoreUI() { el('sc').textContent='Score: '+score; }
-function updWSlots() { for(let i=0;i<5;i++) el('ws'+i).classList.toggle('act',i===PL.curW); }
+function updWSlots() { for(let i=0;i<6;i++){const e=el('ws'+i);if(e)e.classList.toggle('act',i===PL.curW);} }
 function updGrenUI() { el('grc').textContent='手雷: '+PL.grenades; }
 function showHitMark() {
   const h=el('hm'); h.style.opacity='1';
@@ -1198,13 +1422,14 @@ function startGame() {
   }));
   PL.curW=0;
 
+  gatlingSpinup=0;
   // Init world
   buildMap(mapIdx);
   PL.pos.set(curMap.sp.x, C.PH, curMap.sp.z);
   PL.vel.set(0,0,0); PL.yaw=0; PL.pitch=0;
 
   // Wave
-  waveNum=0; wavePhase='wait'; waveTmr=4; score=0;
+  waveNum=0; wavePhase='wait'; waveTmr=2; score=0;
 
   // UI
   makeWpMesh(0); updWSlots(); updAmmoUI(); updHpUI(); updScoreUI(); updGrenUI();
