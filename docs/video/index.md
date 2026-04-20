@@ -143,6 +143,17 @@
 <div class="video-section-title">🧠 深度学习区</div>
 <div class="video-grid">
 
+  <a class="video-card" id="diffusion-policy-intro" href="https://www.youtube.com/watch?v=e4VTrXqo1-Q" target="_blank" rel="noopener">
+    <div class="thumb-wrap">
+      <img src="https://img.youtube.com/vi/e4VTrXqo1-Q/hqdefault.jpg" alt="最适合入门的diffusion policy">
+      <div class="play-icon"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="40" fill="rgba(0,0,0,0.5)"/><polygon points="32,24 60,40 32,56" fill="white"/></svg></div>
+      <span class="source-badge badge-youtube">YouTube</span>
+    </div>
+    <div class="video-info">
+      <div class="video-title">最适合入门的diffusion policy</div>
+    </div>
+  </a>
+
   <a class="video-card" id="diffusion-models-scratch" href="https://www.youtube.com/watch?v=B4oHJpEJBAA" target="_blank" rel="noopener">
     <div class="thumb-wrap">
       <img src="https://img.youtube.com/vi/B4oHJpEJBAA/hqdefault.jpg" alt="Diffusion Models From Scratch">
