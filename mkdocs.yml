@@ -8,6 +8,7 @@ hooks:
 # 1. 主题与颜色、界面功能设置（必须与 nav、plugins 平级）
 theme:
   name: material
+  custom_dir: overrides
   language: zh
   palette:
     # 浅色模式设置
