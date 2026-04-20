@@ -63,7 +63,6 @@ def _parse_new_videos(diff_text):
         line[1:] for line in diff_text.splitlines() if line.startswith('+')
     )
     results = []
-    # 找每个新增 video-card 的 id，及其后紧跟的 video-title 文本
     card_re = re.compile(
         r'class="video-card"\s+id="([^"]+)".*?class="video-title">([^<]+)<',
         re.DOTALL
@@ -75,19 +74,37 @@ def _parse_new_videos(diff_text):
     return results
 
 
-def _get_uncommitted(docs_dir, repo_root):
-    """返回本地已修改但未 commit 的 md 文件（用于本地预览同步）。"""
+def _get_local_changes(docs_dir, repo_root):
+    """
+    返回本地已修改/新增但未 commit 的 md 文件（用于本地预览同步）。
+    同时检测：
+      - git diff HEAD（已跟踪文件的修改）
+      - git ls-files --others（新建的 untracked 文件）
+    """
     import datetime
     today = datetime.date.today().isoformat()
     results = []
+    lines = []
     try:
-        out = subprocess.check_output(
+        # 已跟踪但修改/staged 的文件
+        diff_out = subprocess.check_output(
             ['git', 'diff', '--name-only', 'HEAD'],
             cwd=repo_root, stderr=subprocess.DEVNULL, text=True, timeout=5
         )
+        lines.extend(diff_out.splitlines())
     except Exception:
-        return results
-    for line in out.splitlines():
+        pass
+    try:
+        # 新建的 untracked 文件（git add 之前也能捕捉到）
+        untracked_out = subprocess.check_output(
+            ['git', 'ls-files', '--others', '--exclude-standard'],
+            cwd=repo_root, stderr=subprocess.DEVNULL, text=True, timeout=5
+        )
+        lines.extend(untracked_out.splitlines())
+    except Exception:
+        pass
+
+    for line in lines:
         line = line.strip()
         if not (line.endswith('.md') and line.startswith('docs/')):
             continue
@@ -100,19 +117,12 @@ def _get_uncommitted(docs_dir, repo_root):
 
 def _get_recent(docs_dir):
     repo_root = _find_repo_root(docs_dir)
-    try:
-        out = subprocess.check_output(
-            ['git', 'log', '--pretty=format:%ad %H', '--date=short', '--name-only'],
-            cwd=repo_root, stderr=subprocess.DEVNULL, text=True, timeout=10
-        )
-    except Exception:
-        return []
 
-    # 先把本地未提交的改动放到最前面（本地预览用）
-    uncommitted = _get_uncommitted(docs_dir, repo_root)
+    # ── 本地未提交改动（含新建文件），仅在本地预览时有效 ──────────────
+    local_changes = _get_local_changes(docs_dir, repo_root)
     results = []
     seen = set()
-    for date, rel, abs_path in uncommitted:
+    for date, rel, abs_path in local_changes:
         if rel in EXCLUDE_ALWAYS or any(rel.startswith(p) for p in EXCLUDE_PREFIXES):
             continue
         if _is_section_index(rel, docs_dir):
@@ -120,17 +130,56 @@ def _get_recent(docs_dir):
         seen.add(rel)
         results.append((date, rel, _get_title(abs_path)))
 
+    # ── git log：用 "COMMIT <date>" 作分隔符，解析更稳健 ─────────────
+    # --diff-filter=ACM 只看新增/修改，过滤删除/重命名噪音
+    # --max-count=60 防止仓库极大时超时
+    try:
+        out = subprocess.check_output(
+            ['git', 'log',
+             '--diff-filter=ACM',
+             '--pretty=format:COMMIT %ad',
+             '--date=short',
+             '--name-only',
+             '--max-count=60'],
+            cwd=repo_root, stderr=subprocess.DEVNULL, text=True, timeout=15
+        )
+    except Exception:
+        return results
+
     current_date = None
-    current_hash = None
+    current_hash_for_video = None
+
+    # 同时拿一份带 hash 的 log，仅用于视频区 diff 查询
+    try:
+        hash_out = subprocess.check_output(
+            ['git', 'log', '--diff-filter=ACM',
+             '--pretty=format:HASH %H %ad', '--date=short',
+             '--name-only', '--max-count=60'],
+            cwd=repo_root, stderr=subprocess.DEVNULL, text=True, timeout=15
+        )
+    except Exception:
+        hash_out = ''
+
+    # 建立 date → hash 的快查表（取每个日期最新的 hash）
+    date_to_hash = {}
+    _cur_h = None
+    for hl in hash_out.splitlines():
+        hl = hl.strip()
+        if hl.startswith('HASH '):
+            parts = hl.split()          # ['HASH', '<hash>', '<date>']
+            if len(parts) >= 3:
+                _cur_h = parts[1]
+                _cur_d = parts[2]
+                date_to_hash.setdefault(_cur_d, _cur_h)
 
     for line in out.splitlines():
         line = line.strip()
         if not line:
             continue
-        commit_match = re.match(r'^(\d{4}-\d{2}-\d{2})\s+([0-9a-f]{7,40})$', line)
-        if commit_match:
-            current_date = commit_match.group(1)
-            current_hash = commit_match.group(2)
+
+        if line.startswith('COMMIT '):
+            current_date = line[7:].strip()   # '2026-04-20'
+            current_hash_for_video = date_to_hash.get(current_date)
             continue
 
         if not (line.endswith('.md') and line.startswith('docs/')):
@@ -152,12 +201,12 @@ def _get_recent(docs_dir):
         if not os.path.exists(abs_path):
             continue
 
-        # 视频区特殊处理：解析 diff 找具体新增的视频
-        if rel == VIDEO_INDEX and current_hash:
+        # 视频区特殊处理
+        if rel == VIDEO_INDEX and current_hash_for_video:
             try:
                 diff = subprocess.check_output(
-                    ['git', 'show', '--unified=0', current_hash, '--',
-                     f'docs/{VIDEO_INDEX}'],
+                    ['git', 'show', '--unified=0', current_hash_for_video,
+                     '--', f'docs/{VIDEO_INDEX}'],
                     cwd=repo_root, stderr=subprocess.DEVNULL, text=True, timeout=10
                 )
                 new_videos = _parse_new_videos(diff)
@@ -169,7 +218,7 @@ def _get_recent(docs_dir):
                     results.append((current_date, f'{VIDEO_INDEX}#{vid_id}', title))
                     if len(results) >= MAX_COUNT:
                         return results
-                continue  # 不再走下面的普通处理
+                continue
 
         results.append((current_date, rel, _get_title(abs_path)))
         if len(results) >= MAX_COUNT:

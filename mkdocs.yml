@@ -102,6 +102,9 @@ nav:
         - 经典论文/Transformer/index.md
       - GAN:
         - 经典论文/GAN/index.md
+      - VAE:
+        - 经典论文/VAE/index.md
+        - Auto-Encoding Variational Bayes: "经典论文/VAE/Auto-Encoding Variational Bayes.md"
 
     - 📂 资源归档:
       - 资源归档/index.md
