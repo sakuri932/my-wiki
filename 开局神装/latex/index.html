@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://sakuri932.github.io/my-wiki/%E5%BC%80%E5%B1%80%E7%A5%9E%E8%A3%85/latex/">
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../AI%E5%B7%A5%E5%85%B7/">
       
       
-        <link rel="next" href="../AI%E5%B7%A5%E5%85%B7/">
+        <link rel="next" href="../LaTeX%E6%9E%81%E7%AE%80%E6%95%99%E7%A8%8B/">
       
       
         
@@ -429,6 +429,8 @@
       
         
       
+        
+      
     
     
     
@@ -479,6 +481,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AI%E5%B7%A5%E5%85%B7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI工具
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -591,28 +621,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#10latexlatex" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        10分钟学会LaTeX语法：一个极简的LaTeX教程
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#markdown" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        更简单的选择：Markdown
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -629,14 +637,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../AI%E5%B7%A5%E5%85%B7/" class="md-nav__link">
+      <a href="../LaTeX%E6%9E%81%E7%AE%80%E6%95%99%E7%A8%8B/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    AI工具
+    LaTeX极简教程
   
 
     
@@ -1249,7 +1257,7 @@
   <span class="md-ellipsis">
     
   
-    CS61C
+    CS61C: Great Ideas in Computer Architecture
   
 
     
@@ -2389,28 +2397,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#10latexlatex" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        10分钟学会LaTeX语法：一个极简的LaTeX教程
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#markdown" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        更简单的选择：Markdown
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2443,7 +2429,7 @@
 <ul>
 <li><strong>无与伦比的数学公式排版</strong>：无论是简单的微积分还是复杂的矩阵，LaTeX 都能渲染得非常漂亮。</li>
 <li><strong>自动化管理</strong>：自动生成目录、交叉引用以及参考文献。</li>
-<li><strong>分离内容与格式</strong>：通过更换模板（Class），你可以一键将文章从“会议格式”切换为“期刊格式”，无需重新调整字体和段落。</li>
+<li><strong>分离内容与格式</strong>：通过更换模板（Class），你可以一键将文章从"会议格式"切换为"期刊格式"，无需重新调整字体和段落。</li>
 </ul>
 <h2 id="overleaf">使用Overleaf进行编译</h2>
 <p>对于刚接触 LaTeX 的新人来说，配置本地环境可能会遇到各种报错。<strong>Overleaf</strong> 是一个在线的、基于云端的 LaTeX 编辑器，它能让你像使用 Google Docs 或腾讯文档一样，打开浏览器就能写论文。</p>
@@ -2451,7 +2437,7 @@
 <p>访问 Overleaf 官网，你可以使用邮箱或关联相关学术账号直接注册登录。无需安装任何软件。</p>
 <p><img alt="image-20260411114845613" src="../latex.assets/image-20260411114845613.png" style="zoom:50%;" /></p>
 <p><strong>2. 创建你的第一个项目</strong></p>
-<p>登录后，点击左上角的“New Project”（新建项目）。你可以选择创建一个“Blank Project”（空白项目），也可以直接从海量的“Templates”（模板）中寻找适合的学术期刊或会议模板。由于研究室已经有对应模板，因此我们选择上传文档。</p>
+<p>登录后，点击左上角的"New Project"（新建项目）。你可以选择创建一个"Blank Project"（空白项目），也可以直接从海量的"Templates"（模板）中寻找适合的学术期刊或会议模板。由于研究室已经有对应模板，因此我们选择上传文档。</p>
 <p><img alt="image-20260411104728186" src="../latex.assets/image-20260411104728186.png" style="zoom:33%;" /></p>
 <p><strong>3. 认识操作界面</strong></p>
 <p>打开项目后，你会看到一个经典的三栏/两栏布局：</p>
@@ -2469,7 +2455,7 @@
 <li><em>注意：千万不要选 XeLaTeX 或 LuaLaTeX，就选最基础的 <code>LaTeX</code>，这样 Overleaf 就会乖乖去读取你的 <code>latexmkrc</code> 配置文件，并使用 <code>pLaTeX</code> 和 <code>dvipdfmx</code> 来生成 PDF 了。</em></li>
 </ul>
 <p><strong>4. 编译与下载</strong></p>
-<p>在你修改了代码后，只需按下快捷键 <code>Ctrl + S</code>（或 <code>Cmd + S</code>），或者点击预览区上方绿色的“Recompile”按钮，Overleaf 就会自动编译并更新右侧的 PDF。完成写作后，点击右上角的下载按钮即可获取最终的 PDF 文件。</p>
+<p>在你修改了代码后，只需按下快捷键 <code>Ctrl + S</code>（或 <code>Cmd + S</code>），或者点击预览区上方绿色的"Recompile"按钮，Overleaf 就会自动编译并更新右侧的 PDF。完成写作后，点击右上角的下载按钮即可获取最终的 PDF 文件。</p>
 <h2 id="_1">研究室模板的结构与编辑</h2>
 <p>研究室原版模板由教授在2020年左右从beam学术模版改造而来，以下称为第一版，这款主题奠定了研究室seminar的学术报告风格。按照教授的要求，所有研究室内使用的slide都要用它来编译。</p>
 <p>然而这款模板有许多小问题，引擎太老、只支持日文，所以2024年左右研究室的学长们给它加上描述文件和其它部件，保证它在大多数编译环境内都能成功编译，并且支持全文件英文内容，这是第二版。</p>
@@ -2582,7 +2568,7 @@
 <li><code>\input</code> 命令会去读取外部文件。你需要确保你的根目录下有一个名为 <code>docs</code> 的文件夹，并且里面确确实实有 <code>chap1.tex</code>, <code>chap2.tex</code> 等文件。如果缺少任何一个，都会报错。</li>
 </ul>
 <h3 id="vs-code">改 VS Code 配置以适配该文件</h3>
-<p>我们之前在 VS Code 里配置的是强制使用 <code>XeLaTeX</code>（参数里带有 <code>-pdfxe</code>），这会和实验室的配置“打架”。</p>
+<p>我们之前在 VS Code 里配置的是强制使用 <code>XeLaTeX</code>（参数里带有 <code>-pdfxe</code>），这会和实验室的配置"打架"。</p>
 <p>请再次打开你的 <code>settings.json</code>（<code>Ctrl + Shift + P</code> -&gt; <code>Open User Settings (JSON)</code>），将里面的 <code>tools</code> 和 <code>recipes</code> 替换为以下内容：</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="c1">// ... 前面的其他设置保持不变 ...</span>
@@ -2621,709 +2607,6 @@
 <li>回到 <code>main.tex</code>，为了防止残留的错误文件干扰，按下 <code>Ctrl + Shift + P</code> (Mac 是 <code>Cmd + Shift + P</code>)，输入 <strong><code>LaTeX Workshop: Clean up auxiliary files</code></strong> 清理一下。</li>
 <li>再次按 <code>Ctrl + S</code> 保存编译。</li>
 </ol>
-<h2 id="10latexlatex">10分钟学会LaTeX语法：一个极简的LaTeX教程</h2>
-<p>LaTeX 的本质是用文本指令来描述排版。一个基本的 LaTeX 文档分为<strong>导言区</strong>（Preamble）和<strong>正文区</strong>（Body）。</p>
-<h3 id="1">1. 文档的基本框架</h3>
-<p>极简来说，\begin{document}之前的内容是规定文档的全局格式，比如\documentclass{article}是指文章采用article格式，\usepackage{amsmath}是指加载美国数学协会的数学宏包，保证后面的主流数学公式能成功编译。</p>
-<p>而\begin{document}到\end{document}之间的内容就是文章正文了，里面书写的内容是你能实际看到的内容。</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>% 这里是导言区：用于设置文档类型、调用宏包
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>\documentclass{article}
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>\usepackage{amsmath} % 引入数学宏包
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>% 这里是正文区：文章的所有内容都写在这里面
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>\begin{document}
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>\title{我的第一篇研究报告}
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>\author{张三}
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>\date{\today}
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>\maketitle % 这一行命令用来生成标题、作者和日期
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>你好，世界！这是我在研究室的第一篇 LaTeX 文档。
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>\end{document}
-</code></pre></div>
-<h3 id="2">2. 章节与段落</h3>
-<p>在正文区中，你可以通过以下命令快速划分章节：</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>\section{引言}
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>这是引言的内容。另起一段时，在代码中只需空一行即可。
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>\subsection{研究背景}
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>这是引言下的一个小节。
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>\subsubsection{具体问题}
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>这是更小的一级标题。
-</code></pre></div>
-<h3 id="3">3. 数学公式（核心重点）</h3>
-<p>LaTeX 最强大的地方在于数学公式排版。公式分为<strong>行内公式</strong>（嵌在文字中间）和<strong>行间公式</strong>（单独占一行）。</p>
-<ul>
-<li><strong>行内公式</strong>：使用单个美元符号包裹。例如代码 <code>$E=mc^2$</code>，会渲染为：<span class="arithmatex">\(E=mc^2\)</span>。</li>
-<li><strong>行间公式</strong>：使用双美元符号包裹。例如以下代码：</li>
-</ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>$$f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi)\,e^{2 \pi i \xi x} \,d\xi$$
-</code></pre></div>
-<p>将会渲染出非常专业的积分公式：</p>
-<div class="arithmatex">\[f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi)\,e^{2 \pi i \xi x} \,d\xi\]</div>
-<h3 id="4">4. 环境</h3>
-<p>环境你可以理解为编程语言里的一些常用功能函数，begin后跟随的内容是指定哪种环境。通过不同的环境，实现对一些常用场景的高校排版。现实中常用的环境有align多行公式环境、各类matrix矩阵环境等</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>% 无序列表
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>\begin{itemize}
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    \item 查阅文献
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    \item 设计实验
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    \item 收集数据
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>\end{itemize}
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>% 有序列表
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>\begin{enumerate}
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    \item 第一步
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    \item 第二步
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>\end{enumerate}
-</code></pre></div>
-<h3 id="5">5.常用数学符号</h3>
-<p>这里我省事一点，直接让Gemini给我生成一个了：</p>
-<p>这是一份为您整理的常用 LaTeX 数学符号、环境以及公式书写方法的速查指南。排版已经过优化，非常适合作为教学讲义或参考资料使用。</p>
-<h4 id="_3">一、 基础公式书写环境</h4>
-<p>在 LaTeX 或 Markdown 中，数学公式主要分为<strong>行内公式</strong>和<strong>独立公式（行间公式）</strong>。</p>
-<table>
-<thead>
-<tr>
-<th><strong>环境类型</strong></th>
-<th><strong>说明</strong></th>
-<th><strong>代码示例</strong></th>
-<th><strong>渲染效果</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>行内公式</strong></td>
-<td>嵌在段落文字中</td>
-<td><code>文字 $E=mc^2$ 文字</code></td>
-<td>文字 <span class="arithmatex">\(E=mc^2\)</span> 文字</td>
-</tr>
-<tr>
-<td><strong>独立公式</strong></td>
-<td>单独占一行，居中显示</td>
-<td><code>$$E=mc^2$$</code></td>
-<td>$<span class="arithmatex">\(E=mc^2\)</span>$</td>
-</tr>
-<tr>
-<td><strong>编号公式</strong></td>
-<td>独立成行并自动编号（多用于纯 LaTeX）</td>
-<td><code>\begin{equation} a^2+b^2=c^2 \end{equation}</code></td>
-<td>(渲染同独立公式并带编号)</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="_4">二、 基本数学结构</h4>
-<p>掌握上下标、分数和根号是书写大部分公式的基础。</p>
-<table>
-<thead>
-<tr>
-<th><strong>说明</strong></th>
-<th><strong>LaTeX 代码</strong></th>
-<th><strong>渲染效果</strong></th>
-<th><strong>注意事项</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>上标</strong></td>
-<td><code>a^2</code></td>
-<td><span class="arithmatex">\(a^2\)</span></td>
-<td>若上标多于一个字符，需用大括号包裹，如 <code>a^{x+1}</code></td>
-</tr>
-<tr>
-<td><strong>下标</strong></td>
-<td><code>a_i</code></td>
-<td><span class="arithmatex">\(a_i\)</span></td>
-<td>同上，如 <code>a_{i,j}</code></td>
-</tr>
-<tr>
-<td><strong>上下标组合</strong></td>
-<td><code>x_i^2</code></td>
-<td><span class="arithmatex">\(x_i^2\)</span></td>
-<td>顺序无关紧要</td>
-</tr>
-<tr>
-<td><strong>分数</strong></td>
-<td><code>\frac{a}{b}</code></td>
-<td><span class="arithmatex">\(\frac{a}{b}\)</span></td>
-<td><code>\frac{分子}{分母}</code></td>
-</tr>
-<tr>
-<td><strong>平方根</strong></td>
-<td><code>\sqrt{x}</code></td>
-<td><span class="arithmatex">\(\sqrt{x}\)</span></td>
-<td></td>
-</tr>
-<tr>
-<td><strong>n次方根</strong></td>
-<td><code>\sqrt[n]{x}</code></td>
-<td><span class="arithmatex">\(\sqrt[n]{x}\)</span></td>
-<td>方括号内为开方数</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="_5">三、 常用数学符号</h4>
-<h5 id="1-greek-letters">1. 希腊字母 (Greek Letters)</h5>
-<p><em>注：大写希腊字母只需将首字母大写即可（部分大写字母与拉丁字母相同，如 A, B，直接打出即可）。</em></p>
-<table>
-<thead>
-<tr>
-<th><strong>小写代码</strong></th>
-<th><strong>效果</strong></th>
-<th></th>
-<th><strong>大写代码</strong></th>
-<th><strong>效果</strong></th>
-<th></th>
-<th><strong>变体代码</strong></th>
-<th><strong>效果</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>\alpha</code></td>
-<td><span class="arithmatex">\(\alpha\)</span></td>
-<td></td>
-<td><code>\Gamma</code></td>
-<td><span class="arithmatex">\(\Gamma\)</span></td>
-<td></td>
-<td><code>\varepsilon</code></td>
-<td><span class="arithmatex">\(\varepsilon\)</span></td>
-</tr>
-<tr>
-<td><code>\beta</code></td>
-<td><span class="arithmatex">\(\beta\)</span></td>
-<td></td>
-<td><code>\Delta</code></td>
-<td><span class="arithmatex">\(\Delta\)</span></td>
-<td></td>
-<td><code>\varphi</code></td>
-<td><span class="arithmatex">\(\varphi\)</span></td>
-</tr>
-<tr>
-<td><code>\gamma</code></td>
-<td><span class="arithmatex">\(\gamma\)</span></td>
-<td></td>
-<td><code>\Theta</code></td>
-<td><span class="arithmatex">\(\Theta\)</span></td>
-<td></td>
-<td><code>\varrho</code></td>
-<td><span class="arithmatex">\(\varrho\)</span></td>
-</tr>
-<tr>
-<td><code>\delta</code></td>
-<td><span class="arithmatex">\(\delta\)</span></td>
-<td></td>
-<td><code>\Lambda</code></td>
-<td><span class="arithmatex">\(\Lambda\)</span></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>\theta</code></td>
-<td><span class="arithmatex">\(\theta\)</span></td>
-<td></td>
-<td><code>\Xi</code></td>
-<td><span class="arithmatex">\(\Xi\)</span></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>\lambda</code></td>
-<td><span class="arithmatex">\(\lambda\)</span></td>
-<td></td>
-<td><code>\Pi</code></td>
-<td><span class="arithmatex">\(\Pi\)</span></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>\mu</code></td>
-<td><span class="arithmatex">\(\mu\)</span></td>
-<td></td>
-<td><code>\Sigma</code></td>
-<td><span class="arithmatex">\(\Sigma\)</span></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>\pi</code></td>
-<td><span class="arithmatex">\(\pi\)</span></td>
-<td></td>
-<td><code>\Phi</code></td>
-<td><span class="arithmatex">\(\Phi\)</span></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><code>\omega</code></td>
-<td><span class="arithmatex">\(\omega\)</span></td>
-<td></td>
-<td><code>\Omega</code></td>
-<td><span class="arithmatex">\(\Omega\)</span></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h5 id="2-operators-relations">2. 运算符与关系符 (Operators &amp; Relations)</h5>
-<table>
-<thead>
-<tr>
-<th><strong>说明</strong></th>
-<th><strong>LaTeX 代码</strong></th>
-<th><strong>效果</strong></th>
-<th></th>
-<th><strong>说明</strong></th>
-<th><strong>LaTeX 代码</strong></th>
-<th><strong>效果</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>乘号</strong></td>
-<td><code>\times</code></td>
-<td><span class="arithmatex">\(\times\)</span></td>
-<td></td>
-<td><strong>大于等于</strong></td>
-<td><code>\ge</code> 或 <code>\geq</code></td>
-<td><span class="arithmatex">\(\ge\)</span></td>
-</tr>
-<tr>
-<td><strong>除号</strong></td>
-<td><code>\div</code></td>
-<td><span class="arithmatex">\(\div\)</span></td>
-<td></td>
-<td><strong>小于等于</strong></td>
-<td><code>\le</code> 或 <code>\leq</code></td>
-<td><span class="arithmatex">\(\le\)</span></td>
-</tr>
-<tr>
-<td><strong>点乘</strong></td>
-<td><code>\cdot</code></td>
-<td><span class="arithmatex">\(\cdot\)</span></td>
-<td></td>
-<td><strong>不等于</strong></td>
-<td><code>\neq</code></td>
-<td><span class="arithmatex">\(\neq\)</span></td>
-</tr>
-<tr>
-<td><strong>加减号</strong></td>
-<td><code>\pm</code></td>
-<td><span class="arithmatex">\(\pm\)</span></td>
-<td></td>
-<td><strong>约等于</strong></td>
-<td><code>\approx</code></td>
-<td><span class="arithmatex">\(\approx\)</span></td>
-</tr>
-<tr>
-<td><strong>减加号</strong></td>
-<td><code>\mp</code></td>
-<td><span class="arithmatex">\(\mp\)</span></td>
-<td></td>
-<td><strong>等价于</strong></td>
-<td><code>\equiv</code></td>
-<td><span class="arithmatex">\(\equiv\)</span></td>
-</tr>
-<tr>
-<td><strong>无穷大</strong></td>
-<td><code>\infty</code></td>
-<td><span class="arithmatex">\(\infty\)</span></td>
-<td></td>
-<td><strong>正比于</strong></td>
-<td><code>\propto</code></td>
-<td><span class="arithmatex">\(\propto\)</span></td>
-</tr>
-</tbody>
-</table>
-<h5 id="3-sets-logic">3. 集合与逻辑符号 (Sets &amp; Logic)</h5>
-<table>
-<thead>
-<tr>
-<th><strong>说明</strong></th>
-<th><strong>LaTeX 代码</strong></th>
-<th><strong>效果</strong></th>
-<th></th>
-<th><strong>说明</strong></th>
-<th><strong>LaTeX 代码</strong></th>
-<th><strong>效果</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>属于</strong></td>
-<td><code>\in</code></td>
-<td><span class="arithmatex">\(\in\)</span></td>
-<td></td>
-<td><strong>任意/全称</strong></td>
-<td><code>\forall</code></td>
-<td><span class="arithmatex">\(\forall\)</span></td>
-</tr>
-<tr>
-<td><strong>不属于</strong></td>
-<td><code>\notin</code></td>
-<td><span class="arithmatex">\(\notin\)</span></td>
-<td></td>
-<td><strong>存在</strong></td>
-<td><code>\exists</code></td>
-<td><span class="arithmatex">\(\exists\)</span></td>
-</tr>
-<tr>
-<td><strong>子集</strong></td>
-<td><code>\subset</code></td>
-<td><span class="arithmatex">\(\subset\)</span></td>
-<td></td>
-<td><strong>并集</strong></td>
-<td><code>\cup</code></td>
-<td><span class="arithmatex">\(\cup\)</span></td>
-</tr>
-<tr>
-<td><strong>包含</strong></td>
-<td><code>\subseteq</code></td>
-<td><span class="arithmatex">\(\subseteq\)</span></td>
-<td></td>
-<td><strong>交集</strong></td>
-<td><code>\cap</code></td>
-<td><span class="arithmatex">\(\cap\)</span></td>
-</tr>
-<tr>
-<td><strong>空集</strong></td>
-<td><code>\emptyset</code></td>
-<td><span class="arithmatex">\(\emptyset\)</span></td>
-<td></td>
-<td><strong>实数集</strong></td>
-<td><code>\mathbb{R}</code></td>
-<td><span class="arithmatex">\(\mathbb{R}\)</span></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="_6">四、 微积分与大型运算符</h4>
-<p>这类符号通常会根据是“行内公式”还是“独立公式”自动调整大小。</p>
-<table>
-<thead>
-<tr>
-<th><strong>说明</strong></th>
-<th><strong>LaTeX 代码</strong></th>
-<th><strong>效果</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>极限</strong></td>
-<td><code>\lim_{x \to 0} f(x)</code></td>
-<td><span class="arithmatex">\(\lim_{x \to 0} f(x)\)</span></td>
-</tr>
-<tr>
-<td><strong>求和</strong></td>
-<td><code>\sum_{i=1}^{n} x_i</code></td>
-<td><span class="arithmatex">\(\sum_{i=1}^{n} x_i\)</span></td>
-</tr>
-<tr>
-<td><strong>连乘</strong></td>
-<td><code>\prod_{i=1}^{n} x_i</code></td>
-<td><span class="arithmatex">\(\prod_{i=1}^{n} x_i\)</span></td>
-</tr>
-<tr>
-<td><strong>不定积分</strong></td>
-<td><code>\int f(x) dx</code></td>
-<td><span class="arithmatex">\(\int f(x) dx\)</span></td>
-</tr>
-<tr>
-<td><strong>定积分</strong></td>
-<td><code>\int_{a}^{b} f(x) dx</code></td>
-<td><span class="arithmatex">\(\int_{a}^{b} f(x) dx\)</span></td>
-</tr>
-<tr>
-<td><strong>多重积分</strong></td>
-<td><code>\iint</code>, <code>\iiint</code></td>
-<td><span class="arithmatex">\(\iint\)</span>, <span class="arithmatex">\(\iiint\)</span></td>
-</tr>
-<tr>
-<td><strong>偏导数</strong></td>
-<td><code>\frac{\partial f}{\partial x}</code></td>
-<td><span class="arithmatex">\(\frac{\partial f}{\partial x}\)</span></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="_7">五、 矩阵与分段函数环境</h4>
-<p>对于复杂的多行结构，LaTeX 使用 <code>\begin{环境名} ... \end{环境名}</code> 来实现。</p>
-<p><em>注：在这些环境中，<code>&amp;</code> 用于对齐，<code>\\</code> 用于换行。</em></p>
-<h5 id="1-matrices">1. 矩阵 (Matrices)</h5>
-<p>常见矩阵环境有三种：<code>matrix</code> (无括号)、<code>pmatrix</code> (小括号)、<code>bmatrix</code> (中括号)。</p>
-<p><strong>LaTeX 代码：</strong></p>
-<p>コード スニペット</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$$
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>\begin{bmatrix}
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>  1 &amp; 2 &amp; 3 \\
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  4 &amp; 5 &amp; 6 \\
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>  7 &amp; 8 &amp; 9
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>\end{bmatrix}
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>$$
-</code></pre></div>
-<p><strong>渲染效果：</strong></p>
-<div class="arithmatex">\[\begin{bmatrix}  1 &amp; 2 &amp; 3 \\  4 &amp; 5 &amp; 6 \\  7 &amp; 8 &amp; 9 \end{bmatrix}\]</div>
-<h5 id="2-cases">2. 分段函数 (Cases)</h5>
-<p>使用 <code>cases</code> 环境书写分段函数。</p>
-<p><strong>LaTeX 代码：</strong></p>
-<p>コード スニペット</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>$$
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>f(x) =
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>\begin{cases}
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>  x^2,  &amp; x \ge 0 \\
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>  -x, &amp; x &lt; 0
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>\end{cases}
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>$$
-</code></pre></div>
-<p><strong>渲染效果：</strong></p>
-<div class="arithmatex">\[f(x) = \begin{cases}  x^2,  &amp; x \ge 0 \\  -x, &amp; x &lt; 0 \end{cases}\]</div>
-<h5 id="3-align">3. 多行公式对齐 (Align)</h5>
-<p>使用 <code>align</code> 或 <code>aligned</code> 环境，并在需要对齐的等号前加 <code>&amp;</code>。</p>
-<p><strong>LaTeX 代码：</strong></p>
-<p>コード スニペット</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>$$
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>\begin{aligned}
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>  (a+b)^2 &amp;= (a+b)(a+b) \\
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>          &amp;= a^2 + ab + ba + b^2 \\
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>          &amp;= a^2 + 2ab + b^2
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>\end{aligned}
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>$$
-</code></pre></div>
-<p><strong>渲染效果：</strong></p>
-<div class="arithmatex">\[\begin{aligned}  (a+b)^2 &amp;= (a+b)(a+b) \\          &amp;= a^2 + ab + ba + b^2 \\          &amp;= a^2 + 2ab + b^2 \end{aligned}\]</div>
-<hr />
-<p><em>教学小贴士：在实际输入时，提醒学生注意大括号 <code>{}</code> 的闭合，以及斜杠 <code>\</code> 的方向，这是初学者最容易犯错的地方。</em></p>
-<h2 id="markdown">更简单的选择：Markdown</h2>
-<p>在日常的科研生活中，并不是所有的文档都需要用到 LaTeX 这样重量级的排版工具。如果你只是想写一份简单的实验记录、代码的 <code>README</code> 文件、或者是组会上的快速汇报大纲，<strong>Markdown</strong> 可能是更好的选择。虽然它没法用来制作ppt，但记笔记真的很好用，比如这个博客基本都是用markdown写的。</p>
-<p><strong>什么是 Markdown？</strong></p>
-<p>Markdown 是一种极简的“轻量级标记语言”。与 LaTeX 相比，它的语法极其简单，几乎不需要学习成本。比如，用 <code>#</code> 表示一级标题，用 <code>**加粗**</code> 表示加粗。</p>
-<p><strong>适用场景对比：</strong></p>
-<ul>
-<li><strong>LaTeX</strong>：适合撰写需要严格排版、包含大量公式、交叉引用和参考文献的<strong>正式学术论文</strong>、毕业设计。</li>
-<li><strong>Markdown</strong>：适合撰写<strong>日常笔记、周报、代码文档</strong>。它的关注点在于“快速记录结构化文本”。</li>
-</ul>
-<p>你可以使用 Typora、Obsidian 或者直接在 VS Code 中编写 Markdown 文件。而且，Markdown 同样支持使用 LaTeX 的语法（如 <code>$</code> 和 <code>$$</code>）来插入数学公式，让你在轻量级写作中依然能优雅地书写数学推导。</p>
-<p>Markdown同样需要一个编译环境，日本常用notion及其网页端，不过我这里推荐Typora，100元不到的价格直接买断，支持3台设备同时使用，功能强大界面简洁高效，支持绝大部分语法，还有丰富的插件和皮肤，是你的不二之选。</p>
-<p>同样地下面给一份markdown教程，其实跟latex很像。虽然我有资料，但是懒得整理了，直接找Gemini同样生成一份😁：</p>
-<p>Gemini：</p>
-<p>这是一份为您准备的 Markdown 语法速查教程。Markdown 是一种轻量级标记语言，它使用易读易写的纯文本格式编写文档，非常适合用来编写教学讲义、笔记和说明文档。</p>
-<p>为了方便您教学演示，这里的排版依然采用了“代码 + 效果”的直观对比方式。</p>
-<hr />
-<h4 id="headings">一、 标题 (Headings)</h4>
-<p>Markdown 使用井号 <code>#</code> 来标记标题。<code>#</code> 的数量代表标题的级别（最多支持六级标题）。</p>
-<p><em>注意：<code>#</code> 和标题文字之间必须要有一个空格。</em></p>
-<table>
-<thead>
-<tr>
-<th><strong>Markdown 代码</strong></th>
-<th><strong>渲染效果</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code># 一级标题</code></td>
-<td>(渲染为最大字号的标题，通常占据整行)</td>
-</tr>
-<tr>
-<td><code>## 二级标题</code></td>
-<td>(渲染为次大字号的标题，如本文档的“一、 标题”)</td>
-</tr>
-<tr>
-<td><code>### 三级标题</code></td>
-<td>(渲染为更小一级的标题)</td>
-</tr>
-<tr>
-<td><code>###### 六级标题</code></td>
-<td>(渲染为最小的标题)</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="text-formatting">二、 文本格式 (Text Formatting)</h4>
-<p>通过在文字前后添加特定的符号，可以快速改变文字的样式。</p>
-<table>
-<thead>
-<tr>
-<th><strong>说明</strong></th>
-<th><strong>Markdown 代码</strong></th>
-<th><strong>渲染效果</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>加粗</strong></td>
-<td><code>**重点内容**</code></td>
-<td><strong>重点内容</strong></td>
-</tr>
-<tr>
-<td><strong>斜体</strong></td>
-<td><code>*倾斜内容*</code></td>
-<td><em>倾斜内容</em></td>
-</tr>
-<tr>
-<td><strong>加粗并斜体</strong></td>
-<td><code>***又粗又斜***</code></td>
-<td><strong>*又粗又斜*</strong></td>
-</tr>
-<tr>
-<td><strong>删除线</strong></td>
-<td><code>~~作废内容~~</code></td>
-<td>~~作废内容~~</td>
-</tr>
-<tr>
-<td><strong>高亮/标记</strong></td>
-<td><code>==高亮文字==</code></td>
-<td>==高亮文字== <em>(注：部分编辑器支持)</em></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="lists">三、 列表 (Lists)</h4>
-<h5 id="1_1">1. 无序列表</h5>
-<p>使用 <code>-</code>、<code>+</code> 或 <code>*</code> 加一个空格作为列表标记。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>- 苹果
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>- 香蕉
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>- 橘子
-</code></pre></div>
-<p><strong>效果：</strong></p>
-<ul>
-<li>苹果</li>
-<li>香蕉</li>
-<li>橘子</li>
-</ul>
-<h5 id="2_1">2. 有序列表</h5>
-<p>使用数字加英文句点 <code>.</code> 还有一个空格作为标记。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>1. 第一步
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>2. 第二步
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>3. 第三步
-</code></pre></div>
-<p><strong>效果：</strong></p>
-<ol>
-<li>第一步</li>
-<li>第二步</li>
-<li>第三步</li>
-</ol>
-<h5 id="3_1">3. 任务列表 (待办事项)</h5>
-<p>使用 <code>- [ ]</code> 表示未完成，<code>- [x]</code> 表示已完成。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>- [x] 备课
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>- [ ] 批改作业
-</code></pre></div>
-<p><strong>效果：</strong></p>
-<ul>
-<li>[x] 备课</li>
-<li>[ ] 批改作业</li>
-</ul>
-<hr />
-<h4 id="links-images">四、 链接与图片 (Links &amp; Images)</h4>
-<p>链接和图片的语法非常相似，唯一的区别是图片在最前面多了一个感叹号 <code>!</code>。</p>
-<table>
-<thead>
-<tr>
-<th><strong>类型</strong></th>
-<th><strong>语法结构</strong></th>
-<th><strong>Markdown 代码示例</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>链接</strong></td>
-<td><code>[显示文本](链接地址)</code></td>
-<td><code>欢迎访问 [Google](https://www.google.com)</code></td>
-</tr>
-<tr>
-<td><strong>图片</strong></td>
-<td><code>![图片描述](图片链接地址)</code></td>
-<td><code>![风景图](https://example.com/image.jpg)</code></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="blockquotes-code">五、 引用与代码 (Blockquotes &amp; Code)</h4>
-<h5 id="1_2">1. 引用块</h5>
-<p>在段落前添加 <code>&gt;</code> 加一个空格，常用于引用名言或突出显示某段文字。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>&gt; 知识就是力量。 —— 培根
-</code></pre></div>
-<p><strong>效果：</strong></p>
-<blockquote>
-<p>知识就是力量。 —— 培根</p>
-</blockquote>
-<h5 id="2_2">2. 行内代码</h5>
-<p>使用反引号 ``` 包裹少量的代码或专有名词。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>请使用 `Ctrl + C` 进行复制。
-</code></pre></div>
-<p><strong>效果：</strong></p>
-<p>请使用 <code>Ctrl + C</code> 进行复制。</p>
-<h5 id="3_2">3. 多行代码块</h5>
-<p>使用三个反引号 ````` 包裹多行代码。可以在第一行的反引号后指定编程语言（如 python, java, markdown 等），以实现语法高亮。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>```python
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>print(&quot;Hello, Class!&quot;)
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>```
-</code></pre></div>
-<p><strong>效果：</strong></p>
-<p>Python</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>print(&quot;Hello, Class!&quot;)
-</code></pre></div>
-<hr />
-<h4 id="tables">六、 表格 (Tables)</h4>
-<p>使用管道符 <code>|</code> 分隔不同的单元格，使用减号 <code>-</code> 分隔表头和其他行。还可以在减号前后加冒号 <code>:</code> 来控制对齐方式。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>| 姓名 | 学号 | 成绩 (右对齐) |
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>| :--- | :--- | ---: |
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>| 张三 | 001 | 95 |
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>| 李四 | 002 | 88 |
-</code></pre></div>
-<p><strong>效果：</strong></p>
-<table>
-<thead>
-<tr>
-<th><strong>姓名</strong></th>
-<th><strong>学号</strong></th>
-<th><strong>成绩 (右对齐)</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>张三</td>
-<td>001</td>
-<td>95</td>
-</tr>
-<tr>
-<td>李四</td>
-<td>002</td>
-<td>88</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h4 id="horizontal-rules">七、 分隔线 (Horizontal Rules)</h4>
-<p>在一行中用三个以上的星号 <code>***</code>、减号 <code>---</code> 或底线 <code>___</code> 来建立一个分隔线，行内不能有其他东西。</p>
-<p><strong>代码：</strong></p>
-<p>Markdown</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>---
-</code></pre></div>
-<p><em>(本文档中用于分隔各个大节的横线即是由此代码生成的)</em></p>
 
 
 
