@@ -84,6 +84,7 @@ nav:
         - 深度学习:
           - 修仙课程/深度学习/李宏毅机器学习.md
           - "MIT 6.S184: Generative AI with SDE": 修仙课程/深度学习/MIT 6.S184.md
+          - "Stanford CS336: 从头开始做一个 GPT": 修仙课程/深度学习/Stanford CS336.md
         - 计算机架构: 
           - 修仙课程/计算机架构/nand2tetris.md
 
