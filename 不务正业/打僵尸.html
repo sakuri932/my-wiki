@@ -142,6 +142,34 @@ canvas{display:block;position:fixed;top:0;left:0}
 /* lock indicator */
 #lockinf{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);
   font-size:11px;color:#333;letter-spacing:2px;pointer-events:none;z-index:5}
+
+/* player HP number */
+#hpnum{font-size:12px;color:#cc4444;margin-top:3px;letter-spacing:1px}
+
+/* floating damage numbers */
+.dmgnum{
+  position:fixed;font-size:18px;font-weight:bold;color:#ffdd00;
+  text-shadow:1px 1px 3px rgba(0,0,0,.9),-1px -1px 3px rgba(0,0,0,.9);
+  pointer-events:none;z-index:50;
+  transform:translate(-50%,-50%);
+  animation:floatup .7s ease-out forwards;
+  font-family:'Courier New',monospace;
+}
+.dmgnum.big{font-size:26px;color:#ff5500}
+.dmgnum.head{font-size:24px;color:#ff2222;text-shadow:0 0 8px #ff0000,1px 1px 3px rgba(0,0,0,.9)}
+@keyframes floatup{
+  0%  {opacity:1;transform:translate(-50%,-50%)}
+  100%{opacity:0;transform:translate(-50%,-220%)}
+}
+
+/* enemy HP text labels */
+.enlbl{
+  position:fixed;font-size:11px;color:#fff;
+  text-shadow:1px 1px 2px rgba(0,0,0,1),-1px -1px 2px rgba(0,0,0,1);
+  pointer-events:none;z-index:20;
+  transform:translate(-50%,-50%);white-space:nowrap;
+  letter-spacing:1px;font-family:'Courier New',monospace;
+}
 </style>
 </head>
 <body>
@@ -150,7 +178,7 @@ canvas{display:block;position:fixed;top:0;left:0}
 <!-- HUD -->
 <div id="hud">
   <div id="xh"><div class="xl xlh"></div><div class="xl xlv"></div><div class="xl xld"></div></div>
-  <div id="hp"><div id="hplbl">HEALTH</div><div id="hpbg"><div id="hpfill"></div></div></div>
+  <div id="hp"><div id="hplbl">HEALTH</div><div id="hpbg"><div id="hpfill"></div></div><div id="hpnum">100 / 100</div></div>
   <div id="ammo"><div id="amn">12</div><div id="amr">/ 84</div><div id="wnm">PISTOL</div></div>
   <div id="wavediv"><div id="wnum">WAVE 1</div><div id="ecnt">Enemies: 0</div></div>
   <div id="sc">Score: 0</div>
@@ -163,6 +191,7 @@ canvas{display:block;position:fixed;top:0;left:0}
     <div class="ws" id="ws3">SNIPER</div>
     <div class="ws" id="ws4">STAFF</div>
     <div class="ws" id="ws5">GATLN</div>
+    <div class="ws" id="ws6" style="display:none;border-color:#9900ff;color:#9900ff">奇点炮</div>
   </div>
   <div id="grc">手雷: 3</div>
 
@@ -248,9 +277,9 @@ const C = {
 const WD = [
   {id:'pistol', nm:'PISTOL',  dmg:38,  fr:400,  rl:1200, mag:12, tot:84,  sp:0.015, auto:false, pel:1, rng:95,  mc:0x3a3a3a, bl:.30},
   {id:'ak47',   nm:'AK-47',   dmg:26,  fr:112,  rl:2000, mag:30, tot:210, sp:0.040, auto:true,  pel:1, rng:115, mc:0x3a2818, bl:.50},
-  {id:'shotgun',nm:'SHOTGUN', dmg:17,  fr:950,  rl:2600, mag:8,  tot:48,  sp:0.16,  auto:false, pel:9, rng:22,  mc:0x5a3010, bl:.50},
+  {id:'shotgun',nm:'SHOTGUN', dmg:30,  fr:950,  rl:2600, mag:8,  tot:48,  sp:0.14,  auto:false, pel:9, rng:28,  mc:0x5a3010, bl:.50},
   {id:'sniper', nm:'SNIPER',  dmg:160, fr:1600, rl:2800, mag:5,  tot:30,  sp:0.002, auto:false, pel:1, rng:250, mc:0x2a4020, bl:.80},
-  {id:'staff',  nm:'STAFF',   dmg:65,  fr:720,  rl:0,    mag:Infinity, tot:Infinity, sp:0.008, auto:false, pel:1, rng:90, mc:0x6600aa, bl:.60, proj:true, pspd:26, spl:3.2},
+  {id:'staff',  nm:'激光',    dmg:7,   fr:0,    rl:0,    mag:Infinity, tot:Infinity, sp:0,      auto:false, pel:1, rng:999, mc:0x6600aa, bl:.60, laser:true},
   {id:'gatling',nm:'GATLING', dmg:18,  fr:65,   rl:3500, mag:200, tot:600,      sp:0.055, auto:true,  pel:1, rng:95,  mc:0x4a4a4a, bl:.55, gatling:true},
 ];
 
@@ -262,18 +291,20 @@ const ED = {
   runner: {nm:'奔跑者', hp:42,  spd:5.8, dmg:8,  ar:1.6, atk:800,  sc:15, melee:true,  bc:0x8a1818,hc:0x7a3e10,sz:0.82},
   soldier:{nm:'士兵',   hp:115, spd:3.2, dmg:18, ar:28,  atk:1500, sc:25, melee:false, bc:0x353545,hc:0xc0a880,sz:1.00, bspd:17},
   tank:   {nm:'BOSS',   hp:380, spd:1.7, dmg:30, ar:2.2, atk:2000, sc:65, melee:true,  bc:0x601060,hc:0x401040,sz:1.65},
+  flyer:  {nm:'飞行怪', hp:50,  spd:4.5, dmg:14, ar:2.0, atk:900,  sc:22, melee:true,  bc:0x1a0a2a,hc:0x3a1050,sz:0.88, flyH:3.5},
+  giant:  {nm:'⚡巨人', hp:1400, spd:1.1, dmg:22, ar:35,  atk:2200, sc:200, melee:false, bc:0x3a0000,hc:0xaa2200,sz:2.6, bspd:14, giant:true},
 };
 
 // ─────────────────────────────────────────────────────────────
 // WAVE TEMPLATES
 // ─────────────────────────────────────────────────────────────
 const WT = [
-  {zombie:4,runner:1,soldier:0,tank:0},
-  {zombie:5,runner:2,soldier:1,tank:0},
-  {zombie:5,runner:3,soldier:2,tank:0},
-  {zombie:5,runner:4,soldier:2,tank:1},
-  {zombie:6,runner:5,soldier:3,tank:1},
-  {zombie:7,runner:5,soldier:4,tank:2},
+  {zombie:4,runner:1,soldier:0,tank:0,flyer:0},
+  {zombie:5,runner:2,soldier:1,tank:0,flyer:1},
+  {zombie:5,runner:3,soldier:2,tank:0,flyer:2},
+  {zombie:5,runner:4,soldier:2,tank:1,flyer:2},
+  {zombie:6,runner:5,soldier:3,tank:1,flyer:3},
+  {zombie:7,runner:5,soldier:4,tank:2,flyer:4},
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -344,40 +375,37 @@ const MAPS = [
     L:[{x:0,y:7,z:0,i:.8,c:0xFFFFEE,d:35},{x:-15,y:6,z:-15,i:.6,c:0xEEF0FF,d:28},
        {x:15,y:6,z:-15,i:.6,c:0xEEF0FF,d:28},{x:0,y:6,z:14,i:.5,c:0xFFFFFF,d:25}],
   },
-  { // ── JUNGLE RUINS：热带丛林遗迹 ──
-    nm:'丛林遗迹', fs:58, sp:{x:0,z:22}, ez:{x1:-20,x2:20,z1:-26,z2:-8},
-    fog:0x90C878, fn:20, ff:62, amb:0xA8C898, floor:0x6A7A4A, ceil:null, wh:7,
-    sun:{x:10,y:40,z:-5,c:0xFFEE88,i:1.2},
+  { // ── GIANT RUINS：巨人城废墟（环形螺旋坡道双层地图）──
+    nm:'废墟城', fs:58, sp:{x:0,z:20}, ez:{x1:-18,x2:18,z1:-22,z2:-6},
+    fog:0x707880, fn:24, ff:72, amb:0x888898, floor:0x585850, ceil:null, wh:11,
+    sun:{x:-15,y:50,z:8,c:0xFFDD88,i:1.1},
+    // 螺旋坡道参数（由 buildRamp 生成）
+    ramp:{innerR:25,width:3.2,height:8,stepsPerSide:8,color:0x6A5A48},
     W:[
-      // 外围树林边界
-      [0,3.5,-29,58,7,1,0x4A6A3A],[0,3.5,29,58,7,1,0x4A6A3A],
-      [-29,3.5,0,1,7,58,0x4A6A3A],[29,3.5,0,1,7,58,0x4A6A3A],
-      // 神庙入口石柱
-      [-8,3.25,-24,3,6.5,3,0x8A7A5A],[8,3.25,-24,3,6.5,3,0x8A7A5A],
-      // 残破遗迹墙
-      [-12,2,-17,1,4,12,0x7A6A4A],[-12,2,-6,1,4,8,0x7A6A4A],
-      [12,2,-17,1,4,12,0x7A6A4A],[12,2,-6,1,4,8,0x7A6A4A],
-      // 倒塌的石柱段（卧倒掩体）
-      [-6,.5,-18,5,1,1.5,0x8A7A5A],[6,.5,-18,5,1,1.5,0x8A7A5A],
-      [-6,.5,-8,4,1,1.5,0x8A7A5A],[6,.5,-8,4,1,1.5,0x8A7A5A],
-      // 竖立石柱
-      [-16,3.25,-12,1.8,6.5,1.8,0x8A7A5A],[16,3.25,-12,1.8,6.5,1.8,0x8A7A5A],
-      [-16,3.25,2,1.8,6.5,1.8,0x8A7A5A],[16,3.25,2,1.8,6.5,1.8,0x8A7A5A],
-      // 中央祭坛
-      [0,.75,-16,8,1.5,8,0x9A8A6A],[0,2,-16,4.5,.8,4.5,0xAA9A7A],
-      // 树桩掩体
-      [-4,.65,6,2,1.3,2,0x6A5030],[4,.65,6,2,1.3,2,0x6A5030],
-      [-20,.65,4,2,1.3,2.5,0x6A5030],[20,.65,4,2,1.3,2.5,0x6A5030],
-      [-8,.65,14,2.5,1.3,2.5,0x6A5030],[8,.65,14,2.5,1.3,2.5,0x6A5030],
-      // 大型岩石
-      [-22,1,-22,4,2,3.5,0x6A6A5A],[22,1,-22,4,2,3.5,0x6A6A5A],
-      // 拱门遗迹
-      [-3,3.25,0,1.2,6.5,1.2,0x8A7A5A],[3,3.25,0,1.2,6.5,1.2,0x8A7A5A],
-      [0,6.1,0,7.4,.8,1.2,0x8A7A5A],
+      // ── 外围高墙（高14，封闭二楼空间；二楼在y=8，净空6m）──
+      [0,7,-29,58,14,1,0x3A2A1A],[0,7,29,58,14,1,0x3A2A1A],
+      [-29,7,0,1,14,58,0x3A2A1A],[29,7,0,1,14,58,0x3A2A1A],
+
+      // ── 地面层：少量掩体，中央宽阔 ──
+      [0,.65,0, 8,1.3,.8,0x5A5040],[0,.65,0,.8,1.3,8,0x5A5040],
+      [-10,.55,-10,3,1.1,3,0x686050],[ 10,.55,-10,3,1.1,3,0x686050],
+      [-10,.55, 10,3,1.1,3,0x686050],[ 10,.55, 10,3,1.1,3,0x686050],
+      [-16,.55,-5, 1,1.1,6,0x5A5040],[16,.55,-5,1,1.1,6,0x5A5040],
+      [0,.55,-18, 10,1.1,.8,0x5A5040],
+
+      // ── 二楼掩体（cy=9.5，玩家在二楼y≈8.9时为腰高掩体）──
+      [-25.6,9.5, 0,  3.2,2.0, 10,0x4A3A2A],
+      [ 25.6,9.5, 0,  3.2,2.0, 10,0x4A3A2A],
+      [0,9.5,-25.6, 10,2.0, 3.2,0x4A3A2A],
+      [0,9.5, 20,   10,2.0, 3.2,0x4A3A2A],
     ],
-    L:[{x:0,y:6,z:-16,i:1.1,c:0xFFEE88,d:28},{x:-12,y:5,z:0,i:.7,c:0xCCFF88,d:24},
-       {x:12,y:5,z:0,i:.7,c:0xCCFF88,d:24},{x:0,y:6,z:12,i:.6,c:0xDDFF99,d:22},
-       {x:0,y:5,z:-24,i:.8,c:0xFFDD66,d:22}],
+    L:[
+      {x:0,y:4,z:0,i:1.0,c:0xFFEE88,d:35},
+      {x:-18,y:9,z:0,i:.7,c:0xFFCC66,d:22},
+      {x:18,y:9,z:0,i:.7,c:0xFFCC66,d:22},
+      {x:0,y:9,z:-18,i:.7,c:0xDDEEFF,d:22},
+      {x:0,y:9,z:18,i:.6,c:0xFFEEDD,d:20},
+    ],
   },
 ];
 
@@ -489,27 +517,6 @@ function _schedMusic(){
 }
 
 // ─────────────────────────────────────────────────────────────
-// VOICE LINES (Web Speech API)
-// ─────────────────────────────────────────────────────────────
-const _zhVoices=[];
-if(window.speechSynthesis){
-  const _lv=()=>{speechSynthesis.getVoices().forEach(v=>{if(v.lang.startsWith('zh')&&!_zhVoices.includes(v))_zhVoices.push(v);});};
-  _lv(); speechSynthesis.onvoiceschanged=_lv;
-}
-let _lastSpeakT=0;
-function speak(text,force){
-  if(!window.speechSynthesis) return;
-  const now=Date.now();
-  if(!force&&now-_lastSpeakT<1800) return;
-  _lastSpeakT=now;
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang='zh-CN'; u.rate=1.05; u.pitch=1.0; u.volume=.75;
-  if(_zhVoices.length>0) u.voice=_zhVoices[0];
-  speechSynthesis.speak(u);
-}
-
-// ─────────────────────────────────────────────────────────────
 // GAME STATE
 // ─────────────────────────────────────────────────────────────
 let GS = 'menu';   // menu | playing | paused | gameover
@@ -545,6 +552,26 @@ let lastFire = 0;
 let bobT = 0, bobAmt = 0;
 let stepT = 0;
 let aiming = false;
+let shakeAmt = 0;
+let singBullets = [];
+let laserBeam = null;
+let _ramp = null;
+
+function triggerShake(intensity) { shakeAmt = Math.max(shakeAmt, intensity); }
+
+function showDmgNumber(worldPos, dmg, isHead) {
+  const v = worldPos.clone().project(CAM);
+  if(v.z > 1) return;
+  const sx = (v.x*.5+.5)*innerWidth;
+  const sy = (-v.y*.5+.5)*innerHeight;
+  const d = document.createElement('div');
+  d.className = 'dmgnum' + (isHead ? ' head' : dmg >= 60 ? ' big' : '');
+  d.textContent = (isHead ? '💀 ' : '-') + Math.round(dmg);
+  d.style.left = (sx + (Math.random()-.5)*30) + 'px';
+  d.style.top  = sy + 'px';
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 900);
+}
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -610,6 +637,7 @@ document.addEventListener('keydown', e => {
     case 'Digit4':  switchW(3); break;
     case 'Digit5':  switchW(4); break;
     case 'Digit6':  switchW(5); break;
+    case 'Digit7':  switchW(6); break;
   }
 });
 document.addEventListener('keyup', e => { keys[e.code] = false; });
@@ -635,8 +663,11 @@ function buildMap(idx) {
   for(let i = S3.children.length-1; i >= 0; i--)
     if(S3.children[i] !== CAM) S3.remove(S3.children[i]);
   colBoxes = [];
+  enemies.forEach(en=>{ if(en.label){en.label.remove();en.label=null;} });
   enemies = []; bullets = []; grenades = []; parts = [];
-
+  singBullets.forEach(s=>S3.remove(s.mesh)); singBullets=[];
+  if(laserBeam){ S3.remove(laserBeam.group); laserBeam=null; }
+  _ramp = null;
   const m = MAPS[idx]; curMap = m;
   S3.fog = new THREE.Fog(m.fog, m.fn, m.ff);
   S3.background = new THREE.Color(m.fog);
@@ -671,22 +702,97 @@ function buildMap(idx) {
     mesh.position.set(cx,cy,cz); mesh.castShadow=true; mesh.receiveShadow=true; S3.add(mesh);
     colBoxes.push({x1:cx-ww/2, x2:cx+ww/2, y1:cy-wh/2, y2:cy+wh/2, z1:cz-wd/2, z2:cz+wd/2});
   });
+  // 螺旋坡道（如果地图定义了 ramp 字段）
+  if(m.ramp) buildRamp(m.ramp);
+}
+
+// 生成螺旋坡道：绕地图内壁一圈，从 y=0 爬升到 y=height
+function buildRamp(r) {
+  _ramp = r; // 保存参数供 rampFloorAt 使用
+  const {innerR,width,height,stepsPerSide,color} = r;
+  const STEP_H=0.30; // 每个踏板厚度
+  const totalSteps=stepsPerSide*4;
+  const stepLen=(innerR*2)/stepsPerSide - 0.2; // 每段长度（留0.2缝隙）
+
+  // 4条边: [固定轴, 固定坐标center, 行进轴, 起始方向, 起始值]
+  // 顺序：西(z↓)→北(x↑)→东(z↑)→南(x↓)，从西南角(z=22)起始
+  const sides=[
+    {fix:'x', fc:-(innerR+width/2), mov:'z', startV: innerR, sign:-1},  // 西
+    {fix:'z', fc:-(innerR+width/2), mov:'x', startV:-innerR, sign: 1},  // 北
+    {fix:'x', fc: (innerR+width/2), mov:'z', startV:-innerR, sign: 1},  // 东
+    {fix:'z', fc: (innerR+width/2), mov:'x', startV: innerR, sign:-1},  // 南
+  ];
+
+  const mat=new THREE.MeshLambertMaterial({color});
+
+  for(let i=0;i<totalSteps;i++){
+    const si=Math.floor(i/stepsPerSide), li=i%stepsPerSide;
+    const h_top=(i+1)*height/totalSteps;
+    const cy=h_top-STEP_H/2;
+    const {fix,fc,mov,startV,sign}=sides[si];
+    const movCenter=startV+sign*stepLen*(li+0.5);
+
+    let cx,cz,wx,wz;
+    if(fix==='x'){ cx=fc; cz=movCenter; wx=width; wz=stepLen; }
+    else          { cz=fc; cx=movCenter; wz=width; wx=stepLen; }
+
+    const mesh=new THREE.Mesh(new THREE.BoxGeometry(wx,STEP_H,wz),mat);
+    mesh.position.set(cx,cy,cz); mesh.receiveShadow=true; S3.add(mesh);
+    // 不加碰撞盒：由 rampFloorAt 提供连续高度，消除接缝卡顿
+  }
+
+  // 4个转角连接块
+  const corners=[
+    [-(innerR+width/2),-(innerR+width/2),stepsPerSide],
+    [ (innerR+width/2),-(innerR+width/2),stepsPerSide*2],
+    [ (innerR+width/2), (innerR+width/2),stepsPerSide*3],
+    [-(innerR+width/2), (innerR+width/2),stepsPerSide*4],
+  ];
+  for(const [cx,cz,atStep] of corners){
+    const h_top=atStep*height/totalSteps;
+    const cy=h_top-STEP_H/2;
+    const mesh=new THREE.Mesh(new THREE.BoxGeometry(width+0.1,STEP_H,width+0.1),mat);
+    mesh.position.set(cx,cy,cz); S3.add(mesh);
+    // 转角也不加碰撞盒，由 rampFloorAt 处理
+  }
+
+  // 二楼环形平台（高度=height，厚0.35）
+  const platH=height, platTh=0.35, platMat=new THREE.MeshLambertMaterial({color:0x5A4A3A});
+  const platW=width+0.1;
+  const platLen=innerR*2+width+0.1;
+  const pBoxes=[
+    {cx:-(innerR+width/2), cz:0,              wx:platW, wz:platLen},
+    {cx:  innerR+width/2,  cz:0,              wx:platW, wz:platLen},
+    {cx:0, cz:-(innerR+width/2),              wx:platLen, wz:platW},
+    {cx:0, cz:  innerR+width/2,               wx:platLen, wz:platW},
+  ];
+  for(const {cx,cz,wx,wz} of pBoxes){
+    const cy=platH-platTh/2;
+    const pm=new THREE.Mesh(new THREE.BoxGeometry(wx,platTh,wz),platMat);
+    pm.position.set(cx,cy,cz); pm.receiveShadow=true; S3.add(pm);
+    colBoxes.push({x1:cx-wx/2,x2:cx+wx/2,y1:platH-platTh,y2:platH,z1:cz-wz/2,z2:cz+wz/2,ramp:true});
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
 // COLLISION
 // ─────────────────────────────────────────────────────────────
 function resolvePlayer() {
-  const r = C.PR, p = PL.pos;
-  for(const b of colBoxes) {
-    const ex1=b.x1-r, ex2=b.x2+r, ez1=b.z1-r, ez2=b.z2+r;
-    if(p.x > ex1 && p.x < ex2 && p.z > ez1 && p.z < ez2) {
-      // Vertical check: player occupies y ∈ [pos.y - C.PH, pos.y + 0.1]
-      if((p.y - C.PH) < b.y2 && (p.y + 0.1) > b.y1) {
-        const oNX=p.x-ex1, oPX=ex2-p.x, oNZ=p.z-ez1, oPZ=ez2-p.z;
-        const mn=Math.min(oNX,oPX,oNZ,oPZ);
-        if(mn===oNX) p.x=ex1; else if(mn===oPX) p.x=ex2;
-        else if(mn===oNZ) p.z=ez1; else p.z=ez2;
+  const r=C.PR, p=PL.pos, STEP=0.65;
+  for(const b of colBoxes){
+    if(b.ramp) continue; // 坡道高度由 rampFloorAt 处理，不参与横向推挤
+    const ex1=b.x1-r,ex2=b.x2+r,ez1=b.z1-r,ez2=b.z2+r;
+    if(p.x>ex1&&p.x<ex2&&p.z>ez1&&p.z<ez2){
+      if((p.y-C.PH)<b.y2&&(p.y+0.1)>b.y1){
+        const stepDiff=b.y2-(p.y-C.PH);
+        if(stepDiff>0&&stepDiff<=STEP&&PL.grnd){
+          p.y=b.y2+C.PH; // 自动跨上台阶
+        } else {
+          const oNX=p.x-ex1,oPX=ex2-p.x,oNZ=p.z-ez1,oPZ=ez2-p.z;
+          const mn=Math.min(oNX,oPX,oNZ,oPZ);
+          if(mn===oNX)p.x=ex1; else if(mn===oPX)p.x=ex2;
+          else if(mn===oNZ)p.z=ez1; else p.z=ez2;
+        }
       }
     }
   }
@@ -697,18 +803,66 @@ function wallAt(x, z, r) {
     if(x > b.x1-r && x < b.x2+r && z > b.z1-r && z < b.z2+r) return true;
   return false;
 }
+// 地面实体专用：忽略坡道平台，不让地面AI被高空薄板挡住
+function wallAtGround(x, z, r) {
+  for(const b of colBoxes)
+    if(!b.ramp && x > b.x1-r && x < b.x2+r && z > b.z1-r && z < b.z2+r) return true;
+  return false;
+}
 function inWall(x, y, z) {
   for(const b of colBoxes)
     if(x > b.x1 && x < b.x2 && y > b.y1 && y < b.y2 && z > b.z1 && z < b.z2) return true;
   return false;
 }
 
+// 连续斜坡高度函数：替代阶梯式碰撞盒，消除接缝卡顿
+function rampFloorAt(px, pz) {
+  if(!_ramp) return 0;
+  const {innerR:ir, width:wr, height:H} = _ramp;
+  const onWest = px >= -(ir+wr) && px <= -ir;
+  const onEast = px >= ir && px <= ir+wr;
+  const onNorth = pz >= -(ir+wr) && pz <= -ir;
+  const onSouth = pz >= ir && pz <= ir+wr;
+  const midX = px > -ir && px < ir;
+  const midZ = pz > -ir && pz < ir;
+  // 四条直线段
+  if(onWest && midZ) return Math.max(0, (ir - pz) / (2*ir) * H * 0.25);
+  if(onNorth && midX) return H*0.25 + (px + ir) / (2*ir) * H * 0.25;
+  if(onEast && midZ)  return H*0.5  + (pz + ir) / (2*ir) * H * 0.25;
+  if(onSouth && midX) return H*0.75 + (ir - px) / (2*ir) * H * 0.25;
+  // 四个转角（固定高度）
+  if(onWest && onNorth) return H * 0.25;
+  if(onEast && onNorth) return H * 0.5;
+  if(onEast && onSouth) return H * 0.75;
+  if(onWest && onSouth) return H;
+  return 0;
+}
+
 // ─────────────────────────────────────────────────────────────
 // WEAPON VIEW MODEL
 // ─────────────────────────────────────────────────────────────
+function makeSingWpMesh() {
+  const g=new THREE.Group();
+  function b(col,w,h,dep,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,dep),new THREE.MeshLambertMaterial({color:col}));m.position.set(x,y,z);g.add(m);}
+  b(0x1a0040,.11,.10,.62, 0, 0,.04);        // 主管
+  b(0x330066,.14,.13,.18, 0, 0,.16);        // 后部炮身
+  b(0x220055,.09,.09,.82, 0, 0,-.10);       // 延伸管
+  b(0x9900ff,.16,.16,.08, 0, 0,-.42);       // 炮口扩散环
+  const core=new THREE.Mesh(new THREE.SphereGeometry(.07,8,8),new THREE.MeshBasicMaterial({color:0xcc44ff}));
+  core.position.set(0,0,-.38); g.add(core);
+  const gw=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),new THREE.MeshBasicMaterial({color:0x8800cc,transparent:true,opacity:.4}));
+  gw.position.set(0,0,-.38); g.add(gw);
+  b(0x1a0040,.05,.16,.07, 0,-.095,.12);    // 握把
+  g.position.set(.19,-.175,-.38); g.rotation.y=Math.PI;
+  CAM.add(g); wpMesh=g;
+}
+
 function makeWpMesh(idx) {
   if(wpMesh) { CAM.remove(wpMesh); wpMesh = null; }
+  const wi=PL.wpns[idx];
+  if(wi && wi.singularity) { makeSingWpMesh(); return; }
   const d = WD[idx];
+  if(!d) return;
   const g = new THREE.Group();
 
   function b(col, w, h, dep, x, y, z, rx, rz) {
@@ -848,15 +1002,15 @@ function makeEnMesh(type) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
     m.position.set(x,y,z); m.castShadow=true; g.add(m); return m;
   }
-  box(bm,.72*s,1.1*s,.46*s, 0,.55*s,0);          // body  [0]
-  box(hm,.56*s,.56*s,.56*s, 0,1.42*s,0);          // head  [1]
+  box(bm,.72*s,1.1*s,.46*s, 0,.55*s,0).userData.part='body';   // [0]
+  box(hm,.56*s,.56*s,.56*s, 0,1.42*s,0).userData.part='head';  // [1]
   const em = new THREE.MeshBasicMaterial({color:0xff1800});
-  box(em,.1*s,.08*s,.04*s, -.13*s,1.44*s,.29*s);  // eye L [2]
-  box(em,.1*s,.08*s,.04*s,  .13*s,1.44*s,.29*s);  // eye R [3]
-  box(bm,.18*s,.72*s,.18*s,-.47*s,.55*s,0);        // arm L [4]
-  box(bm,.18*s,.72*s,.18*s, .47*s,.55*s,0);        // arm R [5]
-  box(bm,.26*s,.72*s,.26*s,-.2*s,-.36*s,0);        // leg L [6]
-  box(bm,.26*s,.72*s,.26*s, .2*s,-.36*s,0);        // leg R [7]
+  box(em,.1*s,.08*s,.04*s, -.13*s,1.44*s,.29*s).userData.part='head'; // eye L [2]
+  box(em,.1*s,.08*s,.04*s,  .13*s,1.44*s,.29*s).userData.part='head'; // eye R [3]
+  box(bm,.18*s,.72*s,.18*s,-.47*s,.55*s,0).userData.part='arm'; // arm L [4]
+  box(bm,.18*s,.72*s,.18*s, .47*s,.55*s,0).userData.part='arm'; // arm R [5]
+  box(bm,.26*s,.72*s,.26*s,-.2*s,-.36*s,0).userData.part='leg'; // leg L [6]
+  box(bm,.26*s,.72*s,.26*s, .2*s,-.36*s,0).userData.part='leg'; // leg R [7]
 
   // HP bar background
   const hbg = new THREE.Mesh(new THREE.PlaneGeometry(1*s,.1*s), new THREE.MeshBasicMaterial({color:0x330000,side:THREE.DoubleSide}));
@@ -869,12 +1023,48 @@ function makeEnMesh(type) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// FLYER MESH
+// ─────────────────────────────────────────────────────────────
+function makeFlyerMesh(def) {
+  const s=def.sz, g=new THREE.Group();
+  const bm=new THREE.MeshLambertMaterial({color:def.bc});
+  const hm2=new THREE.MeshLambertMaterial({color:def.hc});
+  const em2=new THREE.MeshBasicMaterial({color:0xff0000});
+  function box(mat,w,h,d,x,y,z,part){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+    m.position.set(x,y,z); m.castShadow=true;
+    if(part) m.userData.part=part; g.add(m); return m;
+  }
+  // 躯干
+  box(bm,.55*s,.32*s,.65*s, 0,0,0,'body');
+  // 头部（前方）
+  box(hm2,.38*s,.34*s,.38*s, 0,.08*s,-.48*s,'head');
+  // 眼睛
+  box(em2,.1*s,.09*s,.04*s, -.11*s,.14*s,-.67*s,'head');
+  box(em2,.1*s,.09*s,.04*s,  .11*s,.14*s,-.67*s,'head');
+  // 翅膀（会动，存在children[4]和[5]）
+  const wingMat=new THREE.MeshLambertMaterial({color:0x0d0820,transparent:true,opacity:.88});
+  box(wingMat,.9*s,.04*s,.45*s, -.72*s,.04*s,.05*s,'arm'); // [4] 左翼
+  box(wingMat,.9*s,.04*s,.45*s,  .72*s,.04*s,.05*s,'arm'); // [5] 右翼
+  // 翅膀爪尖
+  box(bm,.06*s,.18*s,.06*s, -1.18*s,-.06*s,-.08*s,'arm');
+  box(bm,.06*s,.18*s,.06*s,  1.18*s,-.06*s,-.08*s,'arm');
+  // HP bar
+  const hbg=new THREE.Mesh(new THREE.PlaneGeometry(1*s,.1*s),new THREE.MeshBasicMaterial({color:0x330000,side:THREE.DoubleSide}));
+  hbg.position.y=.9*s; hbg.name='hbg'; g.add(hbg);
+  const hbf=new THREE.Mesh(new THREE.PlaneGeometry(1*s,.1*s),new THREE.MeshBasicMaterial({color:0x00ee44,side:THREE.DoubleSide}));
+  hbf.position.y=.9*s; hbf.position.z=.001; hbf.name='hbf'; g.add(hbf);
+  return g;
+}
+
+// ─────────────────────────────────────────────────────────────
 // SPAWN ENEMY
 // ─────────────────────────────────────────────────────────────
 function spawnEnemy(type, px, pz) {
   const def = ED[type];
-  const mesh = makeEnMesh(type);
-  mesh.position.set(px, 0, pz);
+  const mesh = type==='flyer' ? makeFlyerMesh(def) : makeEnMesh(type);
+  const startY = def.flyH || 0;
+  mesh.position.set(px, startY, pz);
   S3.add(mesh);
   const hpSc = 1 + (waveNum-1)*.14;
   enemies.push({
@@ -885,6 +1075,10 @@ function spawnEnemy(type, px, pz) {
     sc:def.sc, melee:def.melee,
     legT:Math.random()*Math.PI*2,
     dead:false, stagger:0,
+    label:null,
+    strafeDir:1, strafeCd:Math.random()*1.5,
+    chargeCd:3+Math.random()*4, chargeEnd:0,
+    flyT:Math.random()*Math.PI*2, swooping:false,
   });
 }
 
@@ -901,7 +1095,14 @@ function spawnWave(n) {
       spawnEnemy(type,px,pz);
     }
   });
-  speak('第'+n+'波，注意！',true);
+  // 每5波额外生成1个巨人BOSS
+  if(n%5===0) {
+    let px,pz,tries=0;
+    do { px=ez.x1+Math.random()*(ez.x2-ez.x1); pz=ez.z1+Math.random()*(ez.z2-ez.z1); tries++; }
+    while(wallAt(px,pz,1.5) && tries<30);
+    spawnEnemy('giant',px,pz);
+    setTimeout(()=>notify('⚡ 巨人BOSS降临！'), 600);
+  }
   showWaveAnn(n);
 }
 
@@ -955,12 +1156,24 @@ function shoot() {
   snd(smap[wi.id]||'pistol', .38);
   muzzleFlashFX();
 
-  // Magic projectile
-  if(wi.proj) {
+  // Singularity projectile
+  if(wi.singularity) {
     CAM.getWorldDirection(_dir);
-    spawnMagicProj(PL.pos.clone(), _dir);
-    updAmmoUI(); return;
+    spawnSingularity(PL.pos.clone(), _dir);
+    updAmmoUI();
+    if(wi.ammo<=0) setTimeout(()=>{
+      if(PL.wpns[6]&&PL.wpns[6].ammo<=0){
+        PL.wpns[6]=undefined;
+        const ws6=el('ws6'); if(ws6) ws6.style.display='none';
+        if(PL.curW===6) switchW(0);
+        notify('奇点炮已耗尽！');
+        updAmmoUI();
+      }
+    }, 4200);
+    return;
   }
+  // Laser handled by updLaser, not shoot()
+  if(wi.laser) return;
 
   // Hitscan
   const allMesh = [];
@@ -975,7 +1188,11 @@ function shoot() {
     if(hits.length > 0) {
       const hm2 = hits[0].object;
       const hitEn = enemies.find(en => { let f=false; en.mesh.traverse(c=>{ if(c===hm2) f=true; }); return f; });
-      if(hitEn && !hitEn.dead) dmgEnemy(hitEn, wi.dmg, hits[0].point);
+      if(hitEn && !hitEn.dead) {
+        const part = hm2.userData.part || 'body';
+        const mult = {head:2.5, body:1.0, arm:0.7, leg:0.5}[part] || 1.0;
+        dmgEnemy(hitEn, wi.dmg*mult, hits[0].point, part);
+      }
     }
     if(p===0) spawnTrail(PL.pos.clone(), _dir, wi.rng);
   }
@@ -1001,7 +1218,7 @@ function spawnEnBullet(pos, dir, dmg) {
 // ─────────────────────────────────────────────────────────────
 // DAMAGE
 // ─────────────────────────────────────────────────────────────
-function dmgEnemy(en, dmg, pt) {
+function dmgEnemy(en, dmg, pt, part) {
   en.hp -= dmg; en.stagger = .14;
   const hbf = en.mesh.getObjectByName('hbf');
   if(hbf) {
@@ -1010,35 +1227,42 @@ function dmgEnemy(en, dmg, pt) {
     hbf.position.x = -(1-r)*.5*en.def.sz;
     hbf.material.color.setHex(r>.5?0x00ee44:r>.25?0xffaa00:0xff2200);
   }
-  showHitMark(); snd('hit',.22);
-  if(pt) spawnParts(pt, 0xaa0000, 5, 3.5);
+  showHitMark(); snd('hit',.26);
+  if(pt) {
+    const isHead = part==='head';
+    spawnParts(pt, isHead?0xff3300:0xaa0000, isHead?12:7, isHead?5.5:4.2);
+    showDmgNumber(pt, dmg, isHead);
+    if(isHead) notify('💀 爆头！');
+  }
+  triggerShake(dmg >= 80 ? 0.07 : dmg >= 40 ? 0.042 : 0.022);
   if(en.hp <= 0) killEnemy(en);
 }
 
-const _killLines=['消灭一个！','干掉了！','精准！','继续！','好样的！'];
 function killEnemy(en) {
   en.dead = true;
   score += en.sc; updScoreUI();
   snd('death',.28);
-  spawnParts(en.mesh.position.clone().setY(1), 0xaa0000, 14, 4.5);
+  spawnParts(en.mesh.position.clone().setY(1), 0xaa0000, 22, 5.5);
+  spawnParts(en.mesh.position.clone().setY(1.2), 0xff3300, 10, 7.0);
+  if(en.label){ en.label.remove(); en.label=null; }
   addKF(en.type); S3.remove(en.mesh);
-  speak(_killLines[Math.floor(Math.random()*_killLines.length)]);
+  triggerShake(0.07);
 }
 
-function splash(pos, dmg, rad) {
+function splash(pos, dmg, rad, noSelf) {
   enemies.forEach(en => {
     if(!en.dead) { const d=en.mesh.position.distanceTo(pos); if(d<rad) dmgEnemy(en,dmg*(1-d/rad),pos.clone()); }
   });
-  const dp = PL.pos.distanceTo(pos);
-  if(dp < rad) dmgPlayer(dmg*.5*(1-dp/rad));
+  if(!noSelf) {
+    const dp = PL.pos.distanceTo(pos);
+    if(dp < rad) dmgPlayer(dmg*.5*(1-dp/rad));
+  }
 }
 
-const _dmgLines=['受伤了！','注意！','撤！','掩护！'];
 function dmgPlayer(amt) {
   if(PL.dmgCooldown>0) return;
   PL.hp = Math.max(0, PL.hp - amt);
   PL.dmgCooldown = .12;
-  speak(_dmgLines[Math.floor(Math.random()*_dmgLines.length)]);
   el('dmg').style.boxShadow = 'inset 0 0 80px rgba(255,0,0,.65)';
   setTimeout(()=> el('dmg').style.boxShadow='', 160);
   updHpUI();
@@ -1140,11 +1364,26 @@ function updPlayer(dt) {
   PL.pos.x+=PL.vel.x*dt; PL.pos.z+=PL.vel.z*dt;
   resolvePlayer();
   PL.pos.y+=PL.vel.y*dt;
-  if(PL.pos.y<=C.PH) { PL.pos.y=C.PH; PL.vel.y=0; PL.grnd=true; } else PL.grnd=false;
+  // 支持多层平台：扫描脚下最高地面
+  let bestGround=0;
+  const feetY=PL.pos.y-C.PH;
+  for(const b of colBoxes){
+    if(PL.pos.x>b.x1&&PL.pos.x<b.x2&&PL.pos.z>b.z1&&PL.pos.z<b.z2&&b.y2<=feetY+0.05&&b.y2>bestGround) bestGround=b.y2;
+  }
+  // 连续斜坡高度（无接缝）
+  const rampH=rampFloorAt(PL.pos.x,PL.pos.z);
+  if(rampH>0 && rampH<=feetY+0.5) bestGround=Math.max(bestGround,rampH);
+  const effFloor=bestGround+C.PH;
+  if(PL.pos.y<=effFloor){PL.pos.y=effFloor;PL.vel.y=0;PL.grnd=true;} else PL.grnd=false;
 
   // Camera position
   CAM.position.copy(PL.pos);
   CAM.position.y += Math.sin(bobT)*.04*bobAmt;
+  if(shakeAmt > 0.001) {
+    CAM.position.x += (Math.random()-.5)*shakeAmt;
+    CAM.position.y += (Math.random()-.5)*shakeAmt;
+    shakeAmt *= 0.82;
+  }
 
   // Gatling spinup
   const wi=PL.wpns[PL.curW];
@@ -1199,45 +1438,136 @@ function updEnemies(dt) {
 
     _tp.copy(PL.pos).sub(en.mesh.position); _tp.y=0;
     const dist=_tp.length();
+    const dist3d=PL.pos.distanceTo(en.mesh.position);
 
-    en.mesh.lookAt(PL.pos.x, en.mesh.position.y, PL.pos.z);
-
-    // HP bars face camera
+    if(en.type!=='flyer') en.mesh.lookAt(PL.pos.x, en.mesh.position.y, PL.pos.z);
     en.mesh.getObjectByName('hbf')?.lookAt(CAM.position);
     en.mesh.getObjectByName('hbg')?.lookAt(CAM.position);
 
     if(en.stagger>0) { en.stagger-=dt; }
 
-    if(dist <= en.ar) {
-      // Attack
+    // ── Attack ──────────────────────────────────────────────
+    const atkDist = en.type==='flyer' ? dist3d : dist;
+    if(atkDist <= en.ar) {
       en.atkT -= dt*1000;
       if(en.atkT<=0) {
         en.atkT=en.atk;
         if(en.melee) {
           dmgPlayer(en.dmg);
+        } else if(en.type==='giant') {
+          // 巨人：扇形8发，大力震屏
+          const base=_tp.clone().normalize();
+          base.y=(PL.pos.y-en.mesh.position.y-1.2)/dist;
+          base.normalize();
+          for(let bi=0;bi<8;bi++){
+            const bd=base.clone();
+            bd.x+=(Math.random()-.5)*0.45;
+            bd.y+=(Math.random()-.5)*0.18;
+            bd.z+=(Math.random()-.5)*0.45;
+            bd.normalize();
+            spawnEnBullet(en.mesh.position.clone().setY(en.mesh.position.y+2.6), bd, en.dmg);
+          }
+          triggerShake(0.12); snd('explode',0.28);
+          spawnParts(en.mesh.position.clone().setY(1),0xff2200,10,4);
         } else {
+          // Soldiers lead their shots slightly toward player velocity
           const bd=_tp.clone().normalize();
           bd.y=(PL.pos.y-en.mesh.position.y-.5)/dist;
+          // Add slight aim randomness based on distance
+          bd.x+=(Math.random()-.5)*0.04*(dist/en.ar);
+          bd.z+=(Math.random()-.5)*0.04*(dist/en.ar);
+          bd.normalize();
           spawnEnBullet(en.mesh.position.clone().setY(en.mesh.position.y+1.4*en.def.sz), bd, en.dmg);
         }
       }
-    } else if(en.stagger<=0) {
-      // Move toward player
-      const nd=_tp.clone().normalize();
-      const nx=en.mesh.position.x+nd.x*en.spd*dt;
-      const nz=en.mesh.position.z+nd.z*en.spd*dt;
-      if(!wallAt(nx,nz,.52)) { en.mesh.position.x=nx; en.mesh.position.z=nz; }
-      else if(!wallAt(nx,en.mesh.position.z,.52)) en.mesh.position.x=nx;
-      else if(!wallAt(en.mesh.position.x,nz,.52)) en.mesh.position.z=nz;
-
-      // Leg anim
-      en.legT+=dt*en.spd*2.8;
-      const ll=en.mesh.children[6], rl=en.mesh.children[7];
-      const la=en.mesh.children[4], ra=en.mesh.children[5];
-      if(ll) { ll.rotation.x=Math.sin(en.legT)*.55; rl.rotation.x=-Math.sin(en.legT)*.55; }
-      if(la) { la.rotation.x=-Math.sin(en.legT)*.45; ra.rotation.x=Math.sin(en.legT)*.45; }
     }
-    en.mesh.position.y=0;
+
+    // ── Movement ─────────────────────────────────────────────
+    const meleeStop = en.melee && dist <= en.ar;
+    if(en.stagger<=0 && !meleeStop) {
+      const nd=_tp.clone().normalize();
+      let moveSpd=en.spd;
+
+      // 巨人：偶尔重步冲刺
+      if(en.type==='giant') {
+        en.chargeCd=(en.chargeCd||8+Math.random()*5)-dt;
+        if(en.chargeCd<=0 && dist<30 && dist>en.ar) {
+          en.chargeCd=8+Math.random()*5; en.chargeEnd=0.8;
+          spawnParts(en.mesh.position.clone().setY(.5),0xff4400,14,5);
+          triggerShake(0.07);
+        }
+        if(en.chargeEnd>0){ en.chargeEnd-=dt; if(en.chargeEnd>0) moveSpd*=2.8; }
+      }
+
+      // BOSS: occasional charge burst
+      if(en.type==='tank') {
+        en.chargeCd=(en.chargeCd||5+Math.random()*3)-dt;
+        if(en.chargeCd<=0 && dist<18 && dist>en.ar) {
+          en.chargeCd=5+Math.random()*4; en.chargeEnd=1.1;
+          spawnParts(en.mesh.position.clone().setY(.5),0xff2200,6,3.5);
+        }
+        if(en.chargeEnd>0){ en.chargeEnd-=dt; if(en.chargeEnd>0) moveSpd*=3.2; }
+      }
+
+      // Runner: zigzag perpendicular to approach
+      if(en.type==='runner') {
+        const perp=new THREE.Vector3(-nd.z,0,nd.x);
+        nd.addScaledVector(perp, Math.sin(en.legT*3.2)*0.85).normalize();
+      }
+
+      // Soldier: strafe at combat range + prefer medium distance
+      if(en.type==='soldier') {
+        en.strafeCd=(en.strafeCd||0)-dt;
+        if(en.strafeCd<=0){ en.strafeDir=(Math.random()<.5?1:-1); en.strafeCd=0.9+Math.random()*1.4; }
+        if(dist < en.ar*2.8) {
+          const perp=new THREE.Vector3(-nd.z,0,nd.x);
+          nd.addScaledVector(perp, en.strafeDir*1.3).normalize();
+          if(dist < en.ar*0.85) nd.multiplyScalar(-0.6); // back off if too close
+        }
+      }
+
+      // Separation: push away from nearby enemies to avoid clumping
+      for(const other of enemies) {
+        if(other===en||other.dead) continue;
+        const dx=en.mesh.position.x-other.mesh.position.x;
+        const dz=en.mesh.position.z-other.mesh.position.z;
+        const d2=dx*dx+dz*dz, sepR=1.5;
+        if(d2<sepR*sepR && d2>0.001){
+          const d=Math.sqrt(d2); nd.x+=dx/d*(sepR-d)/sepR*0.65; nd.z+=dz/d*(sepR-d)/sepR*0.65;
+        }
+      }
+
+      const nx=en.mesh.position.x+nd.x*moveSpd*dt;
+      const nz=en.mesh.position.z+nd.z*moveSpd*dt;
+      if(!wallAtGround(nx,nz,.52)){ en.mesh.position.x=nx; en.mesh.position.z=nz; }
+      else if(!wallAtGround(nx,en.mesh.position.z,.52)) en.mesh.position.x=nx;
+      else if(!wallAtGround(en.mesh.position.x,nz,.52)) en.mesh.position.z=nz;
+
+      if(en.type!=='flyer') {
+        en.legT+=dt*en.spd*2.8;
+        const ll=en.mesh.children[6],rl=en.mesh.children[7],la=en.mesh.children[4],ra=en.mesh.children[5];
+        if(ll){ll.rotation.x=Math.sin(en.legT)*.55; rl.rotation.x=-Math.sin(en.legT)*.55;}
+        if(la){la.rotation.x=-Math.sin(en.legT)*.45; ra.rotation.x=Math.sin(en.legT)*.45;}
+      }
+    }
+
+    // 飞行怪专属：高度 + 翅膀扑打动画
+    if(en.type==='flyer') {
+      en.flyT+=dt;
+      const hDist=dist; // dist已是水平距离
+      // 目标高度：靠近时俯冲，否则巡航
+      const targetY = hDist < 5 ? 0.8 : en.def.flyH;
+      en.mesh.position.y += (targetY - en.mesh.position.y)*dt*3.5;
+      // 翅膀拍打（children[4]=左翼，children[5]=右翼）
+      const wl=en.mesh.children[4], wr=en.mesh.children[5];
+      const flapAmt = hDist<5 ? 1.1 : 0.6;
+      if(wl) wl.rotation.z= 0.15+Math.sin(en.flyT*10)*flapAmt;
+      if(wr) wr.rotation.z=-0.15-Math.sin(en.flyT*10)*flapAmt;
+      // 对准玩家（含高度）
+      en.mesh.lookAt(PL.pos);
+    } else {
+      en.mesh.position.y=0;
+    }
   }
 }
 
@@ -1296,6 +1626,201 @@ function updGrenades(dt) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// SUPPLY CRATE SYSTEM
+// ─────────────────────────────────────────────────────────────
+function grantSingularity() {
+  const existing=PL.wpns[6];
+  if(existing && existing.singularity) {
+    existing.ammo=Math.min(existing.ammo+3, existing.mag);
+    notify('⚡ 奇点炮补充 3 发！');
+  } else {
+    PL.wpns[6]={
+      id:'singularity', nm:'奇点炮',
+      dmg:300, fr:2200, rl:0,
+      mag:5, ammo:5, res:0, tot:5,
+      sp:0, auto:false, pel:1, rng:999,
+      mc:0x220044, bl:.9,
+      reloading:false, recoil:0, singularity:true,
+    };
+    const ws6=el('ws6'); if(ws6) ws6.style.display='flex';
+    notify('⚡ 获得奇点炮！[5发] 按 7 切换');
+    switchW(6);
+  }
+  snd('infect',.58); updAmmoUI();
+}
+
+// ─────────────────────────────────────────────────────────────
+// SINGULARITY PROJECTILE
+// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// LASER BEAM
+// ─────────────────────────────────────────────────────────────
+function rayAABBDist(ox,oy,oz,dx,dy,dz,b) {
+  let tmin=0.4, tmax=200;
+  const axes=[[ox,dx,b.x1,b.x2],[oy,dy,b.y1,b.y2],[oz,dz,b.z1,b.z2]];
+  for(const [o,d,lo,hi] of axes){
+    if(Math.abs(d)<1e-8){ if(o<lo||o>hi) return Infinity; continue; }
+    const t1=(lo-o)/d, t2=(hi-o)/d;
+    tmin=Math.max(tmin,Math.min(t1,t2));
+    tmax=Math.min(tmax,Math.max(t1,t2));
+    if(tmax<tmin) return Infinity;
+  }
+  return tmin;
+}
+
+function updLaser(dt) {
+  const wi=PL.wpns[PL.curW];
+  const active=GS==='playing' && wi && wi.laser && mb[0] && locked;
+  if(!active){
+    if(laserBeam){ S3.remove(laserBeam.group); laserBeam=null; }
+    return;
+  }
+
+  CAM.getWorldDirection(_dir);
+  const ox=PL.pos.x, oy=PL.pos.y, oz=PL.pos.z;
+  const dx=_dir.x, dy=_dir.y, dz=_dir.z;
+
+  // 找到激光打到墙的距离
+  let beamLen=80;
+  for(const b of colBoxes){
+    const d=rayAABBDist(ox,oy,oz,dx,dy,dz,b);
+    if(d<beamLen) beamLen=d;
+  }
+
+  // 首次创建光束 mesh
+  if(!laserBeam){
+    const group=new THREE.Group();
+    // 芯（亮）
+    const coreMat=new THREE.MeshBasicMaterial({color:0xff88ff});
+    const core=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,1,8),coreMat);
+    // 中层光晕
+    const midMat=new THREE.MeshBasicMaterial({color:0xcc44ff,transparent:true,opacity:0.40,side:THREE.DoubleSide,depthWrite:false});
+    const mid=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,1,8,1,true),midMat);
+    // 外层宽光晕（视觉范围 = 击打范围参考）
+    const glowMat=new THREE.MeshBasicMaterial({color:0x8800cc,transparent:true,opacity:0.15,side:THREE.DoubleSide,depthWrite:false});
+    const glow=new THREE.Mesh(new THREE.CylinderGeometry(0.60,0.60,1,10,1,true),glowMat);
+    // 命中点光源
+    const hitLgt=new THREE.PointLight(0xff44ff,5,8);
+    group.add(core); group.add(mid); group.add(glow); group.add(hitLgt);
+    S3.add(group);
+    laserBeam={group,core,mid,glow,hitLgt,dmgTimer:0,sndTimer:0};
+  }
+
+  // 激光从玩家前方 1.5 单位处开始，避免圆柱穿进摄像机导致全屏染色
+  const BEAM_NEAR = 1.5;
+  const effLen = Math.max(0.1, beamLen - BEAM_NEAR);
+  const sx = ox+dx*BEAM_NEAR, sy = oy+dy*BEAM_NEAR, sz2 = oz+dz*BEAM_NEAR;
+  const beamDir=_dir.clone().normalize();
+  laserBeam.group.position.set(sx+dx*effLen*0.5, sy+dy*effLen*0.5, sz2+dz*effLen*0.5);
+  laserBeam.group.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), beamDir);
+  laserBeam.core.scale.y=effLen;
+  laserBeam.mid.scale.y=effLen;
+  laserBeam.glow.scale.y=effLen;
+  laserBeam.hitLgt.position.set(0, effLen*0.5, 0);
+
+  // 脉冲动画
+  const pt=performance.now()*0.007;
+  laserBeam.mid.material.opacity=0.35+Math.sin(pt)*0.12;
+  laserBeam.glow.material.opacity=0.12+Math.sin(pt*1.3)*0.06;
+  laserBeam.hitLgt.intensity=4+Math.sin(pt*1.7)*2;
+
+  // 音效（限频）
+  laserBeam.sndTimer-=dt;
+  if(laserBeam.sndTimer<=0){ laserBeam.sndTimer=0.45; snd('staff',0.15); }
+
+  // 伤害 + 粒子（每 80ms 一次）
+  laserBeam.dmgTimer-=dt;
+  if(laserBeam.dmgTimer<=0){
+    laserBeam.dmgTimer=0.08;
+    // 光束路径粒子：沿光束随机3处各1个紫色粒子
+    for(let pi=0;pi<3;pi++){
+      const pt2=BEAM_NEAR+Math.random()*effLen;
+      spawnParts(new THREE.Vector3(ox+dx*pt2, oy+dy*pt2, oz+dz*pt2), 0xcc44ff, 1, 1.2);
+    }
+    const CRAD=0.65;
+    let hitCount=0;
+    for(const en of enemies){
+      if(en.dead) continue;
+      const ex=en.mesh.position.x-ox, ey=en.mesh.position.y-oy, ez=en.mesh.position.z-oz;
+      const t=ex*dx+ey*dy+ez*dz;
+      if(t<0||t>beamLen) continue;
+      const px=ex-t*dx, py=ey-t*dy, pz=ez-t*dz;
+      const perpDist=Math.sqrt(px*px+py*py+pz*pz);
+      if(perpDist < CRAD+(en.def.sz||0.5)*0.35){
+        dmgEnemy(en, wi.dmg, en.mesh.position.clone().setY(1.3));
+        // 命中处爆出粒子
+        if(hitCount<3) spawnParts(new THREE.Vector3(ox+t*dx,oy+t*dy,oz+t*dz),0xff88ff,3,3.5);
+        hitCount++;
+      }
+    }
+  }
+}
+
+function spawnSingularity(origin, dir) {
+  const orb=new THREE.Mesh(new THREE.SphereGeometry(.22,12,12),new THREE.MeshBasicMaterial({color:0x000000}));
+  const glow=new THREE.Mesh(new THREE.SphereGeometry(.44,10,10),new THREE.MeshBasicMaterial({color:0x9900ff,transparent:true,opacity:.55}));
+  const outer=new THREE.Mesh(new THREE.SphereGeometry(.72,8,8),new THREE.MeshBasicMaterial({color:0x5500bb,transparent:true,opacity:.22}));
+  orb.add(glow); orb.add(outer);
+  const sl=new THREE.PointLight(0x9900ff,5.5,11); orb.add(sl);
+  orb.position.copy(origin).addScaledVector(dir,.9);
+  S3.add(orb); snd('staff',.55);
+  singBullets.push({mesh:orb, sLight:sl, vel:dir.clone().multiplyScalar(9), phase:'travel', travelT:0, pullT:0, dmg:PL.wpns[6]?.dmg||300, origin:origin.clone()});
+}
+
+function updSingBullets(dt) {
+  for(let i=singBullets.length-1; i>=0; i--) {
+    const s=singBullets[i];
+    s.mesh.rotation.y+=dt*3.5; s.mesh.rotation.x+=dt*2.1;
+
+    if(s.phase==='travel') {
+      s.mesh.position.addScaledVector(s.vel,dt);
+      s.travelT+=dt;
+      const p=s.mesh.position;
+      const traveled = s.mesh.position.distanceTo(s.origin);
+      if((inWall(p.x,p.y,p.z) && traveled>2.2)||s.travelT>1.3) {
+        s.phase='pull'; s.vel.set(0,0,0);
+        if(s.mesh.position.y<0.6) s.mesh.position.y=0.9;
+        triggerShake(.05); snd('infect',.42);
+      }
+    } else if(s.phase==='pull') {
+      s.pullT+=dt;
+      // 引力拉扯所有敌人
+      for(const en of enemies) {
+        if(en.dead) continue;
+        const diff=s.mesh.position.clone().sub(en.mesh.position);
+        const d=diff.length();
+        if(d<10 && d>0.3) {
+          const force=(1-d/10)*15*dt;
+          en.mesh.position.addScaledVector(diff.normalize(),force);
+          en.mesh.position.y=0;
+        }
+      }
+      // 脉冲震动
+      if(Math.floor(s.pullT*3)>Math.floor((s.pullT-dt)*3)) triggerShake(.022);
+      // 光强脉冲
+      s.sLight.intensity=4+Math.sin(s.pullT*11)*2.5;
+      // 外层扩张
+      const prog=Math.min(s.pullT/2.8,1);
+      s.mesh.children[0].material.opacity=.55+prog*.3;
+      s.mesh.children[1].material.opacity=.22+prog*.25;
+
+      if(s.pullT>2.8) {
+        // 引爆！
+        const pos=s.mesh.position.clone();
+        splash(pos, s.dmg, 11, true);
+        spawnParts(pos.clone().setY(1.0), 0x9900ff, 55, 12);
+        spawnParts(pos.clone().setY(1.0), 0xffffff, 28, 15);
+        spawnParts(pos.clone().setY(.5),  0xcc44ff, 40, 9);
+        snd('explode',.88); triggerShake(.30);
+        const fl=new THREE.PointLight(0xaa00ff,20,26); fl.position.copy(pos); S3.add(fl);
+        setTimeout(()=>S3.remove(fl), 240);
+        S3.remove(s.mesh); singBullets.splice(i,1);
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
 // PARTICLE UPDATE
 // ─────────────────────────────────────────────────────────────
 function updParts(dt) {
@@ -1318,7 +1843,8 @@ function updWave(dt) {
     if(enemies.filter(e=>!e.dead).length===0) {
       wavePhase='wait'; waveTmr=C.WDL;
       notify(`第 ${waveNum} 波清除! 获得补给...`);
-      PL.wpns.forEach(w=>{ if(w.res!==Infinity) w.res=Math.min(w.res+w.mag*2, w.mag*8); });
+      PL.wpns.forEach(w=>{ if(w&&w.res!==Infinity) w.res=Math.min(w.res+w.mag*2, w.mag*8); });
+      if(waveNum%3===0) grantSingularity();
       PL.hp=Math.min(C.MHP, PL.hp+22); updHpUI(); updAmmoUI();
       if(waveNum%3===0) { PL.grenades=Math.min(8,PL.grenades+2); updGrenUI(); notify('+2 手雷!'); }
     }
@@ -1334,6 +1860,29 @@ function updHpUI() {
   const p=PL.hp/C.MHP;
   el('hpfill').style.width=(p*100)+'%';
   el('hpfill').style.background=p<.25?'linear-gradient(to right,#ff0000,#ff4444)':p<.5?'linear-gradient(to right,#ff6600,#ffaa00)':'linear-gradient(to right,#cc2222,#ff6666)';
+  el('hpnum').textContent=Math.ceil(PL.hp)+' / '+C.MHP;
+  el('hpnum').style.color=p<.25?'#ff4444':p<.5?'#ffaa00':'#cc4444';
+}
+
+function updEnLabels() {
+  for(const en of enemies) {
+    if(en.dead) { if(en.label){en.label.remove();en.label=null;} continue; }
+    if(!en.label) {
+      en.label=document.createElement('div');
+      en.label.className='enlbl';
+      document.body.appendChild(en.label);
+    }
+    const pos3d=en.mesh.position.clone();
+    pos3d.y+=(2.8+0.5)*en.def.sz;
+    const v=pos3d.project(CAM);
+    if(v.z>1||v.z<-1){en.label.style.display='none';continue;}
+    en.label.style.display='block';
+    en.label.style.left=((v.x*.5+.5)*innerWidth)+'px';
+    en.label.style.top=((-v.y*.5+.5)*innerHeight)+'px';
+    en.label.textContent=Math.ceil(en.hp)+'/'+Math.ceil(en.maxHp);
+    const r=en.hp/en.maxHp;
+    en.label.style.color=r>.5?'#88ff88':r>.25?'#ffaa00':'#ff4444';
+  }
 }
 function updAmmoUI() {
   const w=PL.wpns[PL.curW]; if(!w) return;
@@ -1344,14 +1893,14 @@ function updAmmoUI() {
   an.classList.toggle('loammo', w.mag!==Infinity && w.ammo<=Math.ceil(w.mag*.25));
 }
 function updScoreUI() { el('sc').textContent='Score: '+score; }
-function updWSlots() { for(let i=0;i<6;i++){const e=el('ws'+i);if(e)e.classList.toggle('act',i===PL.curW);} }
+function updWSlots() { for(let i=0;i<7;i++){const e=el('ws'+i);if(e)e.classList.toggle('act',i===PL.curW);} }
 function updGrenUI() { el('grc').textContent='手雷: '+PL.grenades; }
 function showHitMark() {
   const h=el('hm'); h.style.opacity='1';
   setTimeout(()=>h.style.opacity='0',95);
 }
 function addKF(type) {
-  const nms={zombie:'僵尸',runner:'奔跑者',soldier:'士兵',tank:'BOSS'};
+  const nms={zombie:'僵尸',runner:'奔跑者',soldier:'士兵',tank:'BOSS',flyer:'飞行怪',giant:'⚡巨人'};
   const f=el('kf'), e=document.createElement('div');
   e.className='ki'; e.textContent='✖ '+(nms[type]||type);
   f.appendChild(e); setTimeout(()=>e.remove(),3000);
@@ -1423,6 +1972,8 @@ function startGame() {
   PL.curW=0;
 
   gatlingSpinup=0;
+  singBullets=[];
+  const ws6=el('ws6'); if(ws6) ws6.style.display='none';
   // Init world
   buildMap(mapIdx);
   PL.pos.set(curMap.sp.x, C.PH, curMap.sp.z);
@@ -1479,16 +2030,21 @@ function goMenu() {
 function loop(ts) {
   requestAnimationFrame(loop);
   const dt=Math.min((ts-lastT)/1000, .055); lastT=ts;
-  if(GS==='playing') {
-    updPlayer(dt);
-    updEnemies(dt);
-    updBullets(dt);
-    updGrenades(dt);
-    updParts(dt);
-    updWpAnim(dt);
-    updWave(dt);
-  }
-  R3.render(S3, CAM);
+  try {
+    if(GS==='playing') {
+      updPlayer(dt);
+      updEnemies(dt);
+      updBullets(dt);
+      updGrenades(dt);
+      updParts(dt);
+      updWpAnim(dt);
+      updWave(dt);
+      updSingBullets(dt);
+      updLaser(dt);
+      updEnLabels();
+    }
+    R3.render(S3, CAM);
+  } catch(e) { console.error('[loop]', e); }
 }
 
 // ─────────────────────────────────────────────────────────────
