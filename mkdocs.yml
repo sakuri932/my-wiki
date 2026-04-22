@@ -103,6 +103,7 @@ nav:
         - Latent Diffusion Models: 经典论文/diffusion/Latent Diffusion Models.md
       - Transformer:
         - 经典论文/Transformer/index.md
+        - Attention Is All You Need: "经典论文/Transformer/Attention Is All You Need.md"
       - GAN:
         - 经典论文/GAN/index.md
       - VAE:
@@ -114,6 +115,7 @@ nav:
       - 26～27实习资讯: 资源归档/26～27实习资讯/26～27实习资讯整理.md
       - VibeVibe: 资源归档/VibeVibe.md
       - 积分求法大总结: 资源归档/积分求法大总结.md
+      - AI 生成 3D 游戏资产: 资源归档/AI生成3D资产.md
 
     - 🤔 不务正业:
       - 不务正业/index.md
