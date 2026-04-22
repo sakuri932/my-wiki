@@ -278,7 +278,7 @@ const WD = [
   {id:'pistol', nm:'PISTOL',  dmg:38,  fr:400,  rl:1200, mag:12, tot:84,  sp:0.015, auto:false, pel:1, rng:95,  mc:0x3a3a3a, bl:.30},
   {id:'ak47',   nm:'AK-47',   dmg:26,  fr:112,  rl:2000, mag:30, tot:210, sp:0.040, auto:true,  pel:1, rng:115, mc:0x3a2818, bl:.50},
   {id:'shotgun',nm:'SHOTGUN', dmg:30,  fr:950,  rl:2600, mag:8,  tot:48,  sp:0.14,  auto:false, pel:9, rng:28,  mc:0x5a3010, bl:.50},
-  {id:'sniper', nm:'SNIPER',  dmg:160, fr:1600, rl:2800, mag:5,  tot:30,  sp:0.002, auto:false, pel:1, rng:250, mc:0x2a4020, bl:.80},
+  {id:'sniper', nm:'SNIPER',  dmg:340, fr:1600, rl:2800, mag:5,  tot:30,  sp:0.002, auto:false, pel:1, rng:250, mc:0x2a4020, bl:.80},
   {id:'staff',  nm:'激光',    dmg:7,   fr:0,    rl:0,    mag:Infinity, tot:Infinity, sp:0,      auto:false, pel:1, rng:999, mc:0x6600aa, bl:.60, laser:true},
   {id:'gatling',nm:'GATLING', dmg:18,  fr:65,   rl:3500, mag:200, tot:600,      sp:0.055, auto:true,  pel:1, rng:95,  mc:0x4a4a4a, bl:.55, gatling:true},
 ];
@@ -381,6 +381,7 @@ const MAPS = [
     sun:{x:-15,y:50,z:8,c:0xFFDD88,i:1.1},
     // 螺旋坡道参数（由 buildRamp 生成）
     ramp:{innerR:25,width:3.2,height:8,stepsPerSide:8,color:0x6A5A48},
+    waveScale:5,
     W:[
       // ── 外围高墙（高14，封闭二楼空间；二楼在y=8，净空6m）──
       [0,7,-29,58,14,1,0x3A2A1A],[0,7,29,58,14,1,0x3A2A1A],
@@ -772,6 +773,47 @@ function buildRamp(r) {
     pm.position.set(cx,cy,cz); pm.receiveShadow=true; S3.add(pm);
     colBoxes.push({x1:cx-wx/2,x2:cx+wx/2,y1:platH-platTh,y2:platH,z1:cz-wz/2,z2:cz+wz/2,ramp:true});
   }
+
+  // ── 填实楼梯底部（分段渐高，只填到第一圈高度）──
+  // y2 = 各段起始高度：玩家在坡面上脚底 >= y2，resolvePlayer 不触发；
+  // wallAtGround 的纯XZ检测照样挡住敌人（标准 colBox，无特殊标志）
+  const ir=innerR, wr=width, H=height;
+  const fillMat2=new THREE.MeshLambertMaterial({color:0x3A2E22});
+  const SEGS=4;
+  // [固定轴, 固定轴中心, 移动轴, 起点, 终点, 高度起始, 高度终止]
+  const sideDescs=[
+    ['x',-(ir+wr/2),'z',+ir,-ir,     0,      H*0.25],
+    ['z',-(ir+wr/2),'x',-ir,+ir,  H*0.25,   H*0.5 ],
+    ['x',+(ir+wr/2),'z',-ir,+ir,  H*0.5,    H*0.75],
+    ['z',+(ir+wr/2),'x',+ir,-ir,  H*0.75,   H     ],
+  ];
+  for(const [fa,fc,ma,ms,me,hs,he] of sideDescs){
+    for(let j=0;j<SEGS;j++){
+      const t0=j/SEGS, t1=(j+1)/SEGS;
+      const mA=ms+t0*(me-ms), mB=ms+t1*(me-ms);
+      const segH=hs+t0*(he-hs); // 本段起始高度
+      if(segH<0.15) continue;   // 跳过入口段，留通道
+      let x1,x2,z1,z2;
+      if(fa==='x'){x1=fc-wr/2;x2=fc+wr/2;z1=Math.min(mA,mB);z2=Math.max(mA,mB);}
+      else        {z1=fc-wr/2;z2=fc+wr/2;x1=Math.min(mA,mB);x2=Math.max(mA,mB);}
+      const fm=new THREE.Mesh(new THREE.BoxGeometry(x2-x1,segH+0.1,z2-z1),fillMat2);
+      fm.position.set((x1+x2)/2,(segH-0.1)/2,(z1+z2)/2); S3.add(fm);
+      colBoxes.push({x1,x2,y1:-0.1,y2:segH,z1,z2});
+    }
+  }
+  // 四个转角，统一填到第一圈高度 H*0.25
+  const capH=H*0.25, cw=wr+0.1;
+  const cornerCenters=[
+    [-(ir+wr/2),-(ir+wr/2)],
+    [+(ir+wr/2),-(ir+wr/2)],
+    [+(ir+wr/2),+(ir+wr/2)],
+    [-(ir+wr/2),+(ir+wr/2)],
+  ];
+  for(const [cx,cz] of cornerCenters){
+    const fm=new THREE.Mesh(new THREE.BoxGeometry(cw,capH+0.1,cw),fillMat2);
+    fm.position.set(cx,(capH-0.1)/2,cz); S3.add(fm);
+    colBoxes.push({x1:cx-cw/2,x2:cx+cw/2,y1:-0.1,y2:capH,z1:cz-cw/2,z2:cz+cw/2});
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -780,7 +822,7 @@ function buildRamp(r) {
 function resolvePlayer() {
   const r=C.PR, p=PL.pos, STEP=0.65;
   for(const b of colBoxes){
-    if(b.ramp) continue; // 坡道高度由 rampFloorAt 处理，不参与横向推挤
+    if(b.ramp) continue; // 2F 平台等坡道盒子不做横向推挤
     const ex1=b.x1-r,ex2=b.x2+r,ez1=b.z1-r,ez2=b.z2+r;
     if(p.x>ex1&&p.x<ex2&&p.z>ez1&&p.z<ez2){
       if((p.y-C.PH)<b.y2&&(p.y+0.1)>b.y1){
@@ -1084,10 +1126,11 @@ function spawnEnemy(type, px, pz) {
 
 function spawnWave(n) {
   const ti = Math.min(n-1, WT.length-1);
-  const sc = n > WT.length ? 1+(n-WT.length)*.35 : 1;
+  const sc = n > WT.length ? Math.pow(1.22, n-WT.length) : 1; // 指数增长
+  const mapScale = curMap.waveScale || 1; // 地图专属倍率
   const ez = curMap.ez;
   Object.entries(WT[ti]).forEach(([type,cnt]) => {
-    const num = Math.floor(cnt*sc);
+    const num = Math.floor(cnt * sc * mapScale);
     for(let i=0;i<num;i++) {
       let px,pz,tries=0;
       do { px=ez.x1+Math.random()*(ez.x2-ez.x1); pz=ez.z1+Math.random()*(ez.z2-ez.z1); tries++; }
@@ -1629,21 +1672,24 @@ function updGrenades(dt) {
 // SUPPLY CRATE SYSTEM
 // ─────────────────────────────────────────────────────────────
 function grantSingularity() {
+  const tier=Math.floor(waveNum/3); // 第几次奖励（从1开始）
+  const bonus=Math.max(1, Math.floor(3*Math.pow(1.25, tier-1))); // 指数增长：3,3,4,5,6,8...
   const existing=PL.wpns[6];
   if(existing && existing.singularity) {
-    existing.ammo=Math.min(existing.ammo+3, existing.mag);
-    notify('⚡ 奇点炮补充 3 发！');
+    existing.ammo+=bonus;
+    existing.tot=existing.ammo;
+    notify(`⚡ 奇点炮 +${bonus} 发！（当前 ${existing.ammo} 发）`);
   } else {
     PL.wpns[6]={
       id:'singularity', nm:'奇点炮',
       dmg:300, fr:2200, rl:0,
-      mag:5, ammo:5, res:0, tot:5,
+      mag:999, ammo:bonus, res:0, tot:bonus,
       sp:0, auto:false, pel:1, rng:999,
       mc:0x220044, bl:.9,
       reloading:false, recoil:0, singularity:true,
     };
     const ws6=el('ws6'); if(ws6) ws6.style.display='flex';
-    notify('⚡ 获得奇点炮！[5发] 按 7 切换');
+    notify(`⚡ 获得奇点炮！[${bonus}发] 按 7 切换`);
     switchW(6);
   }
   snd('infect',.58); updAmmoUI();
