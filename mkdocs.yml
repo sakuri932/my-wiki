@@ -95,6 +95,7 @@ nav:
       - 实用工具/index.md
       - LaTeX公式图片生成器: 实用工具/latex2img/latex2img.md
       - 证件照处理工具: 实用工具/证件照处理工具/证件照处理工具.md
+      - Tiktokenizer: 实用工具/Tiktokenizer.md
 
     - 📜 经典论文选读:
       - 经典论文/index.md
@@ -116,6 +117,7 @@ nav:
       - VibeVibe: 资源归档/VibeVibe.md
       - 积分求法大总结: 资源归档/积分求法大总结.md
       - AI 生成 3D 游戏资产: 资源归档/AI生成3D资产.md
+      - OI-Wiki: 资源归档/OI-Wiki.md
 
     - 🤔 不务正业:
       - 不务正业/index.md
