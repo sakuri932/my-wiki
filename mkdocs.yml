@@ -1,9 +1,12 @@
 site_name: 老中传习录
 site_url: https://sakuri932.github.io/my-wiki/
+repo_url: https://github.com/sakuri932/my-wiki
+repo_name: sakuri932/my-wiki
 
 hooks:
   - hooks/pdf_list.py
   - hooks/recent_updates.py
+  - hooks/last_modified.py
 
 # 1. 主题与颜色、界面功能设置（必须与 nav、plugins 平级）
 theme:
@@ -43,10 +46,14 @@ theme:
 
 # 2. 插件设置
 plugins:
-  - search
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|(?!\b)(?=[A-Z][a-z])|(?<=[^\x00-\x7F])(?=[^\x00-\x7F])'
   - blog:
       archive: false
       categories: false
+  - glightbox:
+      skip_classes:
+        - no-lb
 
 # 3. Markdown 扩展语法设置（把所有扩展合并到了这里）
 markdown_extensions:
@@ -61,8 +68,12 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
 
+extra_css:
+  - stylesheets/extra.css
+
 extra_javascript:
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/extra.js
 
 # 4. 导航栏设置
 nav:
