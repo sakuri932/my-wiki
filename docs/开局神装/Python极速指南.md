@@ -1,6 +1,6 @@
 # Python 极速指南
 
-> 零散技能的集散地，按难度归档。每节一个主题，代码优先，少废话。
+> 这里收录了学习过程中积累的 Python 技能，按难度分层整理。每个主题尽量简明，以代码示例为主。
 
 ---
 
@@ -22,30 +22,6 @@ isinstance(x, int)  # True
 # 多重赋值
 a, b, c = 1, 2, 3
 a, b = b, a    # 交换，无需临时变量
-```
-
----
-
-### 字符串操作
-
-```python
-s = "Hello, World!"
-
-# 切片：[start:stop:step]
-s[0:5]      # 'Hello'
-s[-6:]      # 'orld!'
-s[::-1]     # 反转：'!dlroW ,olleH'
-
-# 常用方法
-s.lower()           # 'hello, world!'
-s.strip()           # 去两端空白
-s.split(", ")       # ['Hello', 'World!']
-", ".join(["a","b","c"])  # 'a, b, c'
-s.replace("World", "Python")
-
-# f-string（推荐格式化方式）
-name, score = "Alice", 98.5
-f"{name} 得了 {score:.1f} 分"  # 'Alice 得了 98.5 分'
 ```
 
 ---
@@ -78,8 +54,6 @@ evens   = [x for x in range(20) if x % 2 == 0]
 d = {"name": "Alice", "age": 25}
 d["city"] = "Beijing"   # 直接赋值添加/修改
 "name" in d             # 检查键是否存在 → True
-for k, v in d.items():  # 最常用的遍历方式
-    print(k, v)
 ```
 
 #### 1. 访问与遍历数据
@@ -92,6 +66,21 @@ for k, v in d.items():  # 最常用的遍历方式
     print(d.get('name'))           # 输出: Alice
     print(d.get('gender', '未知')) # 输出: 未知
     ```
+
+*   **`.items()` —— 同时遍历键和值**
+
+    调用 `.items()` 会返回一个视图对象，内容是所有键值对组成的元组：
+    ```python
+    raw_vocab = {'low': 5, 'lower': 2, 'newest': 6, 'widest': 3}
+    # raw_vocab.items() 大致等于：
+    # [('low', 5), ('lower', 2), ('newest', 6), ('widest', 3)]
+
+    for word, freq in raw_vocab.items():
+        print(word, freq)  # word='low', freq=5 ...
+    ```
+    `word, freq` 这种写法叫**解包（Unpacking）**：自动把元组的第一个元素赋给 `word`，第二个赋给 `freq`。
+
+    如果只写 `for item in raw_vocab:`，Python 默认只遍历**键**，要拿值还需额外写 `freq = raw_vocab[item]`，远不如 `.items()` 简洁。
 
 *   **`.keys()` —— 获取所有的键**
 
@@ -148,6 +137,100 @@ for k, v in d.items():  # 最常用的遍历方式
 *   **`.clear()` —— 清空字典**
 
     删除字典中所有元素，使其变为空字典 `{}`。
+
+---
+
+### 字符串操作
+
+> **字符串是不可变的（Immutable）**：所有方法都不修改原字符串，而是返回一个新字符串。
+
+**切片**（与列表通用的语法）：
+
+```python
+s = "Hello, World!"
+s[0:5]    # 'Hello'
+s[-6:]    # 'orld!'
+s[::-1]   # 反转 → '!dlroW ,olleH'
+```
+
+**f-string**（推荐的格式化方式）：
+
+```python
+name, score = "Alice", 98.5
+f"{name} 得了 {score:.1f} 分"  # 'Alice 得了 98.5 分'
+```
+
+字符串方法分为四类：
+
+#### 1. 拆分与拼接
+
+*   **`.split(sep)` —— 拆分成列表**
+
+    按分隔符切分为列表，不传参数则按空白字符切分。
+    ```python
+    "a,b,c".split(",")  # ['a', 'b', 'c']
+    ```
+
+*   **`.join(iterable)` —— 将列表拼成字符串**
+
+    `.split()` 的逆操作，用当前字符串作"胶水"拼合序列。
+    ```python
+    "-".join(['2024', '05', '01'])  # '2024-05-01'
+    ```
+
+#### 2. 清理与替换
+
+*   **`.strip(chars)` —— 去除首尾字符**
+
+    默认去除两端空白（空格、`\n`、`\t`）；可指定字符。`.lstrip()` / `.rstrip()` 只去一侧。
+    ```python
+    "  hello \n".strip()  # 'hello'
+    ```
+
+*   **`.replace(old, new, count)` —— 替换子串**
+
+    将 `old` 替换为 `new`，`count` 可限制替换次数。
+    ```python
+    "I like apple".replace("apple", "banana")  # 'I like banana'
+    ```
+
+#### 3. 大小写转换
+
+*   **`.lower()` / `.upper()` —— 全转小 / 大写**
+    ```python
+    "Hello".lower()  # 'hello'
+    "Hello".upper()  # 'HELLO'
+    ```
+
+*   **`.capitalize()` / `.title()` —— 首字母大写**
+
+    `.capitalize()` 只让整串第一个字母大写；`.title()` 每个单词首字母都大写。
+    ```python
+    "hello world".title()  # 'Hello World'
+    ```
+
+#### 4. 查找与判断
+
+*   **`.find(sub)` —— 查找子串位置**
+
+    返回子串起始索引（从 0 开始），找不到返回 `-1`。
+    ```python
+    "hello".find("e")  # 1
+    "hello".find("x")  # -1
+    ```
+
+*   **`.startswith(prefix)` / `.endswith(suffix)` —— 判断开头 / 结尾**
+    ```python
+    "pic.jpg".endswith(".jpg")  # True
+    ```
+
+*   **`.isdigit()` / `.isalpha()` / `.isalnum()` —— 内容成分判断**
+
+    依次判断字符串是否全由数字、全由字母、全由数字+字母组成。
+    ```python
+    "12345".isdigit()   # True
+    "123.45".isdigit()  # False（含小数点）
+    ```
 
 ---
 
