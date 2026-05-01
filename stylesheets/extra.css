@@ -10,7 +10,55 @@
   pointer-events: none;
 }
 
-/* ── 2. 字数 & 阅读时长 ── */
+/* ── 2. 长代码块折叠 ── */
+.code-wrap { position: relative; }
+
+.code-wrap.code-collapsed .highlight {
+  max-height: 480px;
+  overflow: hidden;
+}
+
+/* 渐隐遮罩 */
+.code-wrap.code-collapsed::before {
+  content: '';
+  position: absolute;
+  bottom: 32px;
+  left: 0; right: 0;
+  height: 80px;
+  pointer-events: none;
+  z-index: 1;
+}
+[data-md-color-scheme="slate"] .code-wrap.code-collapsed::before {
+  background: linear-gradient(transparent, #1e2127);
+}
+[data-md-color-scheme="default"] .code-wrap.code-collapsed::before {
+  background: linear-gradient(transparent, #fafafa);
+}
+
+/* 展开按钮 */
+.code-expand-btn {
+  display: block;
+  width: 100%;
+  padding: 5px 0;
+  text-align: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  border: none;
+  border-radius: 0 0 6px 6px;
+  transition: opacity 0.15s;
+}
+[data-md-color-scheme="slate"] .code-expand-btn {
+  background: #272b33;
+  color: #7a8394;
+}
+[data-md-color-scheme="default"] .code-expand-btn {
+  background: #e8e8e8;
+  color: #696c77;
+}
+.code-expand-btn:hover { opacity: 0.7; }
+
+/* ── 3. 字数 & 阅读时长 ── */
 .article-meta {
   color: var(--md-default-fg-color--light);
   font-size: .75rem;

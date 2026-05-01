@@ -11,6 +11,33 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', updateBar, { passive: true });
   updateBar();
 
+  /* ── 2. 长代码块折叠 ── */
+  const COLLAPSE_LINES = 25;
+  document.querySelectorAll('.highlight').forEach(block => {
+    const code = block.querySelector('code');
+    if (!code) return;
+    const lines = code.textContent.trimEnd().split('\n').length;
+    if (lines <= COLLAPSE_LINES) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'code-wrap code-collapsed';
+    block.parentNode.insertBefore(wrap, block);
+    wrap.appendChild(block);
+
+    const btn = document.createElement('button');
+    btn.className = 'code-expand-btn';
+    btn.textContent = `展开完整代码（共 ${lines} 行）▾`;
+    wrap.appendChild(btn);
+
+    btn.addEventListener('click', () => {
+      const collapsed = wrap.classList.toggle('code-collapsed');
+      btn.textContent = collapsed
+        ? `展开完整代码（共 ${lines} 行）▾`
+        : '收起 ▴';
+      if (collapsed) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
+
   /* ── 3. 字数 & 阅读时长 ── */
   const article = document.querySelector('.md-content__inner');
   if (article) {
