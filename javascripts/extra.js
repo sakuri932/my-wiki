@@ -1,0 +1,31 @@
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ── 1. 阅读进度条 ── */
+  const bar = document.createElement('div');
+  bar.className = 'reading-progress';
+  document.body.appendChild(bar);
+  const updateBar = () => {
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = total > 0 ? (window.scrollY / total * 100) + '%' : '0%';
+  };
+  window.addEventListener('scroll', updateBar, { passive: true });
+  updateBar();
+
+  /* ── 3. 字数 & 阅读时长 ── */
+  const article = document.querySelector('.md-content__inner');
+  if (article) {
+    const text = article.innerText || '';
+    const chars = text.replace(/\s/g, '').length;
+    if (chars > 150) {
+      const mins = Math.ceil(chars / 400); // 中文技术文约 400 字/分钟
+      const meta = document.createElement('div');
+      meta.className = 'article-meta';
+      meta.innerHTML =
+        `<span>📖 约 ${chars.toLocaleString()} 字</span>` +
+        `<span>⏱ 预计阅读 ${mins} 分钟</span>`;
+      const h1 = article.querySelector('h1');
+      if (h1) h1.insertAdjacentElement('afterend', meta);
+    }
+  }
+
+});

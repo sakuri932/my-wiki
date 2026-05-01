@@ -1,0 +1,334 @@
+/* ── 1. 阅读进度条 ── */
+.reading-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--md-primary-fg-color);
+  z-index: 10000;
+  transition: width 0.08s linear;
+  pointer-events: none;
+}
+
+/* ── 2. 字数 & 阅读时长 ── */
+.article-meta {
+  color: var(--md-default-fg-color--light);
+  font-size: .75rem;
+  margin: -.4rem 0 1.2rem;
+  display: flex;
+  gap: 1rem;
+}
+.article-meta span::before { margin-right: .3em; }
+
+/* ── 3. 通用卡片网格（视频区 / 游戏区共用） ── */
+.card-page-wrap { margin-top: 1.5em; }
+
+.card-section { margin-bottom: 3em; }
+.card-section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1em;
+  padding-bottom: 0.4em;
+  border-bottom: 2px solid var(--md-primary-fg-color);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+/* 基础卡片 */
+.card-item {
+  border-radius: 10px;
+  overflow: visible;
+  text-decoration: none !important;
+  color: inherit !important;
+  background: var(--md-default-bg-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: block;
+  cursor: pointer;
+  position: relative;
+}
+.card-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+}
+
+/* 缩略图区域 */
+.card-thumb {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  overflow: hidden;
+  background: #1a1a2e;
+  border-radius: 10px 10px 0 0;
+}
+.card-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 纯色封面（游戏卡片用） */
+.card-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  user-select: none;
+}
+.cover-icon { font-size: 3rem; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+.cover-label {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* 悬停播放遮罩（CSS 三角形，不需要内联 SVG） */
+.card-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='rgba(0,0,0,0.5)'/%3E%3Cpolygon points='32,24 60,40 32,56' fill='white'/%3E%3C/svg%3E") center/48px no-repeat;
+  opacity: 0;
+  transition: opacity 0.18s;
+  border-radius: 10px 10px 0 0;
+}
+.card-item:hover .card-thumb::after { opacity: 1; }
+
+/* 来源徽标 */
+.source-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  z-index: 1;
+}
+.badge-youtube  { background: #ff0000; color: #fff; }
+.badge-bilibili { background: #00a1d6; color: #fff; }
+.badge-local    { background: #555;    color: #fff; }
+
+/* 卡片信息区 */
+.card-info {
+  padding: 10px 12px 12px;
+  border-radius: 0 0 10px 10px;
+  background: var(--md-default-bg-color);
+}
+.card-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--md-default-fg-color);
+}
+.card-desc {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin-top: 4px;
+  color: var(--md-default-fg-color--light);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 悬停时展开标题 / 描述 */
+.card-item:hover .card-title,
+.card-item:hover .card-desc {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  position: absolute;
+  left: 0; right: 0;
+  background: var(--md-default-bg-color);
+  padding: 10px 12px 12px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+/* ── 4. 代码高亮：深色模式 One Dark Pro ── */
+/* 背景 #1e2127 · 文字 #abb2bf · 注释 #5c6370(斜体)
+   关键字 #c678dd(紫) · 字符串 #98c379(绿) · 数字 #d19a66(橙)
+   函数名 #61afef(蓝) · 类/内建 #e5c07b(黄) · 操作符 #56b6c2(青)
+   self/属性 #e06c75(红)                                          */
+
+[data-md-color-scheme="slate"] .highlight,
+[data-md-color-scheme="slate"] .highlight pre,
+[data-md-color-scheme="slate"] .highlight pre code {
+  background: #1e2127 !important;
+  border-radius: 6px;
+}
+[data-md-color-scheme="slate"] .highlight code,
+[data-md-color-scheme="slate"] .highlight pre code,
+[data-md-color-scheme="slate"] .highlight span {
+  color: #abb2bf !important;
+  background: transparent !important;
+}
+[data-md-color-scheme="slate"] :not(pre) > code {
+  background: #1e2127 !important;
+  color: #abb2bf !important;
+  padding: .15em .4em;
+  border-radius: 4px;
+  font-size: .85em;
+}
+[data-md-color-scheme="slate"] .highlight .c,
+[data-md-color-scheme="slate"] .highlight .c1,
+[data-md-color-scheme="slate"] .highlight .cm,
+[data-md-color-scheme="slate"] .highlight .cs,
+[data-md-color-scheme="slate"] .highlight .cp  { color: #5c6370 !important; font-style: italic; }
+[data-md-color-scheme="slate"] .highlight .k,
+[data-md-color-scheme="slate"] .highlight .kd,
+[data-md-color-scheme="slate"] .highlight .kr,
+[data-md-color-scheme="slate"] .highlight .kt,
+[data-md-color-scheme="slate"] .highlight .kn  { color: #c678dd !important; }
+[data-md-color-scheme="slate"] .highlight .kc  { color: #d19a66 !important; }
+[data-md-color-scheme="slate"] .highlight .s,
+[data-md-color-scheme="slate"] .highlight .s1,
+[data-md-color-scheme="slate"] .highlight .s2,
+[data-md-color-scheme="slate"] .highlight .sa,
+[data-md-color-scheme="slate"] .highlight .sb,
+[data-md-color-scheme="slate"] .highlight .sc,
+[data-md-color-scheme="slate"] .highlight .sd,
+[data-md-color-scheme="slate"] .highlight .se,
+[data-md-color-scheme="slate"] .highlight .sh,
+[data-md-color-scheme="slate"] .highlight .si,
+[data-md-color-scheme="slate"] .highlight .sr,
+[data-md-color-scheme="slate"] .highlight .ss  { color: #98c379 !important; }
+[data-md-color-scheme="slate"] .highlight .mi,
+[data-md-color-scheme="slate"] .highlight .mf,
+[data-md-color-scheme="slate"] .highlight .mh,
+[data-md-color-scheme="slate"] .highlight .mo,
+[data-md-color-scheme="slate"] .highlight .mb,
+[data-md-color-scheme="slate"] .highlight .il  { color: #d19a66 !important; }
+[data-md-color-scheme="slate"] .highlight .nf,
+[data-md-color-scheme="slate"] .highlight .fm,
+[data-md-color-scheme="slate"] .highlight .nd  { color: #61afef !important; }
+[data-md-color-scheme="slate"] .highlight .nc,
+[data-md-color-scheme="slate"] .highlight .nb,
+[data-md-color-scheme="slate"] .highlight .nn  { color: #e5c07b !important; }
+[data-md-color-scheme="slate"] .highlight .o   { color: #56b6c2 !important; }
+[data-md-color-scheme="slate"] .highlight .ow  { color: #c678dd !important; }
+[data-md-color-scheme="slate"] .highlight .bp,
+[data-md-color-scheme="slate"] .highlight .na  { color: #e06c75 !important; }
+[data-md-color-scheme="slate"] .highlight .err { color: #f44747 !important; background: transparent !important; }
+[data-md-color-scheme="slate"] .highlight .ln,
+[data-md-color-scheme="slate"] .highlight .lnt { color: #4b5263 !important; }
+[data-md-color-scheme="slate"] .highlight:hover .md-clipboard { color: #abb2bf !important; }
+
+/* ── 5. 代码高亮：浅色模式 One Light ── */
+/* 背景 #fafafa · 文字 #383a42 · 注释 #a0a1a7(斜体)
+   关键字 #a626a4(紫) · 字符串 #50a14f(绿) · 数字 #986801(棕橙)
+   函数名 #4078f2(蓝) · 类/内建 #c18401(金黄) · 操作符 #0184bc(青)
+   self/属性 #e45649(红)                                           */
+
+[data-md-color-scheme="default"] .highlight,
+[data-md-color-scheme="default"] .highlight pre,
+[data-md-color-scheme="default"] .highlight pre code {
+  background: #fafafa !important;
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+}
+[data-md-color-scheme="default"] .highlight code,
+[data-md-color-scheme="default"] .highlight pre code,
+[data-md-color-scheme="default"] .highlight span {
+  color: #383a42 !important;
+  background: transparent !important;
+}
+[data-md-color-scheme="default"] :not(pre) > code {
+  background: #f0f0f0 !important;
+  color: #383a42 !important;
+  padding: .15em .4em;
+  border-radius: 4px;
+  font-size: .85em;
+}
+[data-md-color-scheme="default"] .highlight .c,
+[data-md-color-scheme="default"] .highlight .c1,
+[data-md-color-scheme="default"] .highlight .cm,
+[data-md-color-scheme="default"] .highlight .cs,
+[data-md-color-scheme="default"] .highlight .cp  { color: #a0a1a7 !important; font-style: italic; }
+[data-md-color-scheme="default"] .highlight .k,
+[data-md-color-scheme="default"] .highlight .kd,
+[data-md-color-scheme="default"] .highlight .kr,
+[data-md-color-scheme="default"] .highlight .kt,
+[data-md-color-scheme="default"] .highlight .kn  { color: #a626a4 !important; }
+[data-md-color-scheme="default"] .highlight .kc  { color: #986801 !important; }
+[data-md-color-scheme="default"] .highlight .s,
+[data-md-color-scheme="default"] .highlight .s1,
+[data-md-color-scheme="default"] .highlight .s2,
+[data-md-color-scheme="default"] .highlight .sa,
+[data-md-color-scheme="default"] .highlight .sb,
+[data-md-color-scheme="default"] .highlight .sc,
+[data-md-color-scheme="default"] .highlight .sd,
+[data-md-color-scheme="default"] .highlight .se,
+[data-md-color-scheme="default"] .highlight .sh,
+[data-md-color-scheme="default"] .highlight .si,
+[data-md-color-scheme="default"] .highlight .sr,
+[data-md-color-scheme="default"] .highlight .ss  { color: #50a14f !important; }
+[data-md-color-scheme="default"] .highlight .mi,
+[data-md-color-scheme="default"] .highlight .mf,
+[data-md-color-scheme="default"] .highlight .mh,
+[data-md-color-scheme="default"] .highlight .mo,
+[data-md-color-scheme="default"] .highlight .mb,
+[data-md-color-scheme="default"] .highlight .il  { color: #986801 !important; }
+[data-md-color-scheme="default"] .highlight .nf,
+[data-md-color-scheme="default"] .highlight .fm,
+[data-md-color-scheme="default"] .highlight .nd  { color: #4078f2 !important; }
+[data-md-color-scheme="default"] .highlight .nc,
+[data-md-color-scheme="default"] .highlight .nb,
+[data-md-color-scheme="default"] .highlight .nn  { color: #c18401 !important; }
+[data-md-color-scheme="default"] .highlight .o   { color: #0184bc !important; }
+[data-md-color-scheme="default"] .highlight .ow  { color: #a626a4 !important; }
+[data-md-color-scheme="default"] .highlight .bp,
+[data-md-color-scheme="default"] .highlight .na  { color: #e45649 !important; }
+[data-md-color-scheme="default"] .highlight .err { color: #e45649 !important; background: transparent !important; }
+[data-md-color-scheme="default"] .highlight .ln,
+[data-md-color-scheme="default"] .highlight .lnt { color: #9d9d9f !important; }
+[data-md-color-scheme="default"] .highlight:hover .md-clipboard { color: #383a42 !important; }
+
+/* ── 5. 游戏封面主题色 ── */
+.cover-doudizhu {
+  background: radial-gradient(ellipse 120% 100% at 50% 80%, #1d6020, #0a2010);
+}
+.cover-doudizhu .cover-label { color: #ffd700; }
+.cover-doudizhu .suit-row {
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.7);
+}
+
+.cover-zombie {
+  background: radial-gradient(ellipse 120% 100% at 50% 30%, #1a0a0a, #0d0d0d);
+}
+.cover-zombie .cover-label { color: #ff3333; text-shadow: 0 0 12px rgba(255,50,50,0.7); }
+.cover-zombie .cover-sub {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: rgba(255,100,100,0.6);
+  text-transform: uppercase;
+}
