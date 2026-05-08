@@ -1,4 +1,4 @@
-# 欢迎来到老中传习录！
+# 欢迎来到 AI master wiki！
 
 <img src="./index.assets/47B71478-0BF9-491E-8EBB-643801A5B128_1_102_o.jpeg" alt="47B71478-0BF9-491E-8EBB-643801A5B128_1_102_o" style="zoom:50%;" />
 
