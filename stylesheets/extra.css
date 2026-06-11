@@ -10,7 +10,17 @@
   pointer-events: none;
 }
 
-/* ── 2. 长代码块折叠 ── */
+/* ── 2. 站点访问统计（页脚） ── */
+.site-counter {
+  width: 100%;
+  text-align: center;
+  padding: 6px 0 2px;
+  font-size: 0.72rem;
+  opacity: 0.6;
+  color: var(--md-footer-fg-color);
+}
+
+/* ── 3. 长代码块折叠 ── */
 .code-wrap { position: relative; }
 
 .code-wrap.code-collapsed .highlight {
