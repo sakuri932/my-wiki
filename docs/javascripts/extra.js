@@ -38,7 +38,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ── 3. 字数 & 阅读时长 ── */
+  /* ── 3. 不蒜子站点访问统计 ── */
+  const bsScript = document.createElement('script');
+  bsScript.async = true;
+  bsScript.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+  document.head.appendChild(bsScript);
+
+  const footerMeta = document.querySelector('.md-footer-meta__inner');
+  if (footerMeta) {
+    const counter = document.createElement('div');
+    counter.className = 'site-counter';
+    counter.innerHTML =
+      `总访问量 <span id="busuanzi_value_site_pv">-</span> 次` +
+      `&ensp;|&ensp;` +
+      `访客人数 <span id="busuanzi_value_site_uv">-</span> 人`;
+    footerMeta.appendChild(counter);
+  }
+
+  /* ── 4. 字数 & 阅读时长 ── */
   const article = document.querySelector('.md-content__inner');
   if (article) {
     const text = article.innerText || '';
