@@ -1711,6 +1711,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Understanding R1-Zero-Like Training
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1727,6 +1745,47 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        论文简介
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        读后感
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -2416,6 +2475,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        论文简介
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        读后感
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2435,8 +2524,14 @@
 
 
 <h1 id="understanding-r1-zero-like-training-a-critical-perspective">Understanding R1-Zero-Like Training: A Critical Perspective</h1>
+<h2 id="_1">论文简介</h2>
+<p>这篇论文主要讲了后训练中使用GRPO可能会遇到的问题以及解决方法。GRPO在DeepSeek R1以及之后的带思维链模型中取得巨大成功，证明了纯RL在解决复杂任务，尤其是如数学类等推理任务上的极高上限，其中DeepSeek创新性地用到了它他们提出的GRPO。</p>
+<p>这篇文章探讨了原版GRPO的优点与缺点，并提出改进方式Dr.GRPO。原版GRPO的归一化操作容易导致模型倾向输出简短而正确、错误且冗长的答案，本论文提到的新方法能够在保持答案正确率差不多的情况下，大幅减少答案错误时引发的超长思维链情况，从而降低吐（token）消耗，优化用户体验和训练效果与稳定性。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../Understanding%20R1-Zero-Like%20Training.assets/image-20260618171527772.png" data-desc-position="bottom"><img alt="image-20260618171527772" src="../Understanding%20R1-Zero-Like%20Training.assets/image-20260618171527772.png"></a></p>
+<h2 id="_2">读后感</h2>
+<p>不错的文章，有工程上的实操意义。</p>
 <hr>
-<p><small>📝 最后更新：2026 年 06 月 11 日</small></p>
+<p><small>📝 最后更新：2026 年 06 月 18 日</small></p>
 
 
 
